@@ -10,6 +10,10 @@
 * Set M1 personal due date to January 26th (Monday)
 * When adding to the SRS, add to the RTM as well
 * Assigned tasks to members
+* Example of adding GitHub issue:
+      [Feat1] .....
+          [Feat1-FR1] ....
+          [Feat1-US1] ....
 
 **Action Items:**
 * Complete documentation for all features, including user stories
