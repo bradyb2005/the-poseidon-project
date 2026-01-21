@@ -23,3 +23,4 @@
 * Brady: Feat 1,3,10
 * Fabiha: Feat 4-6
 * Grayson: Feat 2,7, Write Project Description and Goal
+* **Complete all of this by Jan 26th**
