@@ -4,7 +4,7 @@ A brief summary of what changes were made to this code is required. If you are i
 **Example - New test file** 
 tests/delivery/unit/testDeliveryUpdate
 *Screenshot*
-This test tests the deliveyUpdate file which updates all users on where the item is in the delivery process.
+This test tests the deliveryUpdate file which updates all users on where the item is in the delivery process.
 
 **Example - Editing pre-existing test file**
 tests/delivery/unit/testDeliveryUpdate
