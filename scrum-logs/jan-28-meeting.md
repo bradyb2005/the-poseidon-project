@@ -24,3 +24,4 @@ Key Lessons:
 **Action Items:**
 * Anjana/Fabiha want to pick up action items that pop up next time
 * For next time, complete milestone in "checkpoints", rather than all in one time
+* Read M2 Description and think about what you would want to do (for delegating tasks next meeting)
