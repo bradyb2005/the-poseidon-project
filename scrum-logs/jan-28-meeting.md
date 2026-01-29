@@ -15,7 +15,6 @@ Effective Teamwork Examples:
 Ineffective Teamwork Examples:
 * Grayson does not prefer calendar invites (didn't really impact milestone though)
 * Delegate tasks as much as we can at the very start - otherwise people will do more than needed
-* Project was done all in the back half (mostly)
 
 Key Lessons:
 * Clear and consistent communicating makes everything simple
