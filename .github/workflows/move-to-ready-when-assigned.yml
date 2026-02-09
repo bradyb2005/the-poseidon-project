@@ -22,13 +22,14 @@ jobs:
       - name: Move Issue to Project Column
         run: |
           # 1. Get the Project ID
-          # We list all projects and filter for the one matching PROJECT_NUMBER using jq
-          project_id=$(gh project list --owner "$USER_OR_ORG" --format json | jq -r --argjson num "$PROJECT_NUMBER" '.projects[] | select(.number == $num) | .id')
+          # We list YOUR projects and filter for Project #1
+          project_id=$(gh project list --format json | jq -r --argjson num "$PROJECT_NUMBER" '.projects[] | select(.number == $num) | .id')
           
           echo "Found Project ID: $project_id"
 
           # 2. Get the Item ID for the current Issue
-          item_id=$(gh project item-list "$PROJECT_NUMBER" --owner "$USER_OR_ORG" --format json --limit 1000 | jq -r --arg issue_url "${{ github.event.issue.html_url }}" '.items[] | select(.content.url == $issue_url) | .id')
+          # We search the project for the specific issue URL
+          item_id=$(gh project item-list "$PROJECT_NUMBER" --format json --limit 1000 | jq -r --arg issue_url "${{ github.event.issue.html_url }}" '.items[] | select(.content.url == $issue_url) | .id')
 
           if [ -z "$item_id" ]; then
             echo "Issue is not on the project board. Skipping."
@@ -36,7 +37,7 @@ jobs:
           fi
 
           # 3. Get Field ID for "Status" and Option ID for "Ready"
-          field_data=$(gh project field-list "$PROJECT_NUMBER" --owner "$USER_OR_ORG" --format json)
+          field_data=$(gh project field-list "$PROJECT_NUMBER" --format json)
           field_id=$(echo "$field_data" | jq -r --arg name "$STATUS_FIELD" '.fields[] | select(.name == $name) | .id')
           option_id=$(echo "$field_data" | jq -r --arg name "$STATUS_FIELD" --arg value "$TARGET_STATUS" '.fields[] | select(.name == $name) | .options[] | select(.name == $value) | .id')
 
