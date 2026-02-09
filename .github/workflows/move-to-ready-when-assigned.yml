@@ -1,0 +1,44 @@
+name: Move Assigned Issue to Ready
+
+on:
+  issues:
+    types: [assigned]
+
+jobs:
+  move_to_ready:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      repository-projects: write
+    env:
+      GH_TOKEN: ${{ secrets.PROJECT_PAT }} # See Step 2 below
+      PROJECT_NUMBER: 1                    # Replace with your Project Number
+      USER_OR_ORG: "bradyb2005"         # Replace with your User or Org name
+      STATUS_FIELD: "Status"               # Name of your status column field
+      TARGET_STATUS: "Ready"               # Exact name of the column to move to
+
+    steps:
+      - name: Move Issue to Project Column
+        run: |
+          # 1. Get the Project ID
+          project_id=$(gh project list --owner "$USER_OR_ORG" --format json --search "$PROJECT_NUMBER" | jq -r '.[0].id')
+          
+          # 2. Get the Item ID for the current Issue
+          # We search the project for the specific issue node ID to find its project-item ID
+          item_id=$(gh project item-list "$PROJECT_NUMBER" --owner "$USER_OR_ORG" --format json --limit 1000 | jq -r --arg issue_url "${{ github.event.issue.html_url }}" '.items[] | select(.content.url == $issue_url) | .id')
+
+          if [ -z "$item_id" ]; then
+            echo "Issue is not on the project board. Skipping."
+            exit 0
+          fi
+
+          # 3. Get Field ID for "Status" and Option ID for "Ready"
+          # We fetch the project fields to find the ID for "Status" and the ID for the "Ready" option
+          field_data=$(gh project field-list "$PROJECT_NUMBER" --owner "$USER_OR_ORG" --format json)
+          field_id=$(echo "$field_data" | jq -r --arg name "$STATUS_FIELD" '.fields[] | select(.name == $name) | .id')
+          option_id=$(echo "$field_data" | jq -r --arg name "$STATUS_FIELD" --arg value "$TARGET_STATUS" '.fields[] | select(.name == $name) | .options[] | select(.name == $value) | .id')
+
+          # 4. Move the item
+          gh project item-edit --id "$item_id" --project-id "$project_id" --field-id "$field_id" --single-select-option-id "$option_id"
+          
+          echo "Moved item $item_id to $TARGET_STATUS"
