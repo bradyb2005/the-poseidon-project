@@ -1,6 +1,7 @@
 name: Move Assigned Issue to Ready
 
 on:
+  workflow_dispatch:      # <--- ADD THIS LINE (indent same as "issues")
   issues:
     types: [assigned]
 
