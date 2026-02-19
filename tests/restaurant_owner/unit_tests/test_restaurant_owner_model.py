@@ -1,4 +1,4 @@
-# backend/tests/restaurant_owner/unit_tests/test_restaurant_owner_model.py
+# tests/restaurant_owner/unit_tests/test_restaurant_owner_model.py
 import pytest
 from unittest.mock import MagicMock
 from backend.models import RestaurantOwner
