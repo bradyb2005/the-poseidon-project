@@ -4,10 +4,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import hashlib
 from typing import Dict
-
-from backend.models.user.roles import ALL_ROLES, CUSTOMER
+import bcrypt
 
 
 @dataclass
@@ -30,7 +28,6 @@ class User:
     id: int
     username: str
     password_hash: str
-    role: str = CUSTOMER  # default role is customer
 
     def __post_init__(self) -> None:
         """
@@ -46,40 +43,37 @@ class User:
         if not isinstance(self.password_hash, str) or not self.password_hash.strip():
             raise ValueError("password_hash must be a non-empty string")
 
-        if self.role not in ALL_ROLES:
-            raise ValueError(f"role must be one of {ALL_ROLES}")
 
     
     # -----------------------------------------------------------------------------
     # Password helpers
     # -----------------------------------------------------------------------------
+
     @staticmethod
     def hash_password(raw_password: str) -> str:
         """
-        Convert a raw password into a hash string.
-        (We use SHA-256 because it's simple for a course project.)
-        SHA-256 is one wya function, meaning you cna convert raw password to hash, 
-        but you cannot convert hash back to raw password.
+        Convert a raw password into a bcrypt hash string, bcrpyt is a hashing algorithm 
+        and it is slow and salted, which is more secure against brute-force attacks than SHA256.
         """
-        if not isinstance(raw_password, str) or not raw_password:
-            raise ValueError("password must be a non-empty string") 
-        """this means that password must be a non-empty string, and if not we will raise an error."""
-        return hashlib.sha256(raw_password.encode("utf-8")).hexdigest() 
+        if not isinstance(raw_password, str) or not raw_password.strip():
+            raise ValueError("password must be a non-empty string")
+
+        hashed_bytes = bcrypt.hashpw(raw_password.encode("utf-8"), bcrypt.gensalt())
+        return hashed_bytes.decode("utf-8")  # store as string in JSON
 
     def check_password(self, raw_password: str) -> bool:
-        """Return True if the raw password matches our stored password_hash.""" 
-        return self.password_hash == User.hash_password(raw_password)
+        """Return True if the raw password matches our stored password_hash."""
+        if not isinstance(raw_password, str):
+            return False
+        return bcrypt.checkpw(
+            raw_password.encode("utf-8"),
+            self.password_hash.encode("utf-8")
+        )
 
-    # -----------------------------------------------------------------------------
-    # UML method: login() : bool
-    # -----------------------------------------------------------------------------
-    def login(self, raw_password: str) -> bool:
-        """
-        UML says: login() -> bool
-        in backend terms this means to verify the password and return True/False.
+    def update_password(self, new_password: str) -> None:
+        """Update user's password_hash using bcrypt."""
+        self.password_hash = User.hash_password(new_password)
         
-        """
-        return self.check_password(raw_password)
 
     # -----------------------------------------------------------------------------
     # Repo helpers (saving/loading)
@@ -87,19 +81,34 @@ class User:
     def to_dict(self) -> Dict:
         """Convert User into a dictionary (easy to save to JSON later)."""
         return {
-            "id": self.id,
-            "username": self.username,
-            "password_hash": self.password_hash,
-            "role": self.role,
-        }
+        "id": self.id,
+        "username": self.username,
+        "password_hash": self.password_hash,
+        "user_type": self.__class__.__name__,
+    }
 
     @staticmethod
+    
     def from_dict(data: Dict) -> "User":
-        """Create a User object from a dictionary (loaded from JSON)."""
-        return User(
+        user_type = data.get("user_type", "User")
+
+        from backend.models.user.customer import Customer
+        from backend.models.user.restaurant_owner import RestaurantOwner
+        from backend.models.user.admin import Admin
+
+        cls_map = {
+            "User": User,
+            "Customer": Customer,
+            "RestaurantOwner": RestaurantOwner,
+            "Admin": Admin,
+        }
+
+        cls = cls_map.get(user_type, User)
+
+        return cls(
             id=int(data["id"]),
             username=str(data["username"]),
             password_hash=str(data["password_hash"]),
-            role=str(data.get("role", CUSTOMER)),
         )
+
 
