@@ -1,5 +1,9 @@
 # Restaurant owner model class
 
+from backend.models.user.user_model import User
+from backend.models.restaurant.restaurant_model import Restaurant
+from backend.models.menu_item.menu_item_model import MenuItem
+
 class RestaurantOwner (User):
     #Inherit info from user
 
@@ -7,7 +11,7 @@ class RestaurantOwner (User):
     def create_restaurant(self, name: str) -> "Restaurant":
         return Restaurant(id=0, name=name, owner=self)
 
-    def update_restaurant_info(
+    def update_info(
             self,
             restaurant: "Restaurant",
             address: str = None,
