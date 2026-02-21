@@ -6,7 +6,7 @@ class User:
         self.username = username
         self.password_hash = password_hash
 
-   @staticmethod
+    @staticmethod
     def hash_password(password: str) -> str:
         # Mock password hashing function
         return f"hashed_{password}"
