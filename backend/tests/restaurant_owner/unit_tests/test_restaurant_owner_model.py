@@ -11,7 +11,7 @@ def owner():
     return RestaurantOwner(
         id=1,
         username="John_Doe",
-        password_hash=RestaurantOwner.hash_password("SecurePass123"), 
+        password_hash=RestaurantOwner.hash_password("SecurePass123"),
     )
 
 
@@ -29,6 +29,7 @@ def menu_item():
     item.availability = True
     return item
 
+
 '''Create restaurant'''
 
 
@@ -39,10 +40,12 @@ def test_create_restaurant(owner):
     assert restaurant.name == "John's Diner"
 
 
-# Negative Validation Test: Create restaurant with empty name should raise ValueError
+# Negative Validation Test: Create restaurant with empty name 
+# should raise ValueError
 def test_create_restaurant_empty_name(owner):
     with pytest.raises(ValueError, match="Restaurant name cannot be empty"):
-        owner.create_restaurant("") # Try to create a restaurant with an empty name
+        owner.create_restaurant("") 
+
 
 '''Update restaurant info'''
 
@@ -59,6 +62,7 @@ def test_update_restaurant_multiple_fields(owner, restaurant):
     assert restaurant.address == "123 Main St"
     assert restaurant.phone == "555-1234"
 
+
 '''Adding/removing menu items'''
 
 
@@ -73,6 +77,7 @@ def test_remove_menu_item(owner, restaurant, menu_item):
     owner.add_menu_item(restaurant, menu_item)
     owner.remove_menu_item(restaurant, menu_item)
     assert menu_item not in restaurant.menu # Check if item was removed
+
 
 '''Updating menu items'''
 
@@ -95,6 +100,7 @@ def test_update_menu_item_zero_price(owner, menu_item):
     owner.update_menu_item(menu_item, price=0.00) # Set price to zero
     assert menu_item.price == 0.00 # Check if price was updated to zero
 
+
 '''Set item availability'''
 
 
@@ -104,6 +110,7 @@ def test_set_item_availability(owner, menu_item):
     assert menu_item.availability == True # Check if item is available
     owner.set_item_availability(menu_item, False) # Set item to unavailable
     assert menu_item.availability == False # Check if item is unavailable
+
 
 '''Set restaurant open/closed'''
 
@@ -120,6 +127,7 @@ def test_set_open_closed(owner, restaurant):
 def test_set_open_closed_invalid_status(owner, restaurant):
     with pytest.raises(ValueError, match="Status must be a boolean"):
         owner.set_open_closed(restaurant, "open") # Try to set an invalid status
+
 
 '''Test restaurant operating hours'''
 
