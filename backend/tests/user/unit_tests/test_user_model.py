@@ -2,6 +2,8 @@
 
 import pytest
 
+# Import requirements.txt before testing
+# pip install -r requirements.txt
 from backend.models.user.user_model import User
 from backend.models.user.customer import Customer
 from backend.models.user.admin import Admin
