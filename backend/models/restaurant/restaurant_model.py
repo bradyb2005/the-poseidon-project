@@ -1,7 +1,12 @@
 # backend/models/restaurant/restaurant_model.py
 
-from backend.models.user.restaurant_owner_model import RestaurantOwner
+# Typing used for type hints to avoid circular imports
+from typing import TYPE_CHECKING, List
 
+# Read by VSCode for type checking but python ignores
+if TYPE_CHECKING:
+    from backend.models.user.restaurant_owner_model import RestaurantOwner
+    from backend.models.restaurant.menu_item_model import MenuItem
 
 class Restaurant:
     def __init__(self, id: int, name: str, owner: "RestaurantOwner"):
