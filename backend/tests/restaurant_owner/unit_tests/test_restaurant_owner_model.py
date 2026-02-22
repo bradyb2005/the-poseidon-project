@@ -40,11 +40,11 @@ def test_create_restaurant(owner):
     assert restaurant.name == "John's Diner"
 
 
-# Negative Validation Test: Create restaurant with empty name 
+# Negative Validation Test: Create restaurant with empty name
 # should raise ValueError
 def test_create_restaurant_empty_name(owner):
     with pytest.raises(ValueError, match="Restaurant name cannot be empty"):
-        owner.create_restaurant("") 
+        owner.create_restaurant("")
 
 
 '''Update restaurant info'''
@@ -76,7 +76,7 @@ def test_add_menu_item(owner, restaurant, menu_item):
 def test_remove_menu_item(owner, restaurant, menu_item):
     owner.add_menu_item(restaurant, menu_item)
     owner.remove_menu_item(restaurant, menu_item)
-    assert menu_item not in restaurant.menu # Check if item was removed
+    assert menu_item not in restaurant.menu 
 
 
 '''Updating menu items'''
@@ -85,20 +85,20 @@ def test_remove_menu_item(owner, restaurant, menu_item):
 # Functional Test: Updating price and availability of a menu item
 def test_update_menu_item(owner, menu_item):
     owner.update_menu_item(menu_item, price=10.99, available=False)
-    assert menu_item.price == 10.99 # Check if price was updated
-    assert menu_item.availability == False # Check if availability was updated
+    assert menu_item.price == 10.99  # Check if price was updated
+    assert menu_item.availability == False  # Check if availability was updated
 
 
 # Negative Test: Updating negative price of a menu item
 def test_update_menu_item_negative_price(owner, menu_item):
     with pytest.raises(ValueError, match="Price cannot be negative"):
-        owner.update_menu_item(menu_item, price=-5.99) # Try to set a negative price
+        owner.update_menu_item(menu_item, price=-5.99)  # Try to set a negative price
 
 
 # Edge Case: Test updating price of a menu item to zero for free items
 def test_update_menu_item_zero_price(owner, menu_item):
-    owner.update_menu_item(menu_item, price=0.00) # Set price to zero
-    assert menu_item.price == 0.00 # Check if price was updated to zero
+    owner.update_menu_item(menu_item, price=0.00)  # Set price to zero
+    assert menu_item.price == 0.00  # Check if price was updated to zero
 
 
 '''Set item availability'''
@@ -106,10 +106,10 @@ def test_update_menu_item_zero_price(owner, menu_item):
 
 # Functional Test: Setting item availability
 def test_set_item_availability(owner, menu_item):
-    owner.set_item_availability(menu_item, True) # Set item to available
-    assert menu_item.availability == True # Check if item is available
-    owner.set_item_availability(menu_item, False) # Set item to unavailable
-    assert menu_item.availability == False # Check if item is unavailable
+    owner.set_item_availability(menu_item, True)
+    assert menu_item.availability == True  # Check if item is available
+    owner.set_item_availability(menu_item, False)
+    assert menu_item.availability == False  # Check if item is unavailable
 
 
 '''Set restaurant open/closed'''
@@ -117,16 +117,16 @@ def test_set_item_availability(owner, menu_item):
 
 # Functional Test: Setting restaurant to open and then closed
 def test_set_open_closed(owner, restaurant):
-    owner.set_open_closed(restaurant, True) # Set restaurant to open
-    assert restaurant.is_open == True # Check if restaurant is open
-    owner.set_open_closed(restaurant, False) # Set restaurant to closed
-    assert restaurant.is_open == False # Check if restaurant is closed
+    owner.set_open_closed(restaurant, True)
+    assert restaurant.is_open == True  # Check if restaurant is open
+    owner.set_open_closed(restaurant, False)
+    assert restaurant.is_open == False  # Check if restaurant is closed
 
 
 # Negative Test: Setting restaurant open/closed with invalid status
 def test_set_open_closed_invalid_status(owner, restaurant):
     with pytest.raises(ValueError, match="Status must be a boolean"):
-        owner.set_open_closed(restaurant, "open") # Try to set an invalid status
+        owner.set_open_closed(restaurant, "open")  # Try to set an invalid status
 
 
 '''Test restaurant operating hours'''
@@ -134,15 +134,15 @@ def test_set_open_closed_invalid_status(owner, restaurant):
 
 # Functional Test: Updating restaurant operating hours
 def test_update_restaurant_hours(owner, restaurant):
-    owner.update_info(restaurant, open_time="09:00", close_time="21:00") # Update operating hours
-    assert restaurant.open_time == "09:00" # Check if open time was updated
-    assert restaurant.close_time == "21:00" # Check if close time was updated
+    owner.update_info(restaurant, open_time="09:00", close_time="21:00")  # Update operating hours
+    assert restaurant.open_time == "09:00"  # Check if open time was updated
+    assert restaurant.close_time == "21:00"  # Check if close time was updated
 
 
 # Edge Case: Test updating only one time field
 def test_update_restaurant_hours_partial(owner, restaurant):
-    restaurant.open_time = "08:00" # Set initial open time
-    restaurant.close_time = "20:00" # Set initial close time
-    owner.update_info(restaurant, open_time="10:00") # Update only open time
-    assert restaurant.open_time == "10:00" # Check if open time was updated
-    assert restaurant.close_time == "20:00" # Check if close time remains unchanged
+    restaurant.open_time = "08:00"  # Set initial open time
+    restaurant.close_time = "20:00"  # Set initial close time
+    owner.update_info(restaurant, open_time="10:00")  # Update only open time
+    assert restaurant.open_time == "10:00"  # Check if open time was updated
+    assert restaurant.close_time == "20:00"  # Check if close time remains unchanged
