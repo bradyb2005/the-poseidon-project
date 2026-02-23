@@ -3,22 +3,25 @@ import pytest
 from backend.models.restaurant.restaurant_model import Restaurant
 from unittest.mock import MagicMock
 
+
 @pytest.fixture
 def mock_owner():
     return MagicMock()
 
+
 @pytest.fixture
 def restaurant(mock_owner):
     return Restaurant(
-        id = 1,
-        name = "Testaurant",
+        id=1,
+        name="Testaurant",
         owner=mock_owner
     )
+
 
 ''' Create restaurant initialization'''
 
 
-# Test that the restaurant model initializes correctly with the provided attributes
+# Test that the restaurant model initializes correctly with attributes
 def test_restaurant_initialization(restaurant, mock_owner):
     assert restaurant.id == 1
     assert restaurant.name == "Testaurant"
@@ -37,6 +40,7 @@ def test_restaurant_initialization(restaurant, mock_owner):
 def test_get_average_rating_no_reviews(restaurant):
     assert restaurant.get_average_rating() == 0.0  # Empty
 
+
 # Test rating calculation with multiple reviews
 def test_get_average_rating_multiple_reviews(restaurant):
     restaurant.reviews = [
@@ -46,6 +50,7 @@ def test_get_average_rating_multiple_reviews(restaurant):
     ]
     assert restaurant.get_average_rating() == 4.0
 
+
 # Test rating round down
 def test_get_average_rating_round_down(restaurant):
     restaurant.reviews = [
@@ -54,6 +59,7 @@ def test_get_average_rating_round_down(restaurant):
         MagicMock(rating=5.0)
     ]
     assert restaurant.get_average_rating() == 4.3
+
 
 # Test rating round up
 def test_get_average_rating_round_up(restaurant):
@@ -76,6 +82,7 @@ def test_update_attributes(restaurant):
 
     assert restaurant.open_time == "09:00"
     assert restaurant.address == "123 Test St"
+
 
 # Test hours with empty strings and not None
 def test_hours_empty_strings(restaurant):
