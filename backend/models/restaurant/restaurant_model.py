@@ -1,4 +1,5 @@
 from typing import List, TYPE_CHECKING
+import uuid
 
 # Read by VSCode for type checking but python ignores
 if TYPE_CHECKING:
@@ -8,8 +9,8 @@ if TYPE_CHECKING:
 
 # Restaurant information
 class Restaurant:
-    def __init__(self, id: int, name: str, owner: "RestaurantOwner"):
-        self.id = id
+    def __init__(self, name: str, owner: "RestaurantOwner"):
+        self.id = str(uuid.uuid4())  # Generate unique ID for restaurant
         self.name = name
         self.owner = owner
 
