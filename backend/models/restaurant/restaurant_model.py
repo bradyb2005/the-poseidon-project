@@ -29,7 +29,7 @@ class Restaurant:
         self.is_open: bool = False
 
         # Menu
-        self.menu = List["MenuItem"] = []
+        self.menu: List["MenuItem"] = []
 
         # Reviews
         self.reviews: List = []
@@ -38,5 +38,6 @@ class Restaurant:
     def get_average_rating(self) -> float:
         if not self.reviews:
             return 0.0
-        return sum(review.rating for review in self.reviews
-                   ) / len(self.reviews)
+        average = sum(review.rating for review in self.reviews
+                      ) / len(self.reviews)
+        return round(average, 1)
