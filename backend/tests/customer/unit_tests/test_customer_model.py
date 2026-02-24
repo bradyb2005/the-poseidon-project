@@ -1,8 +1,13 @@
 import unittest
-from backend.customer.models import Customer
-from backend.models.restaurant.menu_item_model import MenuItem
-from backend.models.restaurant.restaurant_model import Restaurant
 from backend.models.user.user_model import User
+from backend.models.user.customer_model import Customer
+
+class testMenuItem:
+    def __init__(self, id, name, description, price):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.price = price
 
 class TestCustomerModel(unittest.TestCase):
 
@@ -40,7 +45,7 @@ class TestCustomerModel(unittest.TestCase):
 
     def test_add_to_cart_new_item(self):
         # Create a sample menu item that does not already exist in the cart
-        menu_item = MenuItem(id=1, name="Pizza", description="its pizza bro, not that deep", price=10.99)
+        menu_item = testMenuItem(id=1, name="Pizza", description="its pizza bro, not that deep", price=10.99)
         # Add the item to the cart with quantity 2
         self.customer.add_to_cart(menu_item, 2)
         self.assertIn(menu_item.id, self.customer.cart)
@@ -48,7 +53,7 @@ class TestCustomerModel(unittest.TestCase):
     
     def test_add_to_cart_existing_item(self):
         # Create a sample menu item that already exists in the cart
-        menu_item = MenuItem(id=1, name="Pizza", description="its pizza bro, not that deep", price=10.99)
+        menu_item = testMenuItem(id=1, name="Pizza", description="its pizza bro, not that deep", price=10.99)
         # Add the item to the cart with quantity 2
         self.customer.add_to_cart(menu_item, 2)
         # Add the same item again with quantity 3
@@ -58,7 +63,7 @@ class TestCustomerModel(unittest.TestCase):
     
     def test_add_to_cart_invalid_quantity(self):
         # Create a sample menu item with invalid quantity
-        menu_item = MenuItem(id=1, name="Pizza", description="its pizza bro, not that deep", price=10.99)
+        menu_item = testMenuItem(id=1, name="Pizza", description="its pizza bro, not that deep", price=10.99)
         # Attempt to add the item with an invalid quantity (0 or negative)
         with self.assertRaises(ValueError):
             self.customer.add_to_cart(menu_item, 0)
