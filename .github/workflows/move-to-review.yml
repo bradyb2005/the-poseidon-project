@@ -13,8 +13,6 @@ jobs:
         with:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
           user: ${{ github.repository_owner }}
-          # If this is an organization repo, use 'organization' instead of 'user'
-          # organization: your-org-name 
-          project_id: 1 # Replace with your project number
+          project_id: 1 
           resource_node_id: ${{ github.event.pull_request.node_id }}
-          status_value: "In Review" # Ensure this matches your column name exactlyf
+          status_value: "In review"
