@@ -94,7 +94,7 @@ class User:
 
         from backend.models.user.customer import Customer
         from backend.models.user.restaurant_owner import RestaurantOwner
-        from backend.models.user.admin import Admin
+        from backend.models.user.admin_model import Admin
 
         cls_map = {
             "User": User,
