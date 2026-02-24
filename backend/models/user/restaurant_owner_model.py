@@ -9,8 +9,8 @@ import uuid
 class RestaurantOwner (User):
     # Inherit info from user
 
-    def __init__(self, name, password_hash):
-        self.id = str(uuid.uuid4())
+    def __init__(self, name, password_hash, id=None):
+        self.id = id or str(uuid.uuid4())
         self.name = name
         self.password_hash = password_hash
 

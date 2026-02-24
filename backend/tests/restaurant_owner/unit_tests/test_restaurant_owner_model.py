@@ -9,9 +9,8 @@ from backend.models.user.restaurant_owner_model import RestaurantOwner
 @pytest.fixture
 def owner():
     return RestaurantOwner(
-        id=1,
-        username="John_Doe",
-        password_hash=RestaurantOwner.hash_password("SecurePass123"),
+        name="John_Doe",
+        password_hash="SecurePass123"
     )
 
 
@@ -38,6 +37,7 @@ def test_create_restaurant(owner):
     restaurant = owner.create_restaurant("John's Diner")
     assert restaurant is not None
     assert restaurant.name == "John's Diner"
+    assert isinstance(restaurant, MagicMock)
 
 
 # Negative Validation Test: Create restaurant with empty name
