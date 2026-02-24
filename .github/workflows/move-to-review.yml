@@ -1,0 +1,20 @@
+name: Move to In Review
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  move_to_review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Move project item to In Review
+        uses: leonsteinhaeuser/project-beta-automations@v2.2.1
+        with:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+          user: ${{ github.repository_owner }}
+          # If this is an organization repo, use 'organization' instead of 'user'
+          # organization: your-org-name 
+          project_id: 1 # Replace with your project number
+          resource_node_id: ${{ github.event.pull_request.node_id }}
+          status_value: "In Review" # Ensure this matches your column name exactlyf
