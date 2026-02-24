@@ -86,7 +86,7 @@ def test_remove_menu_item(owner, restaurant, menu_item):
 def test_update_menu_item(owner, menu_item):
     owner.update_menu_item(menu_item, price=10.99, available=False)
     assert menu_item.price == 10.99  # Check if price was updated
-    assert menu_item.availability  # Check if availability was updated
+    assert menu_item.availability is False
 
 
 # Negative Test: Updating negative price of a menu item
@@ -107,9 +107,9 @@ def test_update_menu_item_zero_price(owner, menu_item):
 # Functional Test: Setting item availability
 def test_set_item_availability(owner, menu_item):
     owner.set_item_availability(menu_item, True)
-    assert menu_item.availability  # Check if item is available
+    assert menu_item.availability is True  # Check if item is available
     owner.set_item_availability(menu_item, False)
-    assert menu_item.availability  # Check if item is unavailable
+    assert menu_item.availability is False  # Check if item is unavailable
 
 
 '''Set restaurant open/closed'''
@@ -118,9 +118,9 @@ def test_set_item_availability(owner, menu_item):
 # Functional Test: Setting restaurant to open and then closed
 def test_set_open_closed(owner, restaurant):
     owner.set_open_closed(restaurant, True)
-    assert restaurant.is_open  # Check if restaurant is open
+    assert restaurant.is_open is True
     owner.set_open_closed(restaurant, False)
-    assert restaurant.is_open  # Check if restaurant is closed
+    assert restaurant.is_open is False
 
 
 # Negative Test: Setting restaurant open/closed with invalid status
