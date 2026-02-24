@@ -37,7 +37,8 @@ def test_create_restaurant(owner):
     restaurant = owner.create_restaurant("John's Diner")
     assert restaurant is not None
     assert restaurant.name == "John's Diner"
-    assert isinstance(restaurant, MagicMock)
+    assert isinstance(restaurant.id, str)
+    assert len(restaurant.id) > 0
 
 
 # Negative Validation Test: Create restaurant with empty name
