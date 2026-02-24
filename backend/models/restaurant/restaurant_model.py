@@ -1,5 +1,7 @@
 # backend/models/restaurant/restaurant_model.py
 
+import uuid
+
 # Typing used for type hints to avoid circular imports
 from typing import TYPE_CHECKING, List
 
@@ -9,19 +11,20 @@ if TYPE_CHECKING:
     from backend.models.restaurant.menu_item_model import MenuItem
 
 class Restaurant:
-    def __init__(self, id: int, name: str, owner: "RestaurantOwner"):
-        self.id = id
+    def __init__(self, name: str, owner: "RestaurantOwner", **kwargs):
+        self.id = str(uuid.uuid4())
         self.name = name
         self.owner = owner
 
         # Operational details
-        self.address = None
-        self.city = None
-        self.postal_code = None
-        self.phone = None
-        self.cuisine_type = None
-        self.open_time = None
-        self.close_time = None
+        self.address = kwargs.get('address')
+        self.phone = kwargs.get('phone')
+        self.open_time = kwargs.get('open_time')
+        self.close_time = kwargs.get('close_time')
+
+        # Set all other kwargs as attributes
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
         # Status
         self.is_open = False
