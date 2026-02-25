@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 from typing import List, TYPE_CHECKING
+=======
+# backend/models/restaurant/restaurant_model.py
+
+import uuid
+
+# Typing used for type hints to avoid circular imports
+from typing import TYPE_CHECKING, List
+>>>>>>> d8c090b1a632556cc479c3abbee92478af525aee
 
 # Read by VSCode for type checking but python ignores
 if TYPE_CHECKING:
@@ -8,8 +17,8 @@ if TYPE_CHECKING:
 
 # Restaurant information
 class Restaurant:
-    def __init__(self, id: int, name: str, owner: "RestaurantOwner"):
-        self.id = id
+    def __init__(self, name: str, owner: "RestaurantOwner", **kwargs):
+        self.id = str(uuid.uuid4())
         self.name = name
         self.owner = owner
 
@@ -18,12 +27,23 @@ class Restaurant:
         self.close_time: str = ""
 
         # Operational details
+<<<<<<< HEAD
         self.address = ""
         self.city = ""
         self.postal_code = ""
         self.phone = ""
         self.cuisine_type = ""
         self.rating = 0.0
+=======
+        self.address = kwargs.get('address')
+        self.phone = kwargs.get('phone')
+        self.open_time = kwargs.get('open_time')
+        self.close_time = kwargs.get('close_time')
+
+        # Set all other kwargs as attributes
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+>>>>>>> d8c090b1a632556cc479c3abbee92478af525aee
 
         # Status
         self.is_open: bool = False

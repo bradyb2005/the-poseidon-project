@@ -1,4 +1,4 @@
-# backend/models/restaurant/restaurant_model.py
+# backend/models/restaurant/menu_item_model.py
 
 class MenuItem:
     def __init__(self, id: int, name: str, price: float,
