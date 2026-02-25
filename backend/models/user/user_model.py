@@ -47,6 +47,8 @@ class User:
             raise ValueError("email must be a non-empty string")
         if "@" not in self.email:
             raise ValueError("email must contain '@'")
+        if "." not in self.email.split("@", 1)[1]:
+            raise ValueError("email domain must contain '.'")
 
 
     
