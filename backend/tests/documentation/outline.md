@@ -9,5 +9,4 @@ This test tests the deliveryUpdate file which updates all users on where the ite
 **Example - Editing pre-existing test file**  
 tests/delivery/unit/testDeliveryUpdate  
 *Screenshot*  
-This test was updated to fix minor bug issues and formatting  
-
+This test was updated to fix minor bug issues and formatting.

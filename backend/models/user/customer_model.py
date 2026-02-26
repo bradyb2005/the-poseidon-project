@@ -5,14 +5,17 @@ from backend.models.restaurant.menu_item_model import MenuItem
 
 class Customer(User):
     # Inherit info from user
-    def __init__(self, email, phone, address, city, postal_code, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.email = email
+    def __init__(self, id: int, username: str, email: str, password_hash: str, 
+                 phone: str, address: str, city: str, postal_code: str):
+        
+        # Send the common attributes to the User constructor
+        super().__init__(id, username, email, password_hash)        
+        
         self.phone = phone
         self.address = address
         self.city = city
         self.postal_code = postal_code
-        self.cart = {}  # Initialize an empty cart for the customer
+        self.cart = {}  # Initialize an empty cart for the customer, TODO: Replace with actual Cart class once implemented
         
     def update_info(self, **kwargs):
         # Update customer's personal information
@@ -33,14 +36,13 @@ class Customer(User):
             self.cart[item.id] = quantity
 
     def remove_from_cart(self, item: MenuItem) -> None:
-        # Removes a menu item from the customer's cart
+        # Removes all instances of a menu item from the customer's cart
         if item.id in self.cart:
             del self.cart[item.id]
 
     def clear_cart(self) -> None:
         # Clears the customer's cart
         self.cart = {}
-
 
     def place_order(self) -> "Order":
         # Places an order based on the items in the customer's cart
@@ -49,5 +51,6 @@ class Customer(User):
 
     def submit_review(self, order: "Order", rating: int, comment: str) -> "Review":
         # Submits a review for a completed order
+        # TODO: Replace with actual Order implementation once Order class is created
         # TODO: Replace with actual review implementation once Review class is created
         pass
