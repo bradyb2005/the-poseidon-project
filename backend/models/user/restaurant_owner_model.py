@@ -3,16 +3,13 @@
 from backend.models.restaurant.restaurant_model import Restaurant
 from backend.models.user.user_model import User
 import backend.models.restaurant.menu_item_model
-import uuid
 
 
-class RestaurantOwner (User):
-    # Inherit info from user
 
-    def __init__(self, name, password_hash, id=None):
-        self.id = id or str(uuid.uuid4())
-        self.name = name
-        self.password_hash = password_hash
+class RestaurantOwner(User):
+
+    def __init__(self, id: int, username: str, email: str, password_hash: str):
+        super().__init__(id, username, email, password_hash)
 
     # Allows the restaurant owner to create a restaurant
     def create_restaurant(self, name, **kwargs):

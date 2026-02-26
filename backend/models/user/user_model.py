@@ -10,6 +10,11 @@ import bcrypt
 
 @dataclass
 class User:
+    id: int
+    username: str
+    email: str
+    password_hash: str
+
     """
     User Model (based on UML diagram)
 
@@ -25,10 +30,6 @@ class User:
         Admin + RestaurantOwner + Customer without needing 3 separate classes yet.
     """
 
-    id: int
-    username: str
-    password_hash: str
-
     def __post_init__(self) -> None:
         """
         This runs right after the dataclass constructor, which means it runs after we create a User object.
@@ -42,6 +43,12 @@ class User:
 
         if not isinstance(self.password_hash, str) or not self.password_hash.strip():
             raise ValueError("password_hash must be a non-empty string")
+        if not isinstance(self.email, str) or not self.email.strip():
+            raise ValueError("email must be a non-empty string")
+        if "@" not in self.email:
+            raise ValueError("email must contain '@'")
+        if "." not in self.email.split("@", 1)[1]:
+            raise ValueError("email domain must contain '.'")
 
 
     
@@ -83,6 +90,7 @@ class User:
         return {
         "id": self.id,
         "username": self.username,
+        "email": self.email,
         "password_hash": self.password_hash,
         "user_type": self.__class__.__name__,
     }
@@ -93,7 +101,7 @@ class User:
         user_type = data.get("user_type", "User")
 
         from backend.models.user.customer import Customer
-        from backend.models.user.restaurant_owner import RestaurantOwner
+        from backend.models.user.restaurant_owner_model import RestaurantOwner
         from backend.models.user.admin import Admin
 
         cls_map = {
@@ -108,6 +116,7 @@ class User:
         return cls(
             id=int(data["id"]),
             username=str(data["username"]),
+            email=str(data["email"]),
             password_hash=str(data["password_hash"]),
         )
 

@@ -9,7 +9,9 @@ from backend.models.user.restaurant_owner_model import RestaurantOwner
 @pytest.fixture
 def owner():
     return RestaurantOwner(
-        name="John_Doe",
+        id=1,
+        username="John_Doe",
+        email="john_doe@gmail.com",
         password_hash="SecurePass123"
     )
 
