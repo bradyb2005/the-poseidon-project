@@ -1,5 +1,5 @@
 # backend/repositories/restaurant_repository.py
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 class RestaurantRepository:
     def __init__(self, db_connection):
