@@ -91,7 +91,7 @@ class RestaurantRepository:
         # If min_rating is provided, filter by average rating
         pass
 
-    def get_all_restaurants(self)
+    def get_all_restaurants(self):
         """
         Feat3-FR1 and Feat3-FR5
         Retrieve all restaurants with pagination
