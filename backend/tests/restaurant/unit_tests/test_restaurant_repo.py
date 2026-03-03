@@ -1,3 +1,4 @@
+import pytest
 from backend.repositories.restaurant_repository import RestaurantRepository
 
 # --- Fixtures ---
