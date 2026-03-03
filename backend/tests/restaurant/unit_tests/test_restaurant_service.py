@@ -3,7 +3,7 @@ import pytest
 from backend.services.restaurant_service import RestaurantService
 from backend.models.user.restaurant_owner_model import RestaurantOwner
 from backend.models.user.customer_model import Customer
-
+from backend.models.user.admin import Admin
 
 class MockRepo:
     def create_restaurant(self, restaurant_data):
