@@ -49,8 +49,8 @@ def test_pagination(restaurant_repo):
     for i in range(10):
         restaurant_repo.create_restaurant({"name": f"Restaurant {i}", "cuisine": "Test"})
 
-    page1 = restaurant_repo.get_restaurants_paginated(page=1, per_page=5)
-    page2 = restaurant_repo.get_restaurants_paginated(page=2, per_page=5)
+    page1 = restaurant_repo.get_restaurants_paginated(page=1, limit=5)
+    page2 = restaurant_repo.get_restaurants_paginated(page=2, limit=5)
 
     assert len(page1) == 5
     assert len(page2) == 5
