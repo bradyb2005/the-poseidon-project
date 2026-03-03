@@ -27,7 +27,7 @@ def test_update_restaurant(restaurant_repo):
 
     restaurant_repo.update_restaurant(restaurant, {"address": "456 Test"})
     
-    updated_restaurant = restaurant_repo.get_by_id(restaurant.id)
+    updated_restaurant = restaurant_repo.get_by_id(restaurant)
     assert updated_restaurant["address"] == "456 Test"
     assert updated_restaurant["name"] == "Testaurant"  # Ensure name is unchanged
 
