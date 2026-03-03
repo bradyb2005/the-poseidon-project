@@ -1,6 +1,6 @@
 import pytest
 
-from restaurant.services.restaurant_service import RestaurantService
+from backend.services.restaurant_service import RestaurantService
 from backend.models.user.restaurant_owner_model import RestaurantOwner
 from backend.models.user.customer_model import Customer
 from backend.models.user.admin_model import Admin
@@ -28,7 +28,7 @@ def test_create_restaurant_as_customer(restaurant_service):
     user = Customer(name="Newbie")
     data = {"name": "Testaurant", "location": "123 Test St"}
     
-    result = restaurant_service.create_restaurant(user, data)
+    result = restaurant_service.register_restaurant(user, data)
 
     assert result["success"] == False
     assert "unauthorized" in result["error"]
