@@ -15,7 +15,7 @@ def restaurant_service():
 
 # Positive functionality test: A restaurant owner should be able to create a restaurant
 def test_create_restaurant_as_owner(restaurant_service):
-    user = RestaurantOwner(name="Grayson")
+    user = RestaurantOwner(id=1,username="Grayson",password_hash="hashed_pw")
     data = {"name": "Testaurant", "location": "123 Test St"}
 
     result = restaurant_service.register_restaurant(user, data)
@@ -25,7 +25,7 @@ def test_create_restaurant_as_owner(restaurant_service):
 
 # Edge case: A customer should not be able to create a restaurant
 def test_create_restaurant_as_customer(restaurant_service):
-    user = Customer(name="Newbie")
+    user = Customer(id=2,username="Newbie",password_hash="hashed_pw")
     data = {"name": "Testaurant", "location": "123 Test St"}
     
     result = restaurant_service.register_restaurant(user, data)
