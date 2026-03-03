@@ -4,7 +4,7 @@ from backend.models.user.user_model import User
 from backend.repositories.restaurant_repository import RestaurantRepository
 
 class RestaurantService:
-    def __init__(self, user, restaurant_repository):
+    def __init__(self, restaurant_repository):
         self.restaurant_repository = restaurant_repository
 
     def register_restaurant(self, user, restaurant_data: dict):
