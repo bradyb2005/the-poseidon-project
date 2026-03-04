@@ -1,0 +1,19 @@
+Restaurant Repository Tests
+
+<img width="517" height="145" alt="Screenshot 2026-03-01 at 11 10 30 PM" src="https://github.com/user-attachments/assets/dd77d3eb-999a-47b0-9c4c-435f7b84476a" />
+
+Information Management (Feat2-FR3)
+The Update test ensures that existing records can be modified accurately.
+It proves that you can change a specific field without accidentally overwriting or deleting other existing fields.
+
+Menu Retrieval (Feat3-FR3)
+The Get by ID test validates the logic for opening specific restaurant menus.
+It checks the positive functional path and the edge case which prevents the application from crashing when a user requests a missing page.
+
+Search & Filtering (Feat3-FR4)
+The Search by Cuisine test verifies that the system can filter results based on specific tags.
+It confirms that when a user searches for a specific cuisine, the repository returns only the matching restaurants.
+
+Performance & Pagination (Feat3-FR5)
+The Pagination test ensures the system handles large data volumes efficiently.
+By requesting data in small chunks across multiple pages, it confirms that the limit is strictly followed.
