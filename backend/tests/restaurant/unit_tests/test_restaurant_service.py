@@ -31,7 +31,7 @@ def test_add_tagged_item_success(service, mock_restaurant_repository, restaurant
     result = service.add_tagged_item(restaurant_owner, restauarant_id, item_data)
 
     assert result["success"] == True
-    assert "menu_item_id" in result
+    assert "menu_item" in result
 
     # Verify repository method was called with correct parameters
     mock_restaurant_repository.add_menu_item.assert_called_once()
