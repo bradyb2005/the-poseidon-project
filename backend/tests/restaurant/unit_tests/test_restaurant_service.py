@@ -14,7 +14,7 @@ def service(mock_restaurant_repository):
 
 @pytest.fixture
 def restaurant_owner():
-    return RestaurantOwner(id="1", username="John Doe", password_hash="hashed_password")
+    return RestaurantOwner(id="1", username="John Doe", password_hash="hashed_password", email="fakeemail@mail.ca")
 
 # --- FR2: Menu tagging tests ---
 
