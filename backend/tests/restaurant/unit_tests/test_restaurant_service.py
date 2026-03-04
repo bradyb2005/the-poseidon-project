@@ -14,7 +14,7 @@ def service(mock_restaurant_repository):
 
 @pytest.fixture
 def restaurant_owner():
-    return RestaurantOwner(id="1", name="John Doe", password_hash="hashed_password")
+    return RestaurantOwner(id="1", username="John Doe", password_hash="hashed_password")
 
 # --- FR2: Menu tagging tests ---
 
@@ -37,4 +37,4 @@ def test_add_tagged_item_success(service, mock_restaurant_repository, restaurant
     mock_restaurant_repository.add_menu_item.assert_called_once()
     args, _ = mock_restaurant_repository.add_menu_item.call_args
     assert args[0] == restauarant_id
-    assert args[1]["tags"] == ["Vegan", "Burger"]
+    assert args[1].tags == ["Vegan", "Burger"]
