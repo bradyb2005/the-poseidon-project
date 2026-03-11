@@ -17,6 +17,7 @@ class Restaurant:
     close_time: Optional[int] = None
     address: Optional[str] = None
     phone: Optional[str] = None
+    distance_from_user: Optional[float] = None
 
     # Defaults
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
