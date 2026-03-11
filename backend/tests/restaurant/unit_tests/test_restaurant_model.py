@@ -130,5 +130,5 @@ def test_validate_for_publish_logic_error(mock_owner):
         open_time=2200,
         close_time=2100
     )
-    with pytest.raises(ValueError, match="must be after 'close_time'"):
+    with pytest.raises(ValueError, match="'open_time' must be after 'close_time'"):
         restaurant.validate_for_publish()

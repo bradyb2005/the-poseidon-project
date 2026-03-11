@@ -24,6 +24,10 @@ class Restaurant:
     is_published: bool = False
     menu: List["MenuItem"] = field(default_factory=list)
 
+    def publish(self):
+        self.validate_for_publish()
+        self.is_published = True
+
     def validate_for_publish(self):
         """
         FR3: Ensure all required fields are valid before publishing
