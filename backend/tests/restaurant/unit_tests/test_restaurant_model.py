@@ -13,9 +13,12 @@ def sample_menu():
     ]
 
 @pytest.fixture
-def sample_restaurant(sample_menu):
+def sample_restaurant(mock_owner, sample_menu):
     return Restaurant(
         name="Testaurant",
+        owner=mock_owner,
+        addresss="123 Test St",
+        phone="555-555-5555",
         open_time="09:00",
         close_time="17:00",
         distance_from_user=2.5,
@@ -56,8 +59,16 @@ def test_admin_customer_perspective(sample_restaurant):
     assert sample_restaurant.get_view("Customer") is not None
 
 # Negative Edge Case: Cannot publish without menu
-def test_publish_without_menu():
-    empty_menu_restaurant = Restaurant("EmptyMenu", "10:00", "20:00", 1.0, [])
+def test_publish_without_menu(mock_owner):
+    empty_menu_restaurant = Restaurant(
+        name="EmptyMenu",
+        owner=mock_owner,
+        address="123 St",
+        phone="555-5555",
+        open_time=1000,
+        close_time=2000,
+        menu=[]
+        )
     success = empty_menu_restaurant.publish()
     assert success is False
     assert empty_menu_restaurant.is_published is False
