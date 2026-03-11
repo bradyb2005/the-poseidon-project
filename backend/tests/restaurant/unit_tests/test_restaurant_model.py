@@ -2,6 +2,7 @@
 import pytest
 from backend.models.restaurant.restaurant_model import Restaurant
 from backend.models.restaurant.menu_item_model import MenuItem
+from backend.models.user.restaurant_owner_model import RestaurantOwner
 
 
 @pytest.fixture
@@ -117,7 +118,7 @@ def test_validate_for_publish_invalid_types(mock_owner):
         open_time="900",
         close_time=2100
     )
-    with pytest.raises(ValueError, match="must be numbers"):
+    with pytest.raises(ValueError, match="Cannot publish restaurant: 'open_time' and 'close_time' must be numbers"):
         restaurant.validate_for_publish()
 
 def test_validate_for_publish_logic_error(mock_owner):
@@ -130,5 +131,5 @@ def test_validate_for_publish_logic_error(mock_owner):
         open_time=2200,
         close_time=2100
     )
-    with pytest.raises(ValueError, match="'open_time' must be after 'close_time'"):
+    with pytest.raises(ValueError, match="Cannot publish restaurant: 'open_time' must be before 'close_time'"):
         restaurant.validate_for_publish()
