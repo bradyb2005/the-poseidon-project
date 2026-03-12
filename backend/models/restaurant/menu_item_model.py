@@ -1,8 +1,11 @@
 # backend/models/restaurant/menu_item_model.py
+from dataclasses import dataclass, field
+from typing import List
 import uuid
 
+@dataclass
 class MenuItem:
-    def __init__(self, name: str, price: float):
-        self.id = str(uuid.uuid4())
-        self.name = name
-        self.price = price
+    name:str
+    price: float
+    tags: List[str] = field(default_factory=list)
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
