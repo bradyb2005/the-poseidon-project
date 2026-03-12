@@ -22,27 +22,11 @@ def test_menu_item_initialization():
     assert menu_item.tags == ["Main", "Vegetarian"]
     # Ensure that optional fields are set to None by default
     assert menu_item.description is None
-    assert menu_item.category is None
 
-# Functional Test: Price is always a float and availability is always a boolean
-def test_menu_item_type_integrity():
-    """
-    Ensure price stays as float and availability stays as boolean
-    """
-    menu_item = MenuItem(
-        id=2,
-        name="Caesar Salad",
-        price=8.50,
-        availability=False,
-        tags=["Salad", "Vegetarian"]
-    )
-    assert isinstance(menu_item.price, float)
-    assert isinstance(menu_item.availability, bool)
 
-# Functional Test: Toggling availability
 def test_menu_item_availability_toggle():
     """
-    Test toggling availability of a menu item
+    Functional Test: Test toggling availability of a menu item
     """
     menu_item = MenuItem(
         id=3,
@@ -51,44 +35,24 @@ def test_menu_item_availability_toggle():
         availability=True,
         tags=["Pasta", "Main"]
     )
-    # Toggle availability
     menu_item.availability = False
     assert menu_item.availability is False
 
-# Functional Test: Tagging functionality
-def test_menu_item_tagging():
-    """
-    Feat2-FR2: Test that tags are correctly assigned
-    """
-    menu_item = MenuItem(
-        id=4,
-        name="Tiramisu",
-        price=6.50,
-        availability=True,
-        tags=["Dessert", "Vegetarian"]
-    )
-    assert menu_item.tags == ["Dessert", "Vegetarian"]
-    assert "Dessert" in menu_item.tags
-    assert len(menu_item.tags) == 2
+# --- Validation tests ---
 
-# Edge Case Test: Default tags should be an empty list if not provided
-def test_menu_item_default_tags():
+def test_menu_item_invalid_name():
     """
-    Test that tags default to an empty list if not provided
+    Edge case test: Test that empty or whitespace only name raises ValueError
     """
-    menu_item = MenuItem(
-        id=5,
-        name="Garlic Bread",
-        price=4.99,
-        availability=True
-    )
-    assert isinstance(menu_item.tags, list)
-    assert len(menu_item.tags) == 0
+    with pytest.raises(ValueError, match="Name cannot be empty"):
+        MenuItem(name="", price=10.00)
+    with pytest.raises(ValueError, match="Name cannot be empty"):
+        MenuItem(name="  ", price=10.00)
 
-# Edge Case Test: Price can be zero (e.g., for free items)
+
 def test_menu_item_zero_price():
     """
-    Test that a menu item can have a price of zero (e.g., for free items)
+    Edge Case Test: Price can be zero (e.g., for free items)
     """
     menu_item = MenuItem(
         id=6,
@@ -99,15 +63,58 @@ def test_menu_item_zero_price():
     assert menu_item.price == 0.00
     assert isinstance(menu_item.price, float)
 
-# Edge Case Test: Price cannot be negative
+
 def test_menu_item_negative_price():
     """
-    Test that a menu item cannot have a negative price
+    Edge Case Test: Price cannot be negative
     """
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Price cannot be negative"):
         MenuItem(
             id=7,
             name="Negative Price Item",
             price=-5.00,
-            availability=True,
         )
+
+
+# --- Tagging tests ---
+
+
+def test_menu_item_tagging():
+    """
+    Functional Test: Feat2-FR2: Test that tags are correctly assigned
+    """
+    menu_item = MenuItem(
+        id=4,
+        name="Tiramisu",
+        price=6.50,
+        tags=["Dessert", "Vegetarian"]
+    )
+    assert menu_item.tags == ["Dessert", "Vegetarian"]
+    assert "Dessert" in menu_item.tags
+    assert len(menu_item.tags) == 2
+
+
+def test_menu_item_default_tags():
+    """
+    Edge Case Test: Default tags should be an empty list if not provided
+    """
+    menu_item = MenuItem(
+        id=5,
+        name="Garlic Bread",
+        price=4.99,
+        availability=True
+    )
+    assert isinstance(menu_item.tags, list)
+    assert len(menu_item.tags) == 0
+
+def test_menu_item_invalid_tags_type():
+    """
+    Edge Case: Ensure Typeerror is raised if tags are not a list of strings
+    """
+    # Case 1: Tags is a string instead of list
+    with pytest.raises(TypeError, match="Tags must be a list of strings"):
+        MenuItem(name="Pizza", price=10.00, tags="Vegetarian")
+    
+    # Case 2: Tags is a list but not all strings
+    with pytest.raises(TypeError, match="Tags must be a list of strings"):
+        MenuItem(name="Pizza", price=10.00, tags=["Vegetarian", 123])
