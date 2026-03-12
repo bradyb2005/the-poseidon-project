@@ -1,6 +1,6 @@
 Restaurant Repository Tests
 
-<img width="563" height="123" alt="Screenshot 2026-03-12 at 12 32 55 PM" src="https://github.com/user-attachments/assets/1f092f7e-4691-4de0-b22b-1a39857eae48" />
+<img width="615" height="117" alt="Screenshot 2026-03-12 at 2 21 47 PM" src="https://github.com/user-attachments/assets/fbe96a38-a4ad-4024-93b3-73dba5aba747" />
 
 Creating a restaurant (Feat2-FR1)
 Functional test ensures a restaurant can be made and data passed in repo
@@ -12,6 +12,10 @@ It proves that you can change a specific field without accidentally overwriting 
 Menu Retrieval (Feat3-FR3)
 The Get by ID test validates the logic for opening specific restaurant menus.
 It checks the positive functional path and the edge case which prevents the application from crashing when a user requests a missing page.
+
+Tags (Feat2-FR2)
+This test ensures that you can add a menu item with tags
+
 
 Search & Filtering (Feat3-FR4)
 The Search by Cuisine test verifies that the system can filter results based on specific tags.
