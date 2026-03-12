@@ -2,11 +2,12 @@
 from typing import List, Dict, Optional
 from backend.models.restaurant.restaurant_model import Restaurant
 
+
 class RestaurantRepository:
     def __init__(self, db_connection):
         # Initialize data storage collection
         self.db = db_connection
-    
+
     # --- Restaurant Information ---
 
     def create_restaurant(self, restaurant: Restaurant) -> str:
@@ -27,8 +28,8 @@ class RestaurantRepository:
             "close_time": restaurant.close_time,
             "is_published": restaurant.is_published,
             "menu": []
-        }
 
+        }
         self.db.append(restaurant_data)
         return restaurant.id
 
@@ -113,7 +114,8 @@ class RestaurantRepository:
         # Return list of matching restaurants and menu items
         pass
 
-    def filter_results(self, cuisine: Optional[str] = None, min_rating: Optional[float] = None) -> List[Dict]:
+    def filter_results(self, cuisine: Optional[str] = None,
+                       min_rating: Optional[float] = None) -> List[Dict]:
         """
         Feat3-FR4 (Filtering results)
         Filter search results based on criteria
@@ -138,7 +140,8 @@ class RestaurantRepository:
         Search for restaurants by cuisine type
         """
         # Query data store for restaurants matching the specified cuisine
-        return [restaurant for restaurant in self.db if restaurant.get('cuisine') == cuisine]
+        return [restaurant for restaurant in self.db
+                if restaurant.get('cuisine') == cuisine]
 
     # --- Admin Support ---
 

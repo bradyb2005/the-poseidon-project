@@ -1,6 +1,9 @@
 Restaurant Repository Tests
 
-<img width="517" height="145" alt="Screenshot 2026-03-01 at 11 10 30 PM" src="https://github.com/user-attachments/assets/dd77d3eb-999a-47b0-9c4c-435f7b84476a" />
+<img width="563" height="123" alt="Screenshot 2026-03-12 at 12 32 55 PM" src="https://github.com/user-attachments/assets/1f092f7e-4691-4de0-b22b-1a39857eae48" />
+
+Creating a restaurant (Feat2-FR1)
+Functional test ensures a restaurant can be made and data passed in repo
 
 Information Management (Feat2-FR3)
 The Update test ensures that existing records can be modified accurately.
@@ -17,3 +20,6 @@ It confirms that when a user searches for a specific cuisine, the repository ret
 Performance & Pagination (Feat3-FR5)
 The Pagination test ensures the system handles large data volumes efficiently.
 By requesting data in small chunks across multiple pages, it confirms that the limit is strictly followed.
+
+Restaurant Edge Cases (Feat2-FR3)
+The two edge cases ensure you cannot get or update a nonexistaant restaurant.
