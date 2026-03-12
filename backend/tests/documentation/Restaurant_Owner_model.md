@@ -1,5 +1,8 @@
 Restaurant_Owner Model test file
 
+<img width="899" height="142" alt="Screenshot 2026-03-11 at 2 48 03 PM" src="https://github.com/user-attachments/assets/4e4d4f56-9918-4361-a11d-f1e10e2c23a9" />
+
+
 This file tests all required methods and functionality of restaurent_owner_model.
 It communicates with the user model and the menu_item model for tasks.
 
@@ -20,9 +23,6 @@ The edge case test ensures no value besides a boolean will be accepted for this 
 
 In test restaurant operating hours this test owners ability to update their store hours. They can decicde to update both the time they open and the time they close or just one.
 
+In test owner prepares restaurant for publishing, owner is able to fill out all fields and validate for publishing and throws error if data is not filled in correctly
+
 All tests pass with no errors.
-
-
-
-<img width="618" height="142" alt="Screenshot 2026-02-21 at 7 08 01 PM" src="https://github.com/user-attachments/assets/c2ce324f-21bb-4ff4-b584-fb45f15d63e4" />
-
