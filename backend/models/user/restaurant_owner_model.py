@@ -1,12 +1,10 @@
 # Restaurant owner model class
+from dataclasses import dataclass
 from backend.models.restaurant.restaurant_model import Restaurant
 from backend.models.user.user_model import User
 
-
+@dataclass
 class RestaurantOwner(User):
-
-    def __init__(self, id: int, username: str, email: str, password_hash: str):
-        super().__init__(id, username, email, password_hash)
 
     # Allows the restaurant owner to create a restaurant
     def create_restaurant(self, name, **kwargs):

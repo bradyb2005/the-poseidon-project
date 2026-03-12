@@ -2,6 +2,8 @@
 import pytest
 from unittest.mock import MagicMock
 from backend.models.user.restaurant_owner_model import RestaurantOwner
+from backend.models.restaurant.restaurant_model import Restaurant
+from backend.models.restaurant.menu_item_model import MenuItem
 
 @pytest.fixture
 def owner():
@@ -26,8 +28,19 @@ def mock_owner():
     return mock
 
 @pytest.fixture
-def restaurant(owner):
+def sample_item():
+    """
+    return valid menu item for FR3
+    """
+    return MenuItem(name="Burger", price=9.99)
+
+@pytest.fixture
+def restaurant(owner, sample_item):
     """
     Return default instance linked to owner
     """
-    return owner.create_restaurant("John's Diner")
+    return Restaurant(
+        name="John's Diner",
+        owner=owner,
+        menu=[sample_item]
+    )

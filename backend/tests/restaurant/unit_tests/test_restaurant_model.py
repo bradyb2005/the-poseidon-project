@@ -38,46 +38,6 @@ def test_restaurant_initialization(sample_restaurant):
     assert len(sample_restaurant.menu) == 2
 
 
-def test_owner_publish_flow(sample_restaurant):
-    # Positive Functional Test: Tests that user can store before publishing
-    assert sample_restaurant.is_published == False is False
-
-    success = sample_restaurant.publish()
-    assert success is True
-    assert sample_restaurant.is_published is True
-
-
-def test_admin_customer_perspective(sample_restaurant):
-    # Positive Functional Test: Tests that different perspectives can be used
-    # Customer perspective should not see unpublished restaurant
-    assert sample_restaurant.get_view("Customer") is None
-
-    # Restaurant owner/ admin should see unpublished restaurant
-    owner_view = sample_restaurant.get_view("Restaurant")
-    assert owner_view is not None
-    assert owner_view["name"] == "Testaurant"
-
-    sample_restaurant.publish()
-    assert sample_restaurant.get_view("Customer") is not None
-
-
-def test_publish_without_menu(mock_owner):
-    # Negative Edge Case: Cannot publish without menu
-    empty_menu_restaurant = Restaurant(
-        name="EmptyMenu",
-        owner=mock_owner,
-        address="123 St",
-        phone="555-5555",
-        open_time=1000,
-        close_time=2000,
-        menu=[]
-        )
-    success = empty_menu_restaurant.publish()
-    assert success is False
-    assert empty_menu_restaurant.is_published is False
-    assert empty_menu_restaurant.get_view("Customer") is None
-
-
 def test_menu_item_initialization(sample_menu):
     # Positive Functional Test: The menu item models are stored correctly
     item = sample_menu[0]

@@ -32,14 +32,6 @@ class Restaurant:
             return None
         return {"name": self.name, "is_published": self.is_published}
 
-    def publish(self) -> bool:
-        try:
-            self.validate_for_publish()
-            self.is_published = True
-            return True
-        except ValueError:
-            return False
-
     def validate_for_publish(self):
         """
         FR3: Ensure all required fields are valid before publishing
