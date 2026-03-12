@@ -28,7 +28,14 @@ class RestaurantRepository:
             "open_time": restaurant.open_time,
             "close_time": restaurant.close_time,
             "is_published": restaurant.is_published,
-            "menu": []
+            "menu": [
+            {
+                "id": item.id, 
+                "name": item.name, 
+                "price": item.price, 
+                "tags": item.tags
+            } for item in restaurant.menu
+        ] if restaurant.menu else []
 
         }
         self.db.append(restaurant_data)
