@@ -2,7 +2,9 @@
 import pytest
 from backend.models.restaurant.menu_item_model import MenuItem
 
-# Initialization Test
+
+# --- Initialization Test ---
+
 def test_menu_item_initialization():
     """
     Test initialization of MenuItem
@@ -39,6 +41,7 @@ def test_menu_item_availability_toggle():
     assert menu_item.availability is False
 
 # --- Validation tests ---
+
 
 def test_menu_item_invalid_name():
     """
@@ -107,6 +110,7 @@ def test_menu_item_default_tags():
     assert isinstance(menu_item.tags, list)
     assert len(menu_item.tags) == 0
 
+
 def test_menu_item_invalid_tags_type():
     """
     Edge Case: Ensure Typeerror is raised if tags are not a list of strings
@@ -114,7 +118,7 @@ def test_menu_item_invalid_tags_type():
     # Case 1: Tags is a string instead of list
     with pytest.raises(TypeError, match="Tags must be a list of strings"):
         MenuItem(name="Pizza", price=10.00, tags="Vegetarian")
-    
+
     # Case 2: Tags is a list but not all strings
     with pytest.raises(TypeError, match="Tags must be a list of strings"):
         MenuItem(name="Pizza", price=10.00, tags=["Vegetarian", 123])

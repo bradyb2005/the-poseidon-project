@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+
 @dataclass
 class MenuItem:
     name: str
@@ -14,9 +15,10 @@ class MenuItem:
     def __post_init__(self):
         if self.price < 0:
             raise ValueError("Price cannot be negative")
-        
+
         if not self.name or not self.name.strip():
             raise ValueError("Name cannot be empty or whitespace")
-        
-        if not isinstance(self.tags, list) or not all(isinstance(t, str) for t in self.tags):
+
+        if not isinstance(self.tags, list) or not all(isinstance(
+                t, str) for t in self.tags):
             raise TypeError("Tags must be a list of strings")
