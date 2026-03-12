@@ -3,7 +3,6 @@ import pytest
 from backend.models.restaurant.restaurant_model import Restaurant
 from backend.repositories.restaurant_repository import RestaurantRepository
 from backend.models.restaurant.menu_item_model import MenuItem
-from backend.models.restaurant.restaurant_model import Restaurant
 
 
 # --- Fixtures ---
@@ -51,6 +50,19 @@ def test_update_restaurant(restaurant_repo, sample_restaurant):
     assert success is True
     updated_data = restaurant_repo.get_by_id(sample_restaurant.id)
     assert updated_data["address"] == "456 New Ave"
+
+# --- Tagging ---
+
+def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
+    # Test for Feat2-FR2: Tagging Menu items
+    # Functional test: Add tags to new menu item
+    restaurant_repo.create_restaurant(restaurant)
+
+    restaurant_repo.add_menu_item(restaurant.id, sample_item)
+
+    stored_res = restaurant_repo.get_by_id(restaurant.id)
+    stored_item = stored_res["menu"][0]
+    assert "Popular" in stored_item["tags"]
 
 # --- Browsing and Search ---
 
