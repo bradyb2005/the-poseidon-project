@@ -1,6 +1,6 @@
 Restaurant Repository Tests
 
-<img width="615" height="117" alt="Screenshot 2026-03-12 at 2 21 47 PM" src="https://github.com/user-attachments/assets/fbe96a38-a4ad-4024-93b3-73dba5aba747" />
+<img width="703" height="120" alt="Screenshot 2026-03-12 at 3 39 15 PM" src="https://github.com/user-attachments/assets/77e26b84-a846-4ef8-9c06-e0f3f7e83703" />
 
 Creating a restaurant (Feat2-FR1)
 Functional test ensures a restaurant can be made and data passed in repo
@@ -16,6 +16,8 @@ It checks the positive functional path and the edge case which prevents the appl
 Tags (Feat2-FR2)
 This test ensures that you can add a menu item with tags
 
+Editing Menu (Feat2-FR4)
+These tests test updating and removing a menu item.
 
 Search & Filtering (Feat3-FR4)
 The Search by Cuisine test verifies that the system can filter results based on specific tags.
