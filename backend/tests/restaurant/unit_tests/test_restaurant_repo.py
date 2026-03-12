@@ -2,7 +2,6 @@
 import pytest
 from backend.models.restaurant.restaurant_model import Restaurant
 from backend.repositories.restaurant_repository import RestaurantRepository
-from backend.models.restaurant.menu_item_model import MenuItem
 
 
 # --- Fixtures ---
@@ -52,6 +51,7 @@ def test_update_restaurant(restaurant_repo, sample_restaurant):
     assert updated_data["address"] == "456 New Ave"
 
 # --- Tagging ---
+
 
 def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
     # Test for Feat2-FR2: Tagging Menu items

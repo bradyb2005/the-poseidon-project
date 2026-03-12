@@ -1,6 +1,7 @@
 # backend/repositories/restaurant_repository.py
 from typing import List, Dict, Optional
 from backend.models.restaurant.restaurant_model import Restaurant
+from backend.models.restaurant.menu_item_model import MenuItem
 
 
 class RestaurantRepository:
@@ -73,7 +74,7 @@ class RestaurantRepository:
             # Ensure menu list exists and append
             if "menu" not in res_dict:
                 res_dict["menu"] = []
-            
+
             res_dict["menu"].append(item_data)
             return True
 
