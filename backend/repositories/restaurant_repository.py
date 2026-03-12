@@ -28,14 +28,13 @@ class RestaurantRepository:
             "open_time": restaurant.open_time,
             "close_time": restaurant.close_time,
             "is_published": restaurant.is_published,
-            "menu": [
-            {
-                "id": item.id, 
-                "name": item.name, 
-                "price": item.price, 
+            "menu": [{
+                "id": item.id,
+                "name": item.name,
+                "price": item.price,
                 "tags": item.tags
             } for item in restaurant.menu
-        ] if restaurant.menu else []
+            ]if restaurant.menu else []
 
         }
         self.db.append(restaurant_data)
@@ -98,10 +97,11 @@ class RestaurantRepository:
             if restaurant['id'] == restaurant_id:
                 return restaurant
         return None
-    
+
     # --- Adding and editing menu item ---
 
-    def update_menu_item(self, restaurant_id: str, item_id: str, updated_item: MenuItem) -> bool:
+    def update_menu_item(self, restaurant_id: str,
+                         item_id: str, updated_item: MenuItem) -> bool:
         """
         Feat2-FR4: Adding and editing menu items
         Finds specific item in a restaurants menu and updates it
@@ -119,7 +119,7 @@ class RestaurantRepository:
                     }
                     return True
         return False
-    
+
     def remove_menu_item(self, restaurant_id: str, item_id: str) -> bool:
         """
         Feat2-FR4 (Adding and editing menu items)
@@ -128,10 +128,10 @@ class RestaurantRepository:
         res = self.get_by_id(restaurant_id)
         if res and "menu" in res:
             initial_len = len(res["menu"])
-            res["menu"] = [item for item in res["menu"] if item["id"] != item_id]
+            res["menu"] = [item for item in
+                           res["menu"] if item["id"] != item_id]
             return len(res["menu"]) < initial_len
         return False
-
 
     # --- Browsing and Search ---
 

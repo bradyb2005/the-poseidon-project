@@ -66,15 +66,18 @@ def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
 
 # --- Updating menu ---
 
+
 def test_update_menu_item(restaurant_repo, restaurant, sample_item):
     # Feat2-FR4: Verifies existing menu item data can be edited
     restaurant_repo.create_restaurant(restaurant)
 
     stored_res = restaurant_repo.get_by_id(restaurant.id)
-    stored_item_id = stored_res["menu"][0]["id"] # The burger from conftest
+    stored_item_id = stored_res["menu"][0]["id"]  # The burger from conftest
 
-    updated_item = MenuItem(name="Premium Burger", price=15.0, id=stored_item_id)
-    success = restaurant_repo.update_menu_item(restaurant.id, stored_item_id, updated_item)
+    updated_item = MenuItem(
+        name="Premium Burger", price=15.0, id=stored_item_id)
+    success = restaurant_repo.update_menu_item(
+        restaurant.id, stored_item_id, updated_item)
 
     assert success is True
     final_data = restaurant_repo.get_by_id(restaurant.id)
@@ -84,12 +87,13 @@ def test_update_menu_item(restaurant_repo, restaurant, sample_item):
 def test_remove_menu_item(restaurant_repo, restaurant, sample_item):
     # FR4: Verifies an item can be removed from the menu.
     restaurant_repo.create_restaurant(restaurant)
-    
+
     # Grab the ID of the first item (the burger)
     stored_res = restaurant_repo.get_by_id(restaurant.id)
     item_id_to_remove = stored_res["menu"][0]["id"]
 
-    success = restaurant_repo.remove_menu_item(restaurant.id, item_id_to_remove)
+    success = restaurant_repo.remove_menu_item(
+        restaurant.id, item_id_to_remove)
 
     assert success is True
     updated_res = restaurant_repo.get_by_id(restaurant.id)
