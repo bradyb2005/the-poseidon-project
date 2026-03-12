@@ -56,6 +56,40 @@ class RestaurantRepository:
             if restaurant['id'] == restaurant_id:
                 return restaurant
         return None
+    
+    # --- Adding and editing menu item ---
+
+    def update_menu_item(self, restaurant_id: str, item_id: str, updated_item: MenuItem) -> bool:
+        """
+        Feat2-FR4: Adding and editing menu items
+        Finds specific item in a restaurants menu and updates it
+        """
+        res = self.get_by_id(restaurant_id)
+        if res and "menu" in res:
+            for i, item in enumerate(res["menu"]):
+                if item["id"] == item_id:
+                    # Update the stored dictionary with new object data
+                    res["menu"][i] = {
+                        "id": updated_item.id,
+                        "name": updated_item.name,
+                        "price": updated_item.price,
+                        "tags": updated_item.tags
+                    }
+                    return True
+        return False
+    
+    def remove_menu_item(self, restaurant_id: str, item_id: str) -> bool:
+        """
+        Feat2-FR4 (Adding and editing menu items)
+        Removes an item from the menu list.
+        """
+        res = self.get_by_id(restaurant_id)
+        if res and "menu" in res:
+            initial_len = len(res["menu"])
+            res["menu"] = [item for item in res["menu"] if item["id"] != item_id]
+            return len(res["menu"]) < initial_len
+        return False
+
 
     # --- Browsing and Search ---
 
