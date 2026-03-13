@@ -10,6 +10,7 @@ class OrderItem:
     id: int
     menu_item: MenuItem
     quantity: int
+    price_at_time: float
 
     def __post_init__(self) -> None:
         """
@@ -19,8 +20,11 @@ class OrderItem:
         if not isinstance(self.id, int) or self.id < 0:
             raise ValueError("id must be a non-negative integer")
 
-        if not isinstance(self.menu_item, "MenuItem"):
+        if not isinstance(self.menu_item, MenuItem):
             raise ValueError("menu_item must be a MenuItem object")
 
         if not isinstance(self.quantity, int) or self.quantity <= 0:
             raise ValueError("quantity must be a positive integer")
+        
+        if not isinstance(self.price_at_time, (int, float)) or self.price_at_time < 0:
+            raise ValueError("price_at_time must be a non-negative number")

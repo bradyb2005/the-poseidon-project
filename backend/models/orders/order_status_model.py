@@ -3,6 +3,9 @@
 from enum import Enum
 
 class OrderStatus(Enum):
-    PROCESSING = "Processing"
+    UNPAID = "Unpaid"
+    PENDING = "Pending"
     IN_PROGRESS = "In Progress"
-    COMPLETE = "Complete"
+    READY_FOR_PICKUP = "Ready for Pickup"
+    COMPLETED = "Completed"
+    CANCELLED = "Cancelled"
