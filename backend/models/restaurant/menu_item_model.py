@@ -1,8 +1,8 @@
 # backend/models/restaurant/menu_item_model.py
-import uuid
+from dataclasses import dataclass, field
 
+@dataclass
 class MenuItem:
-    def __init__(self, name: str, price: float):
-        self.id = str(uuid.uuid4())
-        self.name = name
-        self.price = price
+    name: str
+    price: float
+    id: int = 0
