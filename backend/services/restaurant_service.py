@@ -20,7 +20,12 @@ class RestaurantService:
         # Get tags
         name = item_data.get("name")
         price = item_data.get("price")
-        tags = item_data.get("tags", [])
+        raw_tags = item_data.get("tags", [])
+        # Validate to ensure  tags is a list and all elements are strings
+        if not isinstance(raw_tags, list) or not all (isinstance(t, str) for t in raw_tags):
+            return {"success": False, "error": "tags must be a list of strings"}
+        
+        tags = raw_tags
 
         if not name or price is None:
             return {"success": False, "error": "name and price are required"}

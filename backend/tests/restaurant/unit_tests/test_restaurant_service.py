@@ -53,6 +53,24 @@ def test_add_tagged_item_success(service, mock_restaurant_repository, restaurant
     assert passed_item.name == "Vegan Burger"
     assert passed_item.tags == ["Vegan", "Burger"]
 
+def test_add_tagged_item_invalid_tags(service, mock_restaurant_repository, restaurant_owner):
+    restaurant_id = 123
+    # Sending integers instead of strings
+    item_data = {
+        "name": "Bad Tags Burger",
+        "price": 9.99,
+        "tags": [1, 2, 3] 
+    }
+
+    result = service.add_tagged_item(restaurant_owner, restaurant_id, item_data)
+
+    assert result["success"] is False
+    assert "tags must be a list of strings" in result["error"]
+    # Ensure the repo was NEVER called
+    mock_restaurant_repository.add_menu_item.assert_not_called()
+
+# --- Creating restaurant tests ---
+
 # Positive functionality test: A restaurant owner should be able to create a restaurant
 def test_create_restaurant_as_owner(service, mock_restaurant_repository, restaurant_owner):
     data = {
