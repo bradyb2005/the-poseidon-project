@@ -70,3 +70,37 @@ class UserRepository:
         users.append(user_to_save)
         self._save_all(users)
         return user_to_save
+    
+    from backend.models.user.user_model import User
+    
+    def update_username(self, user_id: int, new_username: str):
+        users = self._load_all()
+        for u in users:
+            if u["id"] == user_id:
+                u["username"] = new_username
+                self._save_all(users)
+                return u
+        return None
+
+    def update_email(self, user_id: int, new_email: str):
+        users = self._load_all()
+        for u in users:
+            if u["id"] == user_id:
+                u["email"] = new_email
+                self._save_all(users)
+                return u
+        return None
+
+    def update_password(self, user_id: int, new_password: str):
+        users = self._load_all()
+        for u in users:
+            if u["id"] == user_id:
+                u["password_hash"] = User.hash_password(new_password)
+
+                # safety: ensure we NEVER keep raw password keys
+                u.pop("password", None)
+                u.pop("raw_password", None)
+
+                self._save_all(users)
+                return u
+        return None

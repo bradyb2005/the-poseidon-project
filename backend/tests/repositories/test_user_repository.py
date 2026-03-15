@@ -60,3 +60,67 @@ def test_find_by_id(repo):
 def test_find_missing_returns_none(repo):
     assert repo.find_by_username("nope") is None
     assert repo.find_by_id(999) is None
+
+
+
+def test_update_username_changes_only_username(repo):
+        created = repo.create({
+            "username": "anjana",
+            "email": "anjana.ubco@gmail.com",
+            "password": "SecurePw123!!"
+        })
+
+        updated = repo.update_username(created["id"], "anjana_r")
+
+        assert updated["username"] == "anjana_r"
+        assert updated["email"] == "anjana.ubco@gmail.com"
+        assert updated["id"] == created["id"]
+
+
+
+def test_update_email_changes_only_email(repo):
+    created = repo.create({
+        "username": "anjana",
+        "email": "oldanjana@gmail.com",
+        "password": "SecurePw123!!"
+    })
+
+    updated = repo.update_email(created["id"], "newanjana@gmail.com")
+
+    assert updated["email"] == "newanjana@gmail.com"
+    assert updated["username"] == "anjana"
+    assert updated["id"] == created["id"]
+
+
+def test_update_password_hashes_and_never_stores_raw(repo):
+    created = repo.create({
+        "username": "anjana",
+        "email": "anjana.ubco@gmail.com",
+        "password": "InitialPw123!!"
+    })
+
+    new_pw = "NewSecurePw456!!"
+    updated = repo.update_password(created["id"], new_pw)
+
+    # ensure password_hash exists
+    assert "password_hash" in updated
+
+    # ensure raw password not stored
+    assert updated["password_hash"] != new_pw
+    assert "password" not in updated
+
+    # double-check persisted file
+    import json
+    from backend.repositories import user_repository
+
+    with open(user_repository.DATA_FILE, "r", encoding="utf-8") as f:
+        saved = json.load(f)
+
+    assert saved[0]["password_hash"] != new_pw
+    assert "password" not in saved[0]
+
+
+def test_update_returns_none_if_user_not_found(repo):
+    assert repo.update_username(999, "ghost_user") is None
+    assert repo.update_email(999, "ghost@gmail.com") is None
+    assert repo.update_password(999, "Nope123!!") is None
