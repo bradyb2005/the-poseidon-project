@@ -11,12 +11,16 @@ def sample_menu():
         MenuItem(name="Pizza", price=12.99)
     ]
 
+
 @pytest.fixture
-def sample_restaurant(sample_menu):
+def sample_restaurant(mock_owner, sample_menu):
     return Restaurant(
         name="Testaurant",
-        open_time="09:00",
-        close_time="17:00",
+        owner=mock_owner,
+        open_time=900,
+        close_time=1700,
+        address="123 Test St",
+        phone="555-555-5555",
         distance_from_user=2.5,
         menu=sample_menu
     )
@@ -25,46 +29,81 @@ def sample_restaurant(sample_menu):
 ''' Create restaurant initialization'''
 
 
-# Positive Functional Test: The restaurant model initializes correctly with attributes
 def test_restaurant_initialization(sample_restaurant):
+    # Positive Functional Test: The restaurant model initializes correctly
     assert sample_restaurant.name == "Testaurant"
-    assert sample_restaurant.open_time == "09:00"
-    assert sample_restaurant.close_time == "17:00"
+    assert sample_restaurant.open_time == 900
+    assert sample_restaurant.close_time == 1700
     assert sample_restaurant.distance_from_user == 2.5
     assert len(sample_restaurant.menu) == 2
+    assert isinstance(sample_restaurant.id, int)
+    assert sample_restaurant.id == 0
 
-# Positive Functional Test: Tests that user can store before publishing
-def test_owner_publish_flow(sample_restaurant):
-    assert sample_restaurant.is_published == False is False
 
-    success = sample_restaurant.publish()
-    assert success is True
-    assert sample_restaurant.is_published is True
-
-# Positive Functional Test: Tests that different perspectives can be used
-def test_admin_customer_perspective(sample_restaurant):
-    # Customer perspective should not see unpublished restaurant
-    assert sample_restaurant.get_view("Customer") is None
-
-    # Restaurant owner/ admin should see unpublished restaurant
-    owner_view = sample_restaurant.get_view("Restaurant")
-    assert owner_view is not None
-    assert owner_view["name"] == "Testaurant"
-
-    sample_restaurant.publish()
-    assert sample_restaurant.get_view("Customer") is not None
-
-# Negative Edge Case: Cannot publish without menu
-def test_publish_without_menu():
-    empty_menu_restaurant = Restaurant("EmptyMenu", "10:00", "20:00", 1.0, [])
-    success = empty_menu_restaurant.publish()
-    assert success is False
-    assert empty_menu_restaurant.is_published is False
-    assert empty_menu_restaurant.get_view("Customer") is None
-
-# Positive Functional Test: The menu item models are stored correctly
 def test_menu_item_initialization(sample_menu):
+    # Positive Functional Test: The menu item models are stored correctly
     item = sample_menu[0]
     assert item.name == "Burger"
     assert item.price == 9.99
-    assert isinstance(item.id, str)
+    assert isinstance(item.id, int)
+
+
+# FR3: Validation tests
+
+def test_validate_for_publish_success(mock_owner):
+    # Positive functional test: Valid restaurant should pass validation
+    restaurant = Restaurant(
+        name="Testaurant",
+        owner=mock_owner,
+        address="123 Test St",
+        phone="123-456-7890",
+        open_time=900,
+        close_time=2100,
+        menu=[MenuItem(name="Burger", price=9.99)]
+    )
+    restaurant.validate_for_publish()
+
+
+def test_validate_for_publish_missing_field(mock_owner):
+    # Negative functional test: Should not pass if missing a field
+    restaurant = Restaurant(
+        name="Testaurant",
+        owner=mock_owner,
+        phone="123-456-7890",
+        open_time=900,
+        close_time=2100,
+        menu=[MenuItem(name="Burger", price=9.99)]
+        # address missing
+    )
+    with pytest.raises(ValueError, match="'address' is required."):
+        restaurant.validate_for_publish()
+
+
+def test_validate_for_publish_invalid_types(mock_owner):
+    # Negative functional test: Should not pass if type check fails
+    restaurant = Restaurant(
+        name="Testaurant",
+        owner=mock_owner,
+        address="123 Test St",
+        phone="123-456-7890",
+        open_time="900",
+        close_time=2100,
+        menu=[MenuItem(name="Burger", price=9.99)]
+    )
+    with pytest.raises(ValueError, match="must be numbers"):
+        restaurant.validate_for_publish()
+
+
+def test_validate_for_publish_logic_error(mock_owner):
+    # Negative funtional test: Should not pass if logic check fails
+    restaurant = Restaurant(
+        name="Testaurant",
+        owner=mock_owner,
+        address="123 Test St",
+        phone="123-456-7890",
+        open_time=2200,
+        close_time=2100,
+        menu=[MenuItem(name="Burger", price=9.99)]
+    )
+    with pytest.raises(ValueError, match="must be before 'close_time'"):
+        restaurant.validate_for_publish()

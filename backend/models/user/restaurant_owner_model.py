@@ -1,12 +1,13 @@
 # Restaurant owner model class
-
+from dataclasses import dataclass
 from backend.models.restaurant.restaurant_model import Restaurant
 from backend.models.user.user_model import User
 import backend.models.restaurant.menu_item_model
 
 
-
+@dataclass
 class RestaurantOwner(User):
+    res_id_counter = 1
 
     def __init__(self, id: int, username: str, email: str, password_hash: str):
         super().__init__(id, username, email, password_hash)
@@ -15,7 +16,10 @@ class RestaurantOwner(User):
     def create_restaurant(self, name, **kwargs):
         if not name or name.strip() == "":
             raise ValueError("Restaurant name cannot be empty")
-        return Restaurant(name=name, owner = self, **kwargs)
+        res_id = kwargs.pop('id', RestaurantOwner.res_id_counter) 
+        if res_id == RestaurantOwner.res_id_counter:
+            RestaurantOwner.res_id_counter += 1
+        return Restaurant(id=res_id, name=name, owner=self, **kwargs)
 
     def update_info(self, restaurant, **kwargs):
         for key, value in kwargs.items():
@@ -28,7 +32,8 @@ class RestaurantOwner(User):
 
     # removes a menu item from the restaurant's menu
     def remove_menu_item(self, restaurant, item):
-        restaurant.menu = [i for i in restaurant.menu if i.id != item.id]
+        if item in restaurant.menu:
+            restaurant.menu.remove(item)
 
     # updates a menu item in the restaurant's menu
     def update_menu_item(self, item, **kwargs):
@@ -41,7 +46,7 @@ class RestaurantOwner(User):
 
         if 'available' in kwargs:
             item.availability = kwargs['available']
-        
+
         for key, value in kwargs.items():
             if key not in ['price', 'available'] and hasattr(item, key):
                 setattr(item, key, value)
@@ -51,7 +56,14 @@ class RestaurantOwner(User):
         item.availability = status
 
     # Sets the restaurant's open and close times
-    def set_open_closed(self, restaurant,status):
+    def set_open_closed(self, restaurant, status):
         if not isinstance(status, bool):
-            raise ValueError ("Status must be a boolean")
+            raise ValueError("Status must be a boolean")
         restaurant.is_open = status
+
+    def publish_restaurant(self, restaurant: Restaurant):
+        """
+        Publish restaurant
+        """
+        restaurant.validate_for_publish()
+        restaurant.is_Published = True

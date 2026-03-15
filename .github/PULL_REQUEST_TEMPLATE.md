@@ -10,6 +10,6 @@
 
 ## Checklist
 - [ ] All tests pass
-- [ ] Test documation submitted to folder
+- [ ] Test documentation submitted to folder
 - [ ] Added necessary comments
 - [ ] Formatted correctly
