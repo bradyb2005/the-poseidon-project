@@ -50,9 +50,7 @@ class Restaurant:
             # Check for missing values
             if value is None or (isinstance(value, str) and not value.strip()):
                 raise ValueError(
-                    f"Cannot publish restaurant: '{
-                        field_name}' is required and cannot be empty."
-                        )
+                    f"Cannot publish restaurant: '{field_name}' is required and cannot be empty.")
 
         if not isinstance(self.open_time, int) or not isinstance(self.close_time, int):
             # Type checking
