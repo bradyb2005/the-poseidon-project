@@ -2,8 +2,24 @@
 import pytest
 from unittest.mock import MagicMock
 from backend.models.restaurant.menu_item_model import MenuItem
+from backend.models.user.restaurant_owner_model import RestaurantOwner
 
 '''Fixtures to create mock data for testing'''
+
+
+@pytest.fixture
+def owner():
+    return RestaurantOwner(
+        id=1,
+        username="John_Doe",
+        email="john_doe@gmail.com",
+        password_hash="SecurePass123"
+    )
+
+
+@pytest.fixture
+def restaurant(owner):
+    return owner.create_restaurant("John's Diner")
 
 
 @pytest.fixture
@@ -24,8 +40,9 @@ def test_create_restaurant(owner):
     restaurant = owner.create_restaurant("John's Diner")
     assert restaurant is not None
     assert restaurant.name == "John's Diner"
-    assert isinstance(restaurant.id, str)
-    assert len(restaurant.id) > 0
+
+    assert isinstance(restaurant.id, int)
+    assert restaurant.id >= 0
 
 
 # Negative Validation Test: Create restaurant with empty name
