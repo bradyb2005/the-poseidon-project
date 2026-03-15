@@ -2,15 +2,24 @@
 from dataclasses import dataclass
 from backend.models.restaurant.restaurant_model import Restaurant
 from backend.models.user.user_model import User
+import backend.models.restaurant.menu_item_model
+
 
 @dataclass
 class RestaurantOwner(User):
+    res_id_counter = 1
+
+    def __init__(self, id: int, username: str, email: str, password_hash: str):
+        super().__init__(id, username, email, password_hash)
 
     # Allows the restaurant owner to create a restaurant
     def create_restaurant(self, name, **kwargs):
         if not name or name.strip() == "":
             raise ValueError("Restaurant name cannot be empty")
-        return Restaurant(name=name, owner=self, **kwargs)
+        res_id = kwargs.pop('id', RestaurantOwner.res_id_counter) 
+        if res_id == RestaurantOwner.res_id_counter:
+            RestaurantOwner.res_id_counter += 1
+        return Restaurant(id=res_id, name=name, owner=self, **kwargs)
 
     def update_info(self, restaurant, **kwargs):
         for key, value in kwargs.items():
@@ -23,7 +32,8 @@ class RestaurantOwner(User):
 
     # removes a menu item from the restaurant's menu
     def remove_menu_item(self, restaurant, item):
-        restaurant.menu = [i for i in restaurant.menu if i.id != item.id]
+        if item in restaurant.menu:
+            restaurant.menu.remove(item)
 
     # updates a menu item in the restaurant's menu
     def update_menu_item(self, item, **kwargs):

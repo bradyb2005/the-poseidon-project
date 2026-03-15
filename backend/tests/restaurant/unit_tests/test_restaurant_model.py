@@ -36,6 +36,8 @@ def test_restaurant_initialization(sample_restaurant):
     assert sample_restaurant.close_time == 1700
     assert sample_restaurant.distance_from_user == 2.5
     assert len(sample_restaurant.menu) == 2
+    assert isinstance(sample_restaurant.id, int)
+    assert sample_restaurant.id == 0
 
 
 def test_menu_item_initialization(sample_menu):
@@ -43,7 +45,7 @@ def test_menu_item_initialization(sample_menu):
     item = sample_menu[0]
     assert item.name == "Burger"
     assert item.price == 9.99
-    assert isinstance(item.id, str)
+    assert isinstance(item.id, int)
 
 
 # FR3: Validation tests

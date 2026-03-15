@@ -1,5 +1,4 @@
 # backend/models/restaurant/restaurant_model.py
-import uuid
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Optional
 
@@ -23,7 +22,7 @@ class Restaurant:
     menu: List["MenuItem"] = field(default_factory=list)
 
     # Defaults
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    id: Optional[int] = None
     is_open: bool = False
     is_published: bool = False
 
@@ -34,7 +33,7 @@ class Restaurant:
 
     def validate_for_publish(self):
         """
-        FR3: Ensure all required fields are valid before publishing
+        Feat2-FR3: Ensure all required fields are valid before publishing
         - Check for missing values, type check and then logic check
         """
         if not self.menu:
@@ -51,8 +50,7 @@ class Restaurant:
             # Check for missing values
             if value is None or (isinstance(value, str) and not value.strip()):
                 raise ValueError(
-                    f"Cannot publish restaurant: '{
-                        field_name}' is required and cannot be empty.")
+                    f"Cannot publish restaurant: '{field_name}' is required and cannot be empty.")
 
         if not isinstance(self.open_time, int) or not isinstance(self.close_time, int):
             # Type checking
