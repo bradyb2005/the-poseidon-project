@@ -22,7 +22,7 @@ class Restaurant:
     menu: List["MenuItem"] = field(default_factory=list)
 
     # Defaults
-    id: int = 0
+    id: Optional[int] = None
     is_open: bool = False
     is_published: bool = False
 
