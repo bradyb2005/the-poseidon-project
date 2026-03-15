@@ -4,8 +4,8 @@ from unittest.mock import MagicMock
 from backend.services.user_service import UserService
 from backend.models.user.user_model import User
 
-
-@pytest.fixture
+#fixing errors - random commoent end 
+@pytest.fixture 
 def user_service():
     service = UserService()
     service.repo = MagicMock()
