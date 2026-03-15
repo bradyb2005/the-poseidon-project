@@ -1,7 +1,5 @@
 Restaurant Repository Tests
 
-<img width="703" height="120" alt="Screenshot 2026-03-12 at 3 39 15 PM" src="https://github.com/user-attachments/assets/77e26b84-a846-4ef8-9c06-e0f3f7e83703" />
-
 Creating a restaurant (Feat2-FR1)
 Functional test ensures a restaurant can be made and data passed in repo
 
@@ -29,3 +27,7 @@ By requesting data in small chunks across multiple pages, it confirms that the l
 
 Restaurant Edge Cases (Feat2-FR3)
 The two edge cases ensure you cannot get or update a nonexistaant restaurant.
+
+Coordinates test (Feat3-FR1)
+We have a safety net test that ensures a restaurant cannot be published without uploading its coordinate.
+We also test creating a restaurant with missing coordinates. You should be able to create a restaurant and the coordinates defaul to 0, 0
