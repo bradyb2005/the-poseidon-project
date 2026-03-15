@@ -22,3 +22,5 @@ All tests were executed using:
 pytest -q
 
 Result: 12 passed in 7.49 seconds.
+
+Coordinate tests have been added to test that a customer can be created with coordinates, as well as invalid coordinate range and a full loop test.
