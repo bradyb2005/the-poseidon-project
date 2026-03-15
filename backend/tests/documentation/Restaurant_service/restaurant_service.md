@@ -1,7 +1,5 @@
 Test documentation for restaurant service
 
-<img width="563" height="126" alt="Screenshot 2026-03-11 at 6 18 00 PM" src="https://github.com/user-attachments/assets/b002050c-1caf-4928-8e10-fae6b6798e76" />
-
 There is a positive functional test to ensure a restaurant can be published when all information is inputted accurately and correctly.
 
 Corresponding tests have been made to test for missing info error.
@@ -15,3 +13,7 @@ Another test ensures that a restaurant can be saved before publishing
 
 One last edge case checks that a restaurant cannot be published without a menu
 
+A collection of tests have been added for nearby search logic to allow to show restaurants near customers.
+There are three functional tests including testing filtering by distance, ignoring unpublished restaurants when filtering, and testing the math helper that calculates distance.
+
+There is a few edge cases as well. One that is a boundary tests at exactly 0,0 coordinates. Another that includes a large radius, and one that only shows exact (0) radius.

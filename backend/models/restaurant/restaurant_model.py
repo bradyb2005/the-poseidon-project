@@ -18,6 +18,8 @@ class Restaurant:
     close_time: Optional[int] = None
     address: Optional[str] = None
     phone: Optional[str] = None
+    latitude: float = 0.0
+    longitude: float = 0.0
     distance_from_user: Optional[float] = None
     menu: List["MenuItem"] = field(default_factory=list)
 
@@ -43,7 +45,9 @@ class Restaurant:
             "address": self.address,
             "phone": self.phone,
             "open_time": self.open_time,
-            "close_time": self.close_time
+            "close_time": self.close_time,
+            "latitude": self.latitude,
+            "longitude": self.longitude
         }
 
         for field_name, value in required_fields.items():
@@ -51,6 +55,10 @@ class Restaurant:
             if value is None or (isinstance(value, str) and not value.strip()):
                 raise ValueError(
                     f"Cannot publish restaurant: '{field_name}' is required and cannot be empty.")
+
+            if field_name in ["latitude", "longitude"] and value == 0.0:
+                 raise ValueError(
+                    f"Cannot publish restaurant: '{field_name}' must be set to a valid location.")
 
         if not isinstance(self.open_time, int) or not isinstance(self.close_time, int):
             # Type checking
