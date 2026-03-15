@@ -111,13 +111,19 @@ class User:
             "Admin": Admin,
         }
 
+        base_args = {
+            "id": int(data["id"]),
+            "username": str(data["username"]),
+            "email": str(data["email"]),
+            "password_hash": str(data["password_hash"]),
+        }
+
+        if user_type == "Customer":
+            base_args["address"] = data.get("address", "")
+            base_args["latitude"] = float(data.get("latitude", 0.0))
+            base_args["longitude"] = float(data.get("longitude", 0.0))
+
         cls = cls_map.get(user_type, User)
 
-        return cls(
-            id=int(data["id"]),
-            username=str(data["username"]),
-            email=str(data["email"]),
-            password_hash=str(data["password_hash"]),
-        )
-
+        return cls(**base_args)
 
