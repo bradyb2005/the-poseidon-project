@@ -22,7 +22,7 @@ class Restaurant:
     menu: List["MenuItem"] = field(default_factory=list)
 
     # Defaults
-    id: int = 0
+    id: Optional[int] = None
     is_open: bool = False
     is_published: bool = False
 
@@ -50,8 +50,7 @@ class Restaurant:
             # Check for missing values
             if value is None or (isinstance(value, str) and not value.strip()):
                 raise ValueError(
-                    f"Cannot publish restaurant: '{
-                        field_name}' is required and cannot be empty.")
+                    f"Cannot publish restaurant: '{field_name}' is required and cannot be empty.")
 
         if not isinstance(self.open_time, int) or not isinstance(self.close_time, int):
             # Type checking
