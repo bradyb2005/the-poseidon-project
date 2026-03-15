@@ -23,6 +23,7 @@ def test_menu_item_missing_restaurant_id():
         # Missing the mandatory restaurant_id argument
         MenuItem(name="Ghost Burger", price=5.00)
 
+
 def test_menu_item_repr():
     """
     Functional test: Verify the string representation
