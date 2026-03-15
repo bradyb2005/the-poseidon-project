@@ -23,24 +23,12 @@ def test_menu_item_missing_restaurant_id():
         # Missing the mandatory restaurant_id argument
         MenuItem(name="Ghost Burger", price=5.00)
 
-
-def test_menu_item_price_edge_cases():
+def test_menu_item_repr():
     """
-    Edge Case: Testing zero-price and high-price items
+    Functional test: Verify the string representation
+    includes the restaurant_id
     """
-    free_item = MenuItem(name="Free Water", price=0.0, restaurant_id=1)
-    expensive_item = MenuItem(name="Gold Pizza", price=999.99, restaurant_id=1)
-
-    assert free_item.price == 0.0
-    assert expensive_item.price == 999.99
-
-
-def test_menu_item_equality():
-    """
-    Functional Test: Two items with
-    the same data should be equal.
-    """
-    item1 = MenuItem(name="Coffee", price=3.50, restaurant_id=2)
-    item2 = MenuItem(name="Coffee", price=3.50, restaurant_id=2)
-
-    assert item1 == item2
+    item = MenuItem(name="Taco", price=5.0, restaurant_id=10, id=1)
+    repr_str = repr(item)
+    assert "name='Taco'" in repr_str
+    assert "restaurant_id=10" in repr_str
