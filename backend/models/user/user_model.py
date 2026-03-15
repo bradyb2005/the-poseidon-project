@@ -87,13 +87,20 @@ class User:
     # -----------------------------------------------------------------------------
     def to_dict(self) -> Dict:
         """Convert User into a dictionary (easy to save to JSON later)."""
-        return {
+        data = {
         "id": self.id,
         "username": self.username,
         "email": self.email,
         "password_hash": self.password_hash,
         "user_type": self.__class__.__name__,
     }
+        from backend.models.user.customer import Customer
+        if isinstance(self, Customer):
+            data["address"] = getattr(self, "address", "")
+            data["latitude"] = getattr(self, "latitude", 0.0)
+            data["longitude"] = getattr(self, "longitude", 0.0)
+            
+        return data
 
     @staticmethod
     
