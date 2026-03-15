@@ -27,6 +27,7 @@ def test_menu_item_repr():
     """
     Functional test: Verify the string representation
     includes the restaurant_id
+    Will help with searching
     """
     item = MenuItem(name="Taco", price=5.0, restaurant_id=10, id=1)
     repr_str = repr(item)
