@@ -61,26 +61,26 @@ def test_update_restaurant(restaurant_repo, sample_restaurant):
     assert updated_data["address"] == "456 New Ave"
     assert updated_data["is_published"] is True
 
-    def test_create_restaurant_with_missing_coordinates(
-            restaurant_repo, owner):
-        """
-        Feat3-FR1: Ensures that if the restaurant object
-        lacks lat/long attributes,
-        the repo defaults them to 0.0 instead of crashing.
-        """
-        minimal_res = Restaurant(name="Minimal", owner=owner)
-        # Manually remove attributes if they exist to simulate an old
-        # model version
-        if hasattr(minimal_res, 'latitude'):
-            del minimal_res.latitude
-        if hasattr(minimal_res, 'longitude'):
-            del minimal_res.longitude
+def test_create_restaurant_with_missing_coordinates(
+        restaurant_repo, owner):
+    """
+    Feat3-FR1: Ensures that if the restaurant object
+    lacks lat/long attributes,
+    the repo defaults them to 0.0 instead of crashing.
+    """
+    minimal_res = Restaurant(name="Minimal", owner=owner)
+    # Manually remove attributes if they exist to simulate an old
+    # model version
+    if hasattr(minimal_res, 'latitude'):
+        del minimal_res.latitude
+    if hasattr(minimal_res, 'longitude'):
+        del minimal_res.longitude
 
-        res_id = restaurant_repo.create_restaurant(minimal_res)
-        stored_data = restaurant_repo.get_by_id(res_id)
+    res_id = restaurant_repo.create_restaurant(minimal_res)
+    stored_data = restaurant_repo.get_by_id(res_id)
 
-        assert stored_data["latitude"] == 0.0
-        assert stored_data["longitude"] == 0.0
+    assert stored_data["latitude"] == 0.0
+    assert stored_data["longitude"] == 0.0
 
 # --- Coordinates ---
 
