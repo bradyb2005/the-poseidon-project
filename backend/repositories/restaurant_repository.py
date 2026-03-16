@@ -8,10 +8,12 @@ class RestaurantRepository:
     def __init__(self, db_connection):
         # Initialize data storage collection
         self.db = db_connection
+        self._next_res_id = 1
+        self._next_menu_id = 1
 
     # --- Restaurant Information ---
 
-    def create_restaurant(self, restaurant: Restaurant) -> str:
+    def create_restaurant(self, restaurant: Restaurant) -> int:
         """
         Feat2-FR1 (Storing Information)
         Create dictionary to store restaurant info
@@ -19,18 +21,28 @@ class RestaurantRepository:
         # Ensure that the dictionary contains all required fields
         # Run Insert query to data store
         # Return unique restaurant id
+        restaurant.id = self._next_res_id
+        self._next_res_id += 1
+
         restaurant_data = {
             "id": restaurant.id,
             "name": restaurant.name,
-            "owner_id": restaurant.owner.id,
+            "owner_id": int(restaurant.owner.id),
             "address": restaurant.address,
             "phone": restaurant.phone,
             "open_time": restaurant.open_time,
             "close_time": restaurant.close_time,
             "is_published": restaurant.is_published,
-            "menu": []
+            "menu": [{
+                "id": item.id,
+                "name": item.name,
+                "price": item.price,
+                "tags": item.tags
+            } for item in restaurant.menu
+            ]if restaurant.menu else []
 
         }
+
         self.db.append(restaurant_data)
         return restaurant.id
 
@@ -41,19 +53,24 @@ class RestaurantRepository:
         """
         # Find existing restaurant by restaurant_id
         # Update fields and save changes to data store
-        for i, entry in enumerate(self.db):
-            if entry['id'] == restaurant.id:
-                self.db[i].update({
-                    "name": restaurant.name,
-                    "address": restaurant.address,
-                    "phone": restaurant.phone,
-                    "open_time": restaurant.open_time,
-                    "close_time": restaurant.close_time,
-                    "is_published": restaurant.is_published})
-                return True
+        res_dict = self.get_by_id(restaurant.id)
+        if res_dict:
+            # We create a map of only the fields we want to sync
+            changes = {
+                "name": restaurant.name,
+                "address": restaurant.address,
+                "phone": restaurant.phone,
+                "open_time": restaurant.open_time,
+                "close_time": restaurant.close_time,
+                "is_published": restaurant.is_published
+            }
+            # .update() merges these changes into the existing dict
+            # Any key NOT in the 'changes' dict remains exactly as it was.
+            res_dict.update(changes)
+            return True
         return False
 
-    def add_menu_item(self, restaurant_id: str, menu_item: "MenuItem"):
+    def add_menu_item(self, restaurant_id: int, menu_item: MenuItem) -> bool:
         """
         Feat2-FR2 (Tagging menu items)
         Feat2-FR4 (Adding and editing menu items)
@@ -65,6 +82,9 @@ class RestaurantRepository:
         res_dict = self.get_by_id(restaurant_id)
 
         if res_dict:
+            menu_item.id = self._next_menu_id
+            self._next_menu_id += 1
+
             item_data = {
                 "id": menu_item.id,
                 "name": menu_item.name,
@@ -76,8 +96,8 @@ class RestaurantRepository:
                 res_dict["menu"] = []
 
             res_dict["menu"].append(item_data)
+            res_dict.setdefault("menu", []).append(item_data)
             return True
-
         return False
 
     def get_by_id(self, restaurant_id: str) -> Optional[Dict]:
@@ -91,6 +111,38 @@ class RestaurantRepository:
             if restaurant['id'] == restaurant_id:
                 return restaurant
         return None
+
+    # --- Adding and editing menu item ---
+
+    def update_menu_item(self, restaurant_id: int,
+                         item_id: int, updated_item: MenuItem) -> bool:
+        """
+        Feat2-FR4: Adding and editing menu items
+        Finds specific item in a restaurants menu and updates it
+        """
+        res = self.get_by_id(restaurant_id)
+        if res and "menu" in res:
+            for item in res["menu"]:
+                if item["id"] == item_id:
+                    # Update the stored dictionary with new object data
+                    item["name"] = updated_item.name
+                    item["price"] = updated_item.price
+                    item["tags"] = updated_item.tags
+                    return True
+        return False
+
+    def remove_menu_item(self, restaurant_id: str, item_id: str) -> bool:
+        """
+        Feat2-FR4 (Adding and editing menu items)
+        Removes an item from the menu list.
+        """
+        res = self.get_by_id(restaurant_id)
+        if res and "menu" in res:
+            initial_len = len(res["menu"])
+            res["menu"] = [item for item in
+                           res["menu"] if item["id"] != item_id]
+            return len(res["menu"]) < initial_len
+        return False
 
     # --- Browsing and Search ---
 
