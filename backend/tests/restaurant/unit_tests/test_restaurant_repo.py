@@ -2,6 +2,7 @@
 import pytest
 from backend.models.restaurant.restaurant_model import Restaurant
 from backend.repositories.restaurant_repository import RestaurantRepository
+from backend.models.restaurant.menu_item_model import MenuItem
 
 
 # --- Fixtures ---
