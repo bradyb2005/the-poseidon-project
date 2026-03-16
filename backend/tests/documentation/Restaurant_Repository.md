@@ -1,8 +1,6 @@
 Restaurant Repository Tests
 
-<img width="703" height="120" alt="Screenshot 2026-03-12 at 3 39 15 PM" src="https://github.com/user-attachments/assets/77e26b84-a846-4ef8-9c06-e0f3f7e83703" />
-<img width="615" height="117" alt="Screenshot 2026-03-12 at 2 21 47 PM" src="https://github.com/user-attachments/assets/fbe96a38-a4ad-4024-93b3-73dba5aba747" />
-<img width="563" height="123" alt="Screenshot 2026-03-12 at 12 32 55 PM" src="https://github.com/user-attachments/assets/1f092f7e-4691-4de0-b22b-1a39857eae48" />
+<img width="659" height="126" alt="Restaurant_repo" src="https://github.com/user-attachments/assets/7940efd8-2167-4045-9f4c-7b17434e8b7f" />
 
 Creating a restaurant (Feat2-FR1)
 Functional test ensures a restaurant can be made and data passed in repo
@@ -31,3 +29,7 @@ By requesting data in small chunks across multiple pages, it confirms that the l
 
 Restaurant Edge Cases (Feat2-FR3)
 The two edge cases ensure you cannot get or update a nonexistaant restaurant.
+
+Rating and Reviewing (Feat3-FR3)
+There is a functional test to ensure rating is updated properly, and that it is added properly.
+There are two edge cases for rating a nonexistent restaurant and adding a review to a nonexistent restaurant.
