@@ -5,7 +5,7 @@ from typing import List, Optional
 
 @dataclass
 class MenuItem:
-    name: str
+    name:str
     price: float
     id: Optional[int] = None
     availability: bool = True

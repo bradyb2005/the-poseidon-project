@@ -1,15 +1,19 @@
 # backend/repositories/restaurant_repository.py
 from typing import List, Dict, Optional
-import uuid
+from backend.models.restaurant.restaurant_model import Restaurant
+from backend.models.restaurant.menu_item_model import MenuItem
+
 
 class RestaurantRepository:
     def __init__(self, db_connection):
         # Initialize data storage collection
         self.db = db_connection
-    
+        self._next_res_id = 1
+        self._next_menu_id = 1
+
     # --- Restaurant Information ---
 
-    def create_restaurant(self, restaurant_data: Dict) -> str:
+    def create_restaurant(self, restaurant: Restaurant) -> int:
         """
         Feat2-FR1 (Storing Information)
         Create dictionary to store restaurant info
@@ -17,24 +21,56 @@ class RestaurantRepository:
         # Ensure that the dictionary contains all required fields
         # Run Insert query to data store
         # Return unique restaurant id
-        restaurant_data['id'] = str(uuid.uuid4())  # Generate unique ID for the restaurant
-        self.db.append(restaurant_data)  # Simulate inserting into data store
-        return restaurant_data['id']
+        restaurant.id = self._next_res_id
+        self._next_res_id += 1
 
-    def update_restaurant(self, restaurant_id: str, update_data: Dict):
+        restaurant_data = {
+            "id": restaurant.id,
+            "name": restaurant.name,
+            "owner_id": int(restaurant.owner.id),
+            "address": restaurant.address,
+            "phone": restaurant.phone,
+            "open_time": restaurant.open_time,
+            "close_time": restaurant.close_time,
+            "is_published": restaurant.is_published,
+            "menu": [{
+                "id": item.id,
+                "name": item.name,
+                "price": item.price,
+                "tags": item.tags
+            } for item in restaurant.menu
+            ]if restaurant.menu else []
+
+        }
+
+        self.db.append(restaurant_data)
+        return restaurant.id
+
+    def update_restaurant(self, restaurant: Restaurant) -> bool:
         """
         Feat2-FR3 (Correct and accurate information)
         Modify existing restaurant info
         """
         # Find existing restaurant by restaurant_id
         # Update fields and save changes to data store
-        res = self.get_by_id(restaurant_id)
-        if res:
-            res.update(update_data)  # Update restaurant information
+        res_dict = self.get_by_id(restaurant.id)
+        if res_dict:
+            # We create a map of only the fields we want to sync
+            changes = {
+                "name": restaurant.name,
+                "address": restaurant.address,
+                "phone": restaurant.phone,
+                "open_time": restaurant.open_time,
+                "close_time": restaurant.close_time,
+                "is_published": restaurant.is_published
+            }
+            # .update() merges these changes into the existing dict
+            # Any key NOT in the 'changes' dict remains exactly as it was.
+            res_dict.update(changes)
             return True
         return False
 
-    def add_menu_item(self, restaurant_id: str, menu_item_data: Dict):
+    def add_menu_item(self, restaurant_id: int, menu_item: MenuItem) -> bool:
         """
         Feat2-FR2 (Tagging menu items)
         Feat2-FR4 (Adding and editing menu items)
@@ -43,7 +79,26 @@ class RestaurantRepository:
         # Verify restaurant exists
         # Format item
         # Store menu item in data store with reference to restaurant_id
-        pass
+        res_dict = self.get_by_id(restaurant_id)
+
+        if res_dict:
+            menu_item.id = self._next_menu_id
+            self._next_menu_id += 1
+
+            item_data = {
+                "id": menu_item.id,
+                "name": menu_item.name,
+                "price": menu_item.price,
+                "tags": menu_item.tags
+            }
+            # Ensure menu list exists and append
+            if "menu" not in res_dict:
+                res_dict["menu"] = []
+
+            res_dict["menu"].append(item_data)
+            res_dict.setdefault("menu", []).append(item_data)
+            return True
+        return False
 
     def get_by_id(self, restaurant_id: str) -> Optional[Dict]:
         """
@@ -56,6 +111,38 @@ class RestaurantRepository:
             if restaurant['id'] == restaurant_id:
                 return restaurant
         return None
+
+    # --- Adding and editing menu item ---
+
+    def update_menu_item(self, restaurant_id: int,
+                         item_id: int, updated_item: MenuItem) -> bool:
+        """
+        Feat2-FR4: Adding and editing menu items
+        Finds specific item in a restaurants menu and updates it
+        """
+        res = self.get_by_id(restaurant_id)
+        if res and "menu" in res:
+            for item in res["menu"]:
+                if item["id"] == item_id:
+                    # Update the stored dictionary with new object data
+                    item["name"] = updated_item.name
+                    item["price"] = updated_item.price
+                    item["tags"] = updated_item.tags
+                    return True
+        return False
+
+    def remove_menu_item(self, restaurant_id: str, item_id: str) -> bool:
+        """
+        Feat2-FR4 (Adding and editing menu items)
+        Removes an item from the menu list.
+        """
+        res = self.get_by_id(restaurant_id)
+        if res and "menu" in res:
+            initial_len = len(res["menu"])
+            res["menu"] = [item for item in
+                           res["menu"] if item["id"] != item_id]
+            return len(res["menu"]) < initial_len
+        return False
 
     # --- Browsing and Search ---
 
@@ -80,7 +167,8 @@ class RestaurantRepository:
         # Return list of matching restaurants and menu items
         pass
 
-    def filter_results(self, cuisine: Optional[str] = None, min_rating: Optional[float] = None) -> List[Dict]:
+    def filter_results(self, cuisine: Optional[str] = None,
+                       min_rating: Optional[float] = None) -> List[Dict]:
         """
         Feat3-FR4 (Filtering results)
         Filter search results based on criteria
@@ -105,7 +193,8 @@ class RestaurantRepository:
         Search for restaurants by cuisine type
         """
         # Query data store for restaurants matching the specified cuisine
-        return [restaurant for restaurant in self.db if restaurant.get('cuisine') == cuisine]
+        return [restaurant for restaurant in self.db
+                if restaurant.get('cuisine') == cuisine]
 
     # --- Admin Support ---
 
