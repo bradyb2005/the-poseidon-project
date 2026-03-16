@@ -1,5 +1,4 @@
 # backend/models/restaurant/restaurant_model.py
-import uuid
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Optional
 
@@ -40,7 +39,6 @@ class Restaurant:
             "is_published": self.is_published
         }
 
-
     def update_average_rating(self):
         """
         Feat3-FR3: Functional logic for average logic to update when
@@ -49,7 +47,7 @@ class Restaurant:
         if not self.reviews:
             self.average_rating = 0.0
             return
-        
+
         total = sum(review.rating for review in self.reviews)
         self.average_rating = round(total / len(self.reviews), 1)
 
@@ -75,7 +73,8 @@ class Restaurant:
                     f"Cannot publish restaurant: '{
                         field_name}' is required and cannot be empty.")
 
-        if not isinstance(self.open_time, int) or not isinstance(self.close_time, int):
+        if not isinstance(self.open_time, int) or not isinstance(
+            self.close_time, int):
             # Type checking
             # Cannot fix flaking error without breaking code
             raise ValueError(

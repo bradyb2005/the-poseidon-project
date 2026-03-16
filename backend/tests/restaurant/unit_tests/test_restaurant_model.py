@@ -112,6 +112,7 @@ def test_validate_for_publish_logic_error(mock_owner):
 
 # --- Reviews/ Ratings ---
 
+
 def test_restaurant_rating_update_logic(sample_restaurant):
     """
     Feat3-FR3:
@@ -127,6 +128,7 @@ def test_restaurant_rating_update_logic(sample_restaurant):
 
     assert sample_restaurant.average_rating == 4.0
 
+
 def test_get_view_includes_reviews_and_menu(sample_restaurant):
     """
     Feat3-FR3:
@@ -135,16 +137,17 @@ def test_get_view_includes_reviews_and_menu(sample_restaurant):
     sample_restaurant.is_published = True
 
     sample_restaurant.reviews = [
-        Review(rating=5, comment="Yum", restaurant_id=1, 
+        Review(rating=5, comment="Yum", restaurant_id=1,
                customer_id=10, customer_name="Tom")
     ]
 
     view = sample_restaurant.get_view(role="Customer")
-    
+
     assert "average_rating" in view
     assert "menu" in view
     assert "reviews" in view
     assert len(view["menu"]) == 2
+
 
 def test_average_rating_with_no_reviews(sample_restaurant):
     """
@@ -171,7 +174,7 @@ def test_rating_rounding_precision(sample_restaurant):
                customer_id=1, customer_name="U3")
     ]
     sample_restaurant.update_average_rating()
-    
+
     # Asserting rounding to 1 decimal place
     assert sample_restaurant.average_rating == 4.7
 
@@ -181,8 +184,8 @@ def test_validation_ignores_impossible_ratings(sample_restaurant):
     Feat3-FR3
     Edge case: tests impossibly high rating
     """
-    sample_restaurant.reviews = [Review(rating=100, comment="Hacker", restaurant_id=1,
-                                        customer_id=999, customer_name="X")]
+    sample_restaurant.reviews = [Review(rating=100, comment="Hacker",
+                                        restaurant_id=1, customer_id=999, customer_name="X")]
     sample_restaurant.update_average_rating()
     assert sample_restaurant.average_rating == 100.0
 
@@ -195,13 +198,14 @@ def test_customer_view_full_data_payload(sample_restaurant):
     """
     sample_restaurant.is_published = True
     view = sample_restaurant.get_view(role="Customer")
-    
+
     # Check that menu items have all necessary data
     for item in view["menu"]:
         assert "name" in item
         assert "price" in item
 
     assert isinstance(view["reviews"], list)
+
 
 def test_get_view_returns_none_for_unpublished_restaurant(sample_restaurant):
     """
@@ -211,7 +215,7 @@ def test_get_view_returns_none_for_unpublished_restaurant(sample_restaurant):
     """
     sample_restaurant.is_published = False
     view = sample_restaurant.get_view(role="Customer")
-    
+
     assert view is None
 
 

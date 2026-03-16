@@ -79,7 +79,7 @@ def test_review_to_dict_for_view():
         comment="Perfect!"
     )
     review_data = vars(review)
-    
+
     expected_keys = {"rating", "restaurant_id",
                      "customer_id", "customer_name", "comment", "id"}
     assert expected_keys.issubset(review_data.keys())
