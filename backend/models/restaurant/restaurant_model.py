@@ -3,6 +3,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Optional
 
+
 # Read by VSCode for type checking but python ignores
 if TYPE_CHECKING:
     from backend.models.restaurant.menu_item_model import MenuItem
@@ -13,11 +14,9 @@ if TYPE_CHECKING:
 class Restaurant:
     name: str
     owner: 'RestaurantOwner'
-    # FR3: Explicitly define attributes instead of using **kwargs
-    # for better clarity and type checking
+    address: str = ""
     open_time: Optional[int] = None
     close_time: Optional[int] = None
-    address: Optional[str] = None
     phone: Optional[str] = None
     distance_from_user: Optional[float] = None
     menu: List["MenuItem"] = field(default_factory=list)
@@ -30,7 +29,10 @@ class Restaurant:
     def get_view(self, role: str):
         if role == "Customer" and not self.is_published:
             return None
-        return {"name": self.name, "is_published": self.is_published}
+        return {
+            "name": self.name,
+            "address": self.address,
+            "is_published": self.is_published}
 
     def validate_for_publish(self):
         """
@@ -50,6 +52,7 @@ class Restaurant:
         for field_name, value in required_fields.items():
             # Check for missing values
             if value is None or (isinstance(value, str) and not value.strip()):
+                # Cannot fix flaking error or will break code
                 raise ValueError(
                     f"Cannot publish restaurant: '{
                         field_name}' is required and cannot be empty.")
