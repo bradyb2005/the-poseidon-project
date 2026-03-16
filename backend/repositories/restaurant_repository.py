@@ -1,6 +1,7 @@
 # backend/repositories/restaurant_repository.py
 from typing import List, Dict, Optional
 from backend.models.restaurant.restaurant_model import Restaurant
+from backend.models.restaurant.menu_item_model import MenuItem
 
 
 class RestaurantRepository:
@@ -52,7 +53,7 @@ class RestaurantRepository:
                 return True
         return False
 
-    def add_menu_item(self, restaurant_id: str, menu_item_data: Dict):
+    def add_menu_item(self, restaurant_id: str, menu_item: "MenuItem"):
         """
         Feat2-FR2 (Tagging menu items)
         Feat2-FR4 (Adding and editing menu items)
@@ -61,7 +62,23 @@ class RestaurantRepository:
         # Verify restaurant exists
         # Format item
         # Store menu item in data store with reference to restaurant_id
-        pass
+        res_dict = self.get_by_id(restaurant_id)
+
+        if res_dict:
+            item_data = {
+                "id": menu_item.id,
+                "name": menu_item.name,
+                "price": menu_item.price,
+                "tags": menu_item.tags
+            }
+            # Ensure menu list exists and append
+            if "menu" not in res_dict:
+                res_dict["menu"] = []
+
+            res_dict["menu"].append(item_data)
+            return True
+
+        return False
 
     def get_by_id(self, restaurant_id: str) -> Optional[Dict]:
         """
