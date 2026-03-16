@@ -139,7 +139,7 @@ class RestaurantRepository:
                     return True
         return False
 
-    def remove_menu_item(self, restaurant_id: str, item_id: str) -> bool:
+    def remove_menu_item(self, restaurant_id: int, item_id: int) -> bool:
         """
         Feat2-FR4 (Adding and editing menu items)
         Removes an item from the menu list.
