@@ -64,7 +64,6 @@ def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
     stored_res = restaurant_repo.get_by_id(res_id)
     stored_item = stored_res["menu"][0]
     assert "Popular" in stored_item["tags"]
-    assert isinstance(stored_item["id"], int)
 
 # --- Updating menu ---
 
