@@ -9,9 +9,6 @@ import backend.models.restaurant.menu_item_model
 class RestaurantOwner(User):
     res_id_counter = 1
 
-    def __init__(self, id: int, username: str, email: str, password_hash: str):
-        super().__init__(id, username, email, password_hash)
-
     # Allows the restaurant owner to create a restaurant
     def create_restaurant(self, name, **kwargs):
         if not name or name.strip() == "":

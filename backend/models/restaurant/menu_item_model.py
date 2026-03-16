@@ -1,11 +1,11 @@
 # backend/models/restaurant/menu_item_model.py
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 
 @dataclass
 class MenuItem:
-    name: str
+    name:str
     price: float
-    id: int = 0
+    id: Optional[int] = None
     tags: List[str] = field(default_factory=list)

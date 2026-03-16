@@ -8,21 +8,6 @@ from backend.models.user.restaurant_owner_model import RestaurantOwner
 
 
 @pytest.fixture
-def owner():
-    return RestaurantOwner(
-        id=1,
-        username="John_Doe",
-        email="john_doe@gmail.com",
-        password_hash="SecurePass123"
-    )
-
-
-@pytest.fixture
-def restaurant(owner):
-    return owner.create_restaurant("John's Diner")
-
-
-@pytest.fixture
 def menu_item():
     item = MagicMock()
     item.id = 1

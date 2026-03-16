@@ -1,4 +1,6 @@
 Restaurant Repository Tests
+<img width="615" height="117" alt="Screenshot 2026-03-12 at 2 21 47 PM" src="https://github.com/user-attachments/assets/fbe96a38-a4ad-4024-93b3-73dba5aba747" />
+<img width="563" height="123" alt="Screenshot 2026-03-12 at 12 32 55 PM" src="https://github.com/user-attachments/assets/1f092f7e-4691-4de0-b22b-1a39857eae48" />
 
 Creating a restaurant (Feat2-FR1)
 Functional test ensures a restaurant can be made and data passed in repo

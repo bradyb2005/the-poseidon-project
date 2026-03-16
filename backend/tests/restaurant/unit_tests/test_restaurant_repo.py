@@ -3,6 +3,8 @@ import pytest
 from backend.models.restaurant.restaurant_model import Restaurant
 from backend.models.restaurant.menu_item_model import MenuItem
 from backend.repositories.restaurant_repository import RestaurantRepository
+from backend.models.restaurant.menu_item_model import MenuItem
+
 
 # --- Fixtures ---
 
@@ -19,8 +21,6 @@ def sample_restaurant(owner):
         name="Testaurant",
         owner=owner,
         address="123 Test st",
-        latitude=45.523062,
-        longitude=-122.676482,
         phone="555-555-5555",
         open_time=900,
         close_time=2200
@@ -37,11 +37,6 @@ def test_create_restaurant(restaurant_repo, sample_restaurant):
     assert result == sample_restaurant.id
     assert len(restaurant_repo.get_all_restaurants()) == 1
 
-    # Verification that coordinates are persisted on creation
-    stored_data = restaurant_repo.get_by_id(result)
-    assert stored_data["latitude"] == 45.523062
-    assert stored_data["longitude"] == -122.676482
-
 
 def test_update_restaurant(restaurant_repo, sample_restaurant):
     # Test for Feat2-FR3: Correct and accurate information
@@ -49,9 +44,6 @@ def test_update_restaurant(restaurant_repo, sample_restaurant):
     res_id = restaurant_repo.create_restaurant(sample_restaurant)
 
     sample_restaurant.address = "456 New Ave"
-    # Update the coordinates as part of the update test
-    sample_restaurant.latitude = 40.7128
-    sample_restaurant.longitude = -74.0060
     sample_restaurant.is_published = True
 
     success = restaurant_repo.update_restaurant(sample_restaurant)
@@ -120,7 +112,6 @@ def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
     stored_res = restaurant_repo.get_by_id(res_id)
     stored_item = stored_res["menu"][0]
     assert "Popular" in stored_item["tags"]
-    assert isinstance(stored_item["id"], int)
 
 # --- Updating menu ---
 
@@ -176,6 +167,20 @@ def test_update_menu_item_preserves_extra_fields(
     final_data = restaurant_repo.get_by_id(res_id)
     assert final_data["menu"][0]["calories"] == 500
     assert final_data["menu"][0]["name"] == "Lean Burger"
+
+# --- Tagging ---
+
+
+def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
+    # Test for Feat2-FR2: Tagging Menu items
+    # Functional test: Add tags to new menu item
+    restaurant_repo.create_restaurant(restaurant)
+
+    restaurant_repo.add_menu_item(restaurant.id, sample_item)
+
+    stored_res = restaurant_repo.get_by_id(restaurant.id)
+    stored_item = stored_res["menu"][0]
+    assert "Popular" in stored_item["tags"]
 
 # --- Browsing and Search ---
 

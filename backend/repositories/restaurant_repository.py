@@ -24,18 +24,11 @@ class RestaurantRepository:
         restaurant.id = self._next_res_id
         self._next_res_id += 1
 
-        lat = getattr(restaurant, 'latitude', 0.0)
-        lon = getattr(restaurant, 'longitude', 0.0)
-        final_published_status = restaurant.is_published if (
-            lat != 0.0 and lon != 0.0) else False
-
         restaurant_data = {
             "id": restaurant.id,
             "name": restaurant.name,
             "owner_id": int(restaurant.owner.id),
             "address": restaurant.address,
-            "latitude": getattr(restaurant, 'latitude', 0.0),
-            "longitude": getattr(restaurant, 'longitude', 0.0),
             "phone": restaurant.phone,
             "open_time": restaurant.open_time,
             "close_time": restaurant.close_time,
@@ -62,24 +55,14 @@ class RestaurantRepository:
         # Update fields and save changes to data store
         res_dict = self.get_by_id(restaurant.id)
         if res_dict:
-            lat = getattr(restaurant, 'latitude', 0.0)
-            long = getattr(restaurant, 'longitude', 0.0)
-
-            # If coordinates are 0.0, force is_published to False
-            # regardless of what the input object says.
-            final_published_status = restaurant.is_published
-            if lat == 0.0 or long == 0.0:
-                final_published_status = False
             # We create a map of only the fields we want to sync
             changes = {
                 "name": restaurant.name,
                 "address": restaurant.address,
-                "latitude": lat,
-                "longitude": long,
                 "phone": restaurant.phone,
                 "open_time": restaurant.open_time,
                 "close_time": restaurant.close_time,
-                "is_published": final_published_status
+                "is_published": restaurant.is_published
             }
             # .update() merges these changes into the existing dict
             # Any key NOT in the 'changes' dict remains exactly as it was.
