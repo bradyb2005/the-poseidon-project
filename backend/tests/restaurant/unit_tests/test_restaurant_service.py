@@ -1,34 +1,40 @@
-# backend/tests/restaurant/unit_tests/test_restaurant_service.py
+# backend/tests/restaurant/unit_tests/test_menu_item_model.py
 import pytest
-from backend.services.restaurant_service import RestaurantService
+from unittest.mock import MagicMock, ANY
 from backend.models.user.customer import Customer
-from backend.models.user.restaurant_owner_model import RestaurantOwner
+from backend.services.restaurant_service import RestaurantService
 from backend.models.restaurant.restaurant_model import Restaurant
+from backend.models.user.restaurant_owner_model import RestaurantOwner
 
-class MockRepo:
-    def __init__(self):
-        self.restaurants = {}
-    
-    def create_restaurant(self, restaurant_data):
-        return "mock_id_123"
-    
-    def get_by_id(self, restaurant_id):
-        return self.restaurants.get(restaurant_id)
-    
-    def update(self, restaurant):
-        self.restaurants[restaurant.id] = restaurant
-        return True
+@pytest.fixture
+def mock_repo():
+    return MagicMock()
+
+@pytest.fixture
+def service(mock_repo):
+    return RestaurantService(mock_repo)
+
+@pytest.fixture
+def restaurant_owner():
+    return RestaurantOwner(
+        id=1, 
+        username="John Doe", 
+        password_hash="hashed_password", 
+        email="fakeemail@mail.ca",
+    )
+
+@pytest.fixture
+def customer():
+    return Customer(id=2, username="Newbie", password_hash="hashed_pw", email="customer@mail.com")
     
     def get_all_restaurants(self):
         # Expects a list of dictionaries
         return [res.to_dict() if hasattr(res, 'to_dict'
                                          ) else res for res in self.restaurants.values()]
 
-@pytest.fixture
-def restaurant_service():
-    return RestaurantService(MockRepo())
 
-# --- F2FR3: Publishing logic ---
+# --- FR3: Publishing logic ---
+
 
 def test_publish_restaurant_success(restaurant_service, restaurant):
     # Positive Functional test: Publish when all required fields are filled
@@ -39,41 +45,58 @@ def test_publish_restaurant_success(restaurant_service, restaurant):
     restaurant.close_time = 2200
     restaurant.menu = ["Mock item"]
 
-    restaurant_service.restaurant_repository.restaurants[restaurant.id] = restaurant
+    mock_repo.get_by_id.return_value = restaurant
 
-    result = restaurant_service.publish_restaurant(restaurant.id)
+    result = service.publish_restaurant(restaurant.id)
 
     assert result["success"] is True
     assert restaurant.is_published is True
 
-def test_publish_restaurant_fails_missing_info(restaurant_service, restaurant):
+def test_publish_restaurant_fails_missing_info(service, mock_repo, restaurant):
     # Edge test: Throw error if incomplete
-    restaurant_service.restaurant_repository.restaurants[restaurant.id] = restaurant
-    result = restaurant_service.publish_restaurant(restaurant.id)
+    mock_repo.get_by_id.return_value = restaurant
+    result = service.publish_restaurant(restaurant.id)
 
     assert result["success"] is False
     assert "is required" in result["error"]
     assert restaurant.is_published is False
 
-def test_admin_customer_perspective(restaurant_service, restaurant):
+def test_publish_fails_without_menu(service, mock_repo, restaurant):
+    # Negative Edge Case: Cannot publish without menu
+    restaurant.address = "123 Test Ave"
+    restaurant.phone = "555-555-5555"
+    # Clear menu
+    restaurant.menu = []
+    mock_repo.get_by_id.return_value = restaurant
+
+    result = service.publish_restaurant(restaurant.id)
+
+    assert result["success"] is False
+    assert "menu cannot be empty" in result["error"]
+
+
+def test_admin_customer_perspective(service, mock_repo, restaurant):
     # Positive Functional Test: Tests that different perspectives can be used
     # Customer perspective should not see unpublished restaurant
     restaurant.address = "123 Test Ave"
     restaurant.phone = "555-555-5555"
     restaurant.open_time = 900
     restaurant.close_time = 2200
-    restaurant_service.restaurant_repository.restaurants[restaurant.id] = restaurant
+    restaurant.menu = ["Item"]
+
+    mock_repo.get_by_id.return_value = restaurant
 
     # Ensure customer cant see restaurant before it is published
     assert restaurant.get_view("Customer") is None
 
     # Publish
-    restaurant_service.publish_restaurant(restaurant.id)
+    service.publish_restaurant(restaurant.id)
 
     # Check to see if customer can view it
     view = restaurant.get_view("Customer")
     assert view is not None
     assert view["name"] == "John's Diner"
+
 
 # --- F2FR1: Registration and roles---
 
@@ -106,25 +129,18 @@ def test_service_publish_flow_success(restaurant_service, restaurant):
     restaurant.phone = "555-555-5555"
     restaurant.open_time = 900
     restaurant.close_time = 2200
-    restaurant_service.restaurant_repository.restaurants[restaurant.id] = restaurant
+    mock_repo.get_by_id.return_value = restaurant
 
-    result = restaurant_service.publish_restaurant(restaurant.id)
+    assert restaurant.is_published is False
+    assert restaurant.get_view("Customer") is None
 
+    restaurant.menu = ["Item"]
+    result = service.publish_restaurant(restaurant.id)
+
+    # 5. Assert final state
     assert result["success"] is True
     assert restaurant.is_published is True
-
-def test_publish_fails_without_menu(restaurant_service, restaurant):
-    # Negative Edge Case: Cannot publish without menu
-    restaurant.address = "123 Test Ave"
-    restaurant.phone = "555-555-5555"
-    # Clear menu
-    restaurant.menu = []
-    restaurant_service.restaurant_repository.restaurants[restaurant.id] = restaurant
-
-    result = restaurant_service.publish_restaurant(restaurant.id)
-
-    assert result["success"] is False
-    assert "menu cannot be empty" in result["error"]
+    assert restaurant.get_view("Customer") is not None
 
 # --- F3FR1 Nearby search logic ---
 

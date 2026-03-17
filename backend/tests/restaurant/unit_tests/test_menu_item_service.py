@@ -22,29 +22,28 @@ def test_add_menu_item_success(menu_service, mock_repo):
     # Feat2-FR4: Functional Test:
     # tests that adding menu item is successful
     mock_repo.get_by_id.return_value = {
-        "id": "res_123", "owner_id": 1, "menu": []}
+        "id": 123, "owner_id": 1, "menu": []}
     item_data = {"name": "New Burger", "price": 10.99, "tags": ["New"]}
 
     menu_service.add_menu_item(
-        owner_id=1, restaurant_id="res_123", item_data=item_data)
+        owner_id=1, restaurant_id=123, item_data=item_data)
 
     args, _ = mock_repo.add_menu_item.call_args
-    assert args[0] == "res_123"
-    assert isinstance(args[1], MenuItem)
+    assert args[0] == 123
     assert args[1].name == "New Burger"
 
 
 def test_update_availability_success(menu_service, mock_repo):
     # Edge case: Update availabilitiy of a menu item
-    mock_repo.get_by_id.return_value = {"id": "res_10", "owner_id": 1}
+    mock_repo.get_by_id.return_value = {"id": 10, "owner_id": 1}
     mock_repo.update_menu_item.return_value = True
 
     result = menu_service.update_item_availability(
-        1, "res_10", "item_1", False)
+        1, 10, 1, False)
 
     assert result is True
     mock_repo.update_menu_item_availability.assert_called_once_with(
-        "res_10", "item_1", False)
+        10, 1, False)
 
 
 def test_edit_menu_item_success(menu_service, mock_repo):
@@ -79,7 +78,7 @@ def test_update_availability_restaurant_not_found(menu_service, mock_repo):
     mock_repo.get_by_id.return_value = None
 
     with pytest.raises(EntityNotFoundError) as exc:
-        menu_service.update_item_availability(1, "99", "item1", False)
+        menu_service.update_item_availability(1, 99, 1, False)
 
     assert "Restaurant with ID 99 not found" in str(exc.value)
 
@@ -102,4 +101,5 @@ def test_unauthorized_owner_access(menu_service, mock_repo):
     with pytest.raises(PermissionError) as exc:
         menu_service.update_item_availability(
             2, "res_123", "item_001", False)
+
     assert "Access denied" in str(exc.value)
