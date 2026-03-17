@@ -62,8 +62,8 @@ def test_validate_csv_valid_data(mock_csv):
 def test_load_csv_file_not_found():
     """
     Feature 2
-    Edge case: Tests loading a file that doesn't
-    exist
+    Edge case: Tests loading a file that
+    cannot be found
     """
     with pytest.raises(FileNotFoundError):
         load_csv("non_existent_file.csv")
