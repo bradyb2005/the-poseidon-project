@@ -16,6 +16,7 @@ def restaurant_repo():
 
 
 @pytest.fixture
+<<<<<<< F3FR3_Repo
 def owner():
     class MockOwner:
         id = 1
@@ -23,6 +24,8 @@ def owner():
 
 
 @pytest.fixture
+=======
+>>>>>>> main
 def sample_restaurant(owner):
     return Restaurant(
         name="Testaurant",
@@ -60,6 +63,7 @@ def test_update_restaurant(restaurant_repo, sample_restaurant):
     assert updated_data["address"] == "456 New Ave"
     assert updated_data["is_published"] is True
 
+<<<<<<< F3FR3_Repo
 # --- Ratings and Reviews  ---
 
 def test_update_restaurant_rating_persistence(restaurant_repo, sample_restaurant):
@@ -121,6 +125,8 @@ def test_add_review_nonexistent_restaurant(restaurant_repo):
     success = restaurant_repo.add_review_to_restaurant(999, {"rating": 5})
     assert success is False
 
+=======
+>>>>>>> main
 # --- Tagging ---
 
 
@@ -178,6 +184,10 @@ def test_update_menu_item_preserves_extra_fields(
     restaurant_repo.add_menu_item(res_id, sample_item)
 
     # Simulate a field we didn't account for in the model
+<<<<<<< F3FR3_Repo
+=======
+    # (e.g., from a future DB migration)
+>>>>>>> main
     stored_res = restaurant_repo.get_by_id(res_id)
     stored_res["menu"][0]["calories"] = 500
     item_id = stored_res["menu"][0]["id"]
@@ -203,6 +213,58 @@ def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
     stored_item = stored_res["menu"][0]
     assert "Popular" in stored_item["tags"]
 
+<<<<<<< F3FR3_Repo
+=======
+# --- Tagging ---
+
+
+def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
+    # Test for Feat2-FR2: Tagging Menu items
+    # Functional test: Add tags to new menu item
+    restaurant_repo.create_restaurant(restaurant)
+
+    restaurant_repo.add_menu_item(restaurant.id, sample_item)
+
+    stored_res = restaurant_repo.get_by_id(restaurant.id)
+    stored_item = stored_res["menu"][0]
+    assert "Popular" in stored_item["tags"]
+
+# --- Updating menu ---
+
+
+def test_update_menu_item(restaurant_repo, restaurant, sample_item):
+    # Feat2-FR4: Verifies existing menu item data can be edited
+    restaurant_repo.create_restaurant(restaurant)
+
+    stored_res = restaurant_repo.get_by_id(restaurant.id)
+    stored_item_id = stored_res["menu"][0]["id"]  # The burger from conftest
+
+    updated_item = MenuItem(
+        name="Premium Burger", price=15.0, id=stored_item_id)
+    success = restaurant_repo.update_menu_item(
+        restaurant.id, stored_item_id, updated_item)
+
+    assert success is True
+    final_data = restaurant_repo.get_by_id(restaurant.id)
+    assert final_data["menu"][0]["name"] == "Premium Burger"
+
+
+def test_remove_menu_item(restaurant_repo, restaurant, sample_item):
+    # FR4: Verifies an item can be removed from the menu.
+    restaurant_repo.create_restaurant(restaurant)
+
+    # Grab the ID of the first item (the burger)
+    stored_res = restaurant_repo.get_by_id(restaurant.id)
+    item_id_to_remove = stored_res["menu"][0]["id"]
+
+    success = restaurant_repo.remove_menu_item(
+        restaurant.id, item_id_to_remove)
+
+    assert success is True
+    updated_res = restaurant_repo.get_by_id(restaurant.id)
+    assert len(updated_res["menu"]) == 0
+
+>>>>>>> main
 # --- Browsing and Search ---
 
 
