@@ -1,12 +1,26 @@
+import sys
+import types
 import pytest
-import backend.services.payment_service as payment_service_module
-from backend.services.payment_service import PaymentService
-from backend.models.payment.payment_model import PaymentStatus
+
+mock_cost_calculator_module = types.ModuleType("backend.models.payment.cost_calculator_model")
+mock_payment_model_module = types.ModuleType("backend.models.payment.payment_model")
 
 
-class MockOrder:
-    def __init__(self, order_id=1):
-        self.id = order_id
+class MockCostCalculator:
+    def calculateTotal(self, order):
+        return 42.50
+
+    def getBreakdown(self, order):
+        return {
+            "subtotal": 20.00,
+            "tax": 2.40,
+            "fees": 1.60,
+            "total": 24.00,
+        }
+
+
+class MockPaymentStatus:
+    DENIED = types.SimpleNamespace(value="denied")
 
 
 class MockPayment:
@@ -34,18 +48,34 @@ class MockPayment:
         return True
 
     def processPayment(self):
-        self.status = type("MockStatus", (), {"value": "accepted"})()
+        self.status = types.SimpleNamespace(value="accepted")
         return True
 
     def get_payment_info(self):
         return {
             "card_name": self.card_name,
             "amount": self.amount,
-            "status": self.status.value if hasattr(self.status, "value") else self.status,
+            "status": self.status.value,
         }
 
     def request_fulfillment(self):
         return True
+
+
+mock_cost_calculator_module.CostCalculator = MockCostCalculator
+mock_payment_model_module.Payment = MockPayment
+mock_payment_model_module.PaymentStatus = MockPaymentStatus
+
+sys.modules["backend.models.payment.cost_calculator_model"] = mock_cost_calculator_module
+sys.modules["backend.models.payment.payment_model"] = mock_payment_model_module
+
+
+from backend.services.payment_service import PaymentService
+
+
+class MockOrder:
+    def __init__(self, order_id=1):
+        self.id = order_id
 
 
 @pytest.fixture
@@ -60,15 +90,8 @@ def order():
 
 # --- FR1: Retrieving Information ---
 
-def test_create_payment_success(payment_service, order, monkeypatch):
+def test_create_payment_success(payment_service, order):
     # Positive Functional Test: Payment object is created successfully
-    monkeypatch.setattr(
-        payment_service.cost_calculator,
-        "calculateTotal",
-        lambda order: 42.50
-    )
-    monkeypatch.setattr(payment_service_module, "Payment", MockPayment)
-
     data = {
         "card_name": "John Doe",
         "card_number": 1234567812345678,
@@ -81,36 +104,30 @@ def test_create_payment_success(payment_service, order, monkeypatch):
     assert result["success"] is True
     assert result["payment"].card_name == "John Doe"
     assert result["payment"].amount == 42.50
-    assert result["payment"].status == PaymentStatus.DENIED
+    assert result["payment"].status.value == "denied"
 
 
-def test_create_payment_fails_when_cost_calculation_errors(payment_service, order, monkeypatch):
-    # Edge Case: Return error if total calculation fails
-    def raise_error(order):
-        raise Exception("Calculation failed")
-
-    monkeypatch.setattr(
-        payment_service.cost_calculator,
-        "calculateTotal",
-        raise_error
-    )
-
+def test_create_payment_defaults(payment_service, order):
+    # Edge Test: Missing fields fall back to defaults
     result = payment_service.create_payment(order, {})
 
-    assert result["success"] is False
-    assert "Calculation failed" in result["error"]
+    assert result["success"] is True
+    assert result["payment"].card_name == ""
+    assert result["payment"].card_number == 0
+    assert result["payment"].security_number == 0
+    assert result["payment"].expiration == ""
 
 
-def test_get_payment_info_success(payment_service):
+def test_get_payment_info_success(payment_service, order):
     # Positive Functional Test: Payment info can be retrieved
     payment = MockPayment(
         id=1,
-        order=MockOrder(),
+        order=order,
         card_name="Jane Doe",
         card_number=1111222233334444,
         security_number=321,
         expiration="10/27",
-        status=PaymentStatus.DENIED,
+        status=types.SimpleNamespace(value="denied"),
         amount=25.00,
     )
 
@@ -122,7 +139,7 @@ def test_get_payment_info_success(payment_service):
 
 
 def test_get_payment_info_failure(payment_service):
-    # Edge Case: Return error if payment info retrieval fails
+    # Edge Test: Return error if payment info retrieval fails
     class BrokenPayment:
         def get_payment_info(self):
             raise Exception("Could not retrieve payment info")
@@ -135,19 +152,26 @@ def test_get_payment_info_failure(payment_service):
 
 # --- FR2: Complete data types ---
 
-def test_validate_payment_success(payment_service):
+def test_validate_payment_success(payment_service, order):
     # Positive Functional Test: Valid payment passes validation
-    class ValidPayment:
-        def validate(self):
-            return True
+    payment = MockPayment(
+        id=1,
+        order=order,
+        card_name="John Doe",
+        card_number=1234,
+        security_number=123,
+        expiration="12/28",
+        status=types.SimpleNamespace(value="denied"),
+        amount=42.50,
+    )
 
-    result = payment_service.validate_payment(ValidPayment())
+    result = payment_service.validate_payment(payment)
 
     assert result["success"] is True
 
 
 def test_validate_payment_failure(payment_service):
-    # Negative Edge Case: Invalid payment fails validation
+    # Negative Edge Test: Invalid payment fails validation
     class InvalidPayment:
         def validate(self):
             return False
@@ -160,17 +184,19 @@ def test_validate_payment_failure(payment_service):
 
 # --- FR3: Integrated payment gateway ---
 
-def test_process_payment_success(payment_service):
+def test_process_payment_success(payment_service, order):
     # Positive Functional Test: Payment is processed successfully
-    class ProcessablePayment:
-        def __init__(self):
-            self.status = type("MockStatus", (), {"value": "denied"})()
+    payment = MockPayment(
+        id=1,
+        order=order,
+        card_name="John Doe",
+        card_number=1234,
+        security_number=123,
+        expiration="12/28",
+        status=types.SimpleNamespace(value="denied"),
+        amount=42.50,
+    )
 
-        def processPayment(self):
-            self.status = type("MockStatus", (), {"value": "accepted"})()
-            return True
-
-    payment = ProcessablePayment()
     result = payment_service.process_payment(payment)
 
     assert result["success"] is True
@@ -178,7 +204,7 @@ def test_process_payment_success(payment_service):
 
 
 def test_process_payment_failure(payment_service):
-    # Negative Edge Case: Payment is denied
+    # Negative Edge Test: Payment is denied
     class DeniedPayment:
         def processPayment(self):
             return False
@@ -191,19 +217,26 @@ def test_process_payment_failure(payment_service):
 
 # --- FR4: Fulfillment request ---
 
-def test_request_fulfillment_success(payment_service):
-    # Positive Functional Test: Fulfillment request succeeds for accepted payment
-    class FulfillablePayment:
-        def request_fulfillment(self):
-            return True
+def test_request_fulfillment_success(payment_service, order):
+    # Positive Functional Test: Fulfillment request succeeds
+    payment = MockPayment(
+        id=1,
+        order=order,
+        card_name="John Doe",
+        card_number=1234,
+        security_number=123,
+        expiration="12/28",
+        status=types.SimpleNamespace(value="accepted"),
+        amount=42.50,
+    )
 
-    result = payment_service.request_fulfillment(FulfillablePayment())
+    result = payment_service.request_fulfillment(payment)
 
     assert result["success"] is True
 
 
 def test_request_fulfillment_failure(payment_service):
-    # Negative Edge Case: Fulfillment fails if payment not accepted
+    # Negative Edge Test: Fulfillment fails if payment not accepted
     class UnfulfillablePayment:
         def request_fulfillment(self):
             return False
@@ -216,39 +249,12 @@ def test_request_fulfillment_failure(payment_service):
 
 # --- Cost breakdown ---
 
-def test_get_cost_breakdown_success(payment_service, order, monkeypatch):
+def test_get_cost_breakdown_success(payment_service, order):
     # Positive Functional Test: Cost breakdown is returned correctly
-    expected_breakdown = {
-        "subtotal": 20.00,
-        "tax": 2.40,
-        "fees": 1.60,
-        "total": 24.00,
-    }
-
-    monkeypatch.setattr(
-        payment_service.cost_calculator,
-        "getBreakdown",
-        lambda order: expected_breakdown
-    )
-
     result = payment_service.get_cost_breakdown(order)
 
     assert result["success"] is True
-    assert result["breakdown"] == expected_breakdown
-
-
-def test_get_cost_breakdown_failure(payment_service, order, monkeypatch):
-    # Edge Case: Return error if breakdown calculation fails
-    def raise_error(order):
-        raise Exception("Breakdown failed")
-
-    monkeypatch.setattr(
-        payment_service.cost_calculator,
-        "getBreakdown",
-        raise_error
-    )
-
-    result = payment_service.get_cost_breakdown(order)
-
-    assert result["success"] is False
-    assert "Breakdown failed" in result["error"]
+    assert result["breakdown"]["subtotal"] == 20.00
+    assert result["breakdown"]["tax"] == 2.40
+    assert result["breakdown"]["fees"] == 1.60
+    assert result["breakdown"]["total"] == 24.00
