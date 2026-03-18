@@ -53,7 +53,6 @@ def test_update_restaurant(restaurant_repo, sample_restaurant):
     assert updated_data["address"] == "456 New Ave"
     assert updated_data["is_published"] is True
 
-
 def test_create_restaurant_with_missing_coordinates(
         restaurant_repo, owner):
     """
@@ -92,8 +91,8 @@ def test_repository_safety_net_forces_false_publication(
     restaurant_repo.update_restaurant(sample_restaurant)
 
     updated_data = restaurant_repo.get_by_id(res_id)
-    assert updated_data.get("is_published") is False, "Safety net failed to override is_published to False"
-
+    assert updated_data["is_published"] is False
+    assert updated_data["latitude"] == 0.0
 
 # --- Tagging ---
 
