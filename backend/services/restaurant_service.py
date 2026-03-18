@@ -23,34 +23,30 @@ class RestaurantService:
         if not self._is_authorized(user):
             return {"success": False, "error": "unauthorized"}
         
-        # Get tags
-        name = item_data.get("name")
-        price = item_data.get("price")
-        raw_tags = item_data.get("tags", [])
-        # Validate to ensure  tags is a list and all elements are strings
-        
-        if not isinstance(raw_tags, list) or not all (isinstance(t, str) for t in raw_tags):
-            return {"success": False, "error": "tags must be a list of strings"}
-        
-        if not name or price is None:
-            return {"success": False, "error": "name and price are required"}
-        
-        # Create menu item and add to restaurant
         try:
-            menu_item = MenuItem(
-            id=item_data.get("id", 0),
-            name=name,
-            price=float(price),
-            tags=raw_tags)
-            # Link menu item to restaurant
-            success = self.restaurant_repository.add_menu_item(restaurant_id, menu_item)
 
-            if success:
-                return {"success": True, "menu_item": menu_item.id}
+            # Get tags
+            name = item_data.get("name")
+            price = item_data.get("price")
+            raw_tags = item_data.get("tags", [])
+            # Validate to ensure  tags is a list and all elements are strings
+
+            if not name or price is None:
+                return {"success": False, "error": "name and price are required"}
+
+            if not isinstance(raw_tags, list) or not all (isinstance(t, str) for t in raw_tags):
+                return {"success": False, "error": "tags must be a list of strings"}
+
+            menu_item = MenuItem(name=name, price=price, tags=raw_tags)
+            if self.restaurant_repository.add_menu_item(restaurant_id, menu_item):
+                return {"success": True, "menu_item_id": menu_item.id}
             return {"success": False, "error": "Restaurant not found"}
     
         except (ValueError, TypeError):
             return {"success": False, "error": "invalid price format"}
+        except Exception as e:
+            return {"success": False, "error": f"An unexpected error occurred: {str(e)}"}
+
     
     def update_item_availability(self, user, restaurant_id: int, menu_id: int, status: bool):
         """
@@ -78,6 +74,8 @@ class RestaurantService:
                 owner=user,
                 open_time=data.get("open_time", 900),
                 close_time=data.get("close_time", 2100),
+                latitude=data.get("latitude", 0.0),   # Added
+                longitude=data.get("longitude", 0.0),
                 menu=[]
             )
             new_id = self.restaurant_repository.save(new_restaurant)
@@ -112,14 +110,10 @@ class RestaurantService:
         Feat3-FR1: Restaurants near me
         Retrieves all published restaurants within a specific radius of the customer.
         """
-        all_data = self.restaurant_repository.get_all_restaurants()
-
-        # When tests inject data into repo
-        if not isinstance(all_data, list):
-            all_data = list(self.restaurant_repository.restaurants.values())
-
+        all_restaurants = self.restaurant_repository.get_all_restaurants()
+        
         nearby = []
-        for res_data in all_data:
+        for res_data in all_restaurants:
             # Rule: Only show published restaurants to customers
             if not res_data.get("is_published"):
                 continue

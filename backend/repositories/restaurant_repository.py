@@ -5,7 +5,7 @@ from backend.models.restaurant.menu_item_model import MenuItem
 
 
 class RestaurantRepository:
-    def __init__(self, db_connection):
+    def __init__(self, db_connection: list):
         # Initialize data storage collection
         self.db = db_connection
         self._next_res_id = 1
@@ -30,6 +30,8 @@ class RestaurantRepository:
             "owner_id": int(restaurant.owner.id),
             "address": restaurant.address,
             "phone": restaurant.phone,
+            "open_time": restaurant.open_time,
+            "close_time": restaurant.close_time,
             "open_time": restaurant.open_time,
             "close_time": restaurant.close_time,
             "is_published": restaurant.is_published,
@@ -69,6 +71,23 @@ class RestaurantRepository:
             res_dict.update(changes)
             return True
         return False
+    
+    def get_by_id(self, restaurant_id: int) -> Optional[Dict]:
+        """
+        Needed for tests to pass: Dummy method
+        Standardized to use int for ID lookups.
+        """
+        for restaurant in self.db:
+            if restaurant['id'] == restaurant_id:
+                return restaurant
+        return None
+
+    def get_all_restaurants(self) -> List[Dict]:
+        """
+        Needed for tests to pass: dummy method
+        Used by Service for Haversine/Nearby calculations.
+        """
+        return self.db
 
     def add_menu_item(self, restaurant_id: int, menu_item: MenuItem) -> bool:
         """
