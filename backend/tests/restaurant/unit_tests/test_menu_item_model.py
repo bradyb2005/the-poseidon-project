@@ -10,18 +10,18 @@ def test_menu_item_initialization():
     item = MenuItem(
         id=1,
         restaurant_id=1,
-        name="Margherita Pizza",
+        name="Tacos",
         price=12.99,
         availability=True,
         tags=["Main", "Vegetarian"]
 
     )
-    assert menu_item.id == 1
-    assert item.name == "Tacos"
-    assert item.price == 10.50
+    assert item.id == 1
     assert item.restaurant_id == 1
-    assert menu_item.tags == ["Main", "Vegetarian"]
-    assert menu_item.description is None
+    assert item.name == "Tacos"
+    assert item.price == 12.99
+    assert item.tags == ["Main", "Vegetarian"]
+    assert item.description is None
 
 
 def test_menu_item_missing_restaurant_id():
@@ -50,6 +50,7 @@ def test_menu_item_availability_toggle():
     """
     menu_item = MenuItem(
         id=3,
+        restaurant_id=1,
         name="Spaghetti Carbonara",
         price=14.99,
         availability=True,
@@ -66,9 +67,9 @@ def test_menu_item_invalid_name():
     Edge case test: Test that empty or whitespace only name raises ValueError
     """
     with pytest.raises(ValueError, match="Name cannot be empty"):
-        MenuItem(name="", price=10.00)
+        MenuItem(name="", restaurant_id=1, price=10.00)
     with pytest.raises(ValueError, match="Name cannot be empty"):
-        MenuItem(name="  ", price=10.00)
+        MenuItem(name="  ", restaurant_id=1, price=10.00)
 
 
 def test_menu_item_zero_price():
@@ -77,6 +78,7 @@ def test_menu_item_zero_price():
     """
     menu_item = MenuItem(
         id=6,
+        restaurant_id=1,
         name="Complimentary Breadsticks",
         price=0.00,
         availability=True,
@@ -92,6 +94,7 @@ def test_menu_item_negative_price():
     with pytest.raises(ValueError, match="Price cannot be negative"):
         MenuItem(
             id=7,
+            restaurant_id=1,
             name="Negative Price Item",
             price=-5.00,
         )
@@ -106,6 +109,7 @@ def test_menu_item_tagging():
     """
     menu_item = MenuItem(
         id=4,
+        restaurant_id=1,
         name="Tiramisu",
         price=6.50,
         tags=["Dessert", "Vegetarian"]
@@ -121,6 +125,7 @@ def test_menu_item_default_tags():
     """
     menu_item = MenuItem(
         id=5,
+        restaurant_id=1,
         name="Garlic Bread",
         price=4.99,
         availability=True
@@ -135,8 +140,8 @@ def test_menu_item_invalid_tags_type():
     """
     # Case 1: Tags is a string instead of list
     with pytest.raises(TypeError, match="Tags must be a list of strings"):
-        MenuItem(name="Pizza", price=10.00, tags="Vegetarian")
+        MenuItem(name="Pizza", restaurant_id=1, price=10.00, tags="Vegetarian")
 
     # Case 2: Tags is a list but not all strings
     with pytest.raises(TypeError, match="Tags must be a list of strings"):
-        MenuItem(name="Pizza", price=10.00, tags=["Vegetarian", 123])
+        MenuItem(name="Pizza", restaurant_id=1, price=10.00, tags=["Vegetarian", 123])
