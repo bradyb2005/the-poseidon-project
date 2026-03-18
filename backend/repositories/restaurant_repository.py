@@ -35,6 +35,8 @@ class RestaurantRepository:
             "latitude": getattr(restaurant, 'latitude', 0.0),
             "longitude": getattr(restaurant, 'longitude', 0.0),
             "is_published": restaurant.is_published,
+            "latitude": getattr(restaurant, 'latitude', 0.0),
+            "longitude": getattr(restaurant, 'longitude', 0.0),
             "menu": [{
                 "id": item.id,
                 "name": item.name,
@@ -57,8 +59,12 @@ class RestaurantRepository:
         # Update fields and save changes to data store
         res_dict = self.get_by_id(restaurant.id)
         if res_dict:
-            if restaurant.latitude == 0.0 or restaurant.longitude == 0.0:
-                restaurant.is_published = False
+            lat = getattr(restaurant, 'latitude', 0.0)
+            lng = getattr(restaurant, 'longitude', 0.0)
+            is_published = restaurant.is_published
+            
+            if lat == 0.0 or lng == 0.0:
+                is_published = False
             # We create a map of only the fields we want to sync
             changes = {
                 "name": restaurant.name,
@@ -135,7 +141,7 @@ class RestaurantRepository:
                     return True
         return False
 
-    def remove_menu_item(self, restaurant_id: str, item_id: str) -> bool:
+    def remove_menu_item(self, restaurant_id: int, item_id: int) -> bool:
         """
         Feat2-FR4 (Adding and editing menu items)
         Removes an item from the menu list.

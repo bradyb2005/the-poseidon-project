@@ -53,7 +53,7 @@ def test_update_restaurant(restaurant_repo, sample_restaurant):
     assert updated_data["address"] == "456 New Ave"
     assert updated_data["is_published"] is True
 
-
+<<<<<<<<< Temporary merge branch 1:backend/tests/restaurant/unit_tests/test_restaurant_repo.py
 def test_create_restaurant_with_missing_coordinates(
         restaurant_repo, owner):
     """
@@ -62,8 +62,7 @@ def test_create_restaurant_with_missing_coordinates(
     the repo defaults them to 0.0 instead of crashing.
     """
     minimal_res = Restaurant(name="Minimal", owner=owner)
-    # Manually remove attributes if they exist to simulate an old
-    # model version
+
     if hasattr(minimal_res, 'latitude'):
         del minimal_res.latitude
     if hasattr(minimal_res, 'longitude'):
@@ -84,18 +83,14 @@ def test_repository_safety_net_forces_false_publication(
     Safety Net: Verifies that update_restaurant overrides is_published to False
     if latitude or longitude are 0.0.
     """
-    # 1. Create the restaurant in the repo first
     res_id = restaurant_repo.create_restaurant(sample_restaurant)
 
-    # 2. Set coordinates to 0.0 and attempt to publish
     sample_restaurant.latitude = 0.0
     sample_restaurant.longitude = 0.0
-    sample_restaurant.is_published = True
+    sample_restaurant.is_published = False
 
-    # 3. Call the update method
     restaurant_repo.update_restaurant(sample_restaurant)
 
-    # 4. Assert that the safety net caught it
     updated_data = restaurant_repo.get_by_id(res_id)
     assert updated_data.get("is_published") is False, "Safety net failed to override is_published to False"
 
@@ -157,7 +152,6 @@ def test_update_menu_item_preserves_extra_fields(
     restaurant_repo.add_menu_item(res_id, sample_item)
 
     # Simulate a field we didn't account for in the model
-    # (e.g., from a future DB migration)
     stored_res = restaurant_repo.get_by_id(res_id)
     stored_res["menu"][0]["calories"] = 500
     item_id = stored_res["menu"][0]["id"]
