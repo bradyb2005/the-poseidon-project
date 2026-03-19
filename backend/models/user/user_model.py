@@ -10,10 +10,6 @@ import bcrypt
 
 @dataclass
 class User:
-    """
-    User model for authentication/basic user storage.
-    """
-    
     id: int
     username: str
     email: str

@@ -4,3 +4,4 @@ __pycache__/
 pytest.ini
 
 # Ignore the users.json file which contains user data
+backend/models/user/users.json
