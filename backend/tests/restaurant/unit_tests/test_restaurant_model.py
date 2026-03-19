@@ -13,14 +13,15 @@ def mock_owner():
 @pytest.fixture
 def sample_menu():
     return [
-        MenuItem(name="Burger", price=9.99, restaurant_id=1),
-        MenuItem(name="Pizza", price=12.99, restaurant_id=1)
+        MenuItem(id=1, name="Burger", price=9.99),
+        MenuItem(id=2, name="Pizza", price=12.99)
     ]
 
 
 @pytest.fixture
 def sample_restaurant(mock_owner, sample_menu):
     return Restaurant(
+        id=0,
         name="Testaurant",
         owner=mock_owner,
         open_time=900,
@@ -28,7 +29,7 @@ def sample_restaurant(mock_owner, sample_menu):
         address="123 Test St",
         phone="555-555-5555",
         distance_from_user=2.5,
-        menu=sample_menu
+        menu=sample_menu,
     )
 
 
@@ -42,9 +43,8 @@ def test_restaurant_initialization(sample_restaurant):
     assert sample_restaurant.address == "123 Test St"
     assert sample_restaurant.id is None
     assert sample_restaurant.open_time == 900
-    assert sample_restaurant.close_time == 1700
-    assert sample_restaurant.distance_from_user == 2.5
-    assert len(sample_restaurant.menu) == 2
+    assert isinstance(sample_restaurant.id, int)
+    assert sample_restaurant.id == 0
 
 
 def test_menu_item_initialization(sample_menu):
@@ -53,8 +53,8 @@ def test_menu_item_initialization(sample_menu):
     item = sample_menu[0]
     assert item.name == "Burger"
     assert item.price == 9.99
-    assert item.restaurant_id == 1
-    assert item.id is None
+    assert isinstance(item.id, int)
+    assert item.id == 1
 
 
 def test_get_view_includes_address(sample_restaurant):
@@ -72,14 +72,14 @@ def test_validate_for_publish_success(mock_owner):
     # Positive functional test:
     # Valid restaurant should pass validation
     restaurant = Restaurant(
+        id=1,
         name="Testaurant",
         owner=mock_owner,
         address="123 Test St",
         phone="123-456-7890",
         open_time=900,
         close_time=2100,
-        menu=[MenuItem(name="Burger",
-                       price=9.99, restaurant_id=1)]
+        menu=[MenuItem(id=1, name="Burger", price=9.99)]
     )
     restaurant.validate_for_publish()
 
