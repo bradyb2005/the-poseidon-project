@@ -13,8 +13,8 @@ def mock_owner():
 @pytest.fixture
 def sample_menu():
     return [
-        MenuItem(id=1, name="Burger", price=9.99),
-        MenuItem(id=2, name="Pizza", price=12.99)
+        MenuItem(id=1, restaurant_id=1, name="Burger", price=9.99),
+        MenuItem(id=2, restaurant_id=1, name="Pizza", price=12.99)
     ]
 
 
