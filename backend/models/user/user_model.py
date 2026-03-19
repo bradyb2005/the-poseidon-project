@@ -69,12 +69,22 @@ class User:
         return hashed_bytes.decode("utf-8")  # store as string in JSON
 
     def check_password(self, raw_password: str) -> bool:
-        """Return True if the raw password matches our stored password_hash."""
-        if not isinstance(raw_password, str):
+        """
+        Return True if the raw password matches this user's stored password hash.
+        """
+        return User.verify_password(raw_password, self.password_hash)
+
+    @staticmethod
+    def verify_password(raw_password: str, password_hash: str) -> bool:
+        """
+        Return True if the raw password matches the given password hash.
+        """
+        if not isinstance(raw_password, str) or not isinstance(password_hash, str):
             return False
+
         return bcrypt.checkpw(
             raw_password.encode("utf-8"),
-            self.password_hash.encode("utf-8")
+            password_hash.encode("utf-8")
         )
 
     def update_password(self, new_password: str) -> None:

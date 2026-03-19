@@ -15,16 +15,18 @@ def user_service():
 def test_register_success(user_service):
     username = "anjana"
     password = "Password1!"
+    email    = "anjana@email.com"
 
     user_service.repo.find_by_username.return_value = None
     user_service.repo.create.return_value = {
         "id": 1,
         "username": username,
+        "email": email,
         "password_hash": User.hash_password(password),
         "user_type": "User",
     }
 
-    result = user_service.register(username, password)
+    result = user_service.register(username, email, password)
 
     user_service.repo.find_by_username.assert_called_once_with(username)
     user_service.repo.create.assert_called_once()
@@ -33,6 +35,7 @@ def test_register_success(user_service):
 
     assert result["id"] == 1
     assert result["username"] == username
+    assert result["email"] == email
     assert created_data["password_hash"] != password
     assert User.verify_password(password, created_data["password_hash"])
 
@@ -41,12 +44,13 @@ def test_register_raises_error_if_username_exists(user_service):
     user_service.repo.find_by_username.return_value = {
         "id": 1,
         "username": "anjana",
+        "email": "anjana@email.com",
         "password_hash": "hashed_pw",
         "user_type": "User",
     }
 
     with pytest.raises(ValueError, match="Username already exists"):
-        user_service.register("anjana", "Password1!")
+        user_service.register("anjana", "anjana@email.com", "Password1!")
 
     user_service.repo.create.assert_not_called()
 
@@ -59,6 +63,7 @@ def test_login_returns_true_for_valid_credentials(user_service):
     user_service.repo.find_by_username.return_value = {
         "id": 1,
         "username": username,
+        "email": "anjana@email.com",
         "password_hash": hashed_password,
         "user_type": "User",
     }
@@ -86,6 +91,7 @@ def test_login_returns_false_for_wrong_password(user_service):
     user_service.repo.find_by_username.return_value = {
         "id": 1,
         "username": username,
+        "email": "anjana@email.com",
         "password_hash": hashed_password,
         "user_type": "User",
     }
