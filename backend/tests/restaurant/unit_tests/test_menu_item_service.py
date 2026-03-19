@@ -101,5 +101,4 @@ def test_unauthorized_owner_access(menu_service, mock_repo):
     with pytest.raises(PermissionError) as exc:
         menu_service.update_item_availability(
             2, "res_123", "item_001", False)
-
     assert "Access denied" in str(exc.value)

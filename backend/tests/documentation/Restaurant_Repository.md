@@ -35,3 +35,8 @@ The two edge cases ensure you cannot get or update a nonexistaant restaurant.
 Coordinates test (Feat3-FR1)
 We have a safety net test that ensures a restaurant cannot be published without uploading its coordinate.
 We also test creating a restaurant with missing coordinates. You should be able to create a restaurant and the coordinates defaul to 0, 0
+
+Search Features (Feat3-FR2)
+We have a functional test to properly find restaurant by name, by menu item name, and testing case sensitivity 
+
+We have edge case tests to test for empty string, ensuring it doesnt crash if a restaurant has not assigned a menu, and partial matching.
