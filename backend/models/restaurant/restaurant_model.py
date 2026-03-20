@@ -13,21 +13,19 @@ if TYPE_CHECKING:
 class Restaurant:
     name: str
     owner: 'RestaurantOwner'
-    # FR3: Explicitly define attributes instead of using **kwargs
-    # for better clarity and type checking
+    latitude: float = 0.0
+    longitude: float = 0.0
+    price_level: int = 1
     open_time: Optional[int] = None
     close_time: Optional[int] = None
     address: Optional[str] = None
     phone: Optional[str] = None
-    latitude: float = 0.0
-    longitude: float = 0.0
-    distance_from_user: Optional[float] = None
     menu: List["MenuItem"] = field(default_factory=list)
-
-    # Defaults
     id: Optional[int] = None
     is_open: bool = False
     is_published: bool = False
+
+    distance_from_user: Optional[float] = None
 
     def get_view(self, role: str):
         if role == "Customer" and not self.is_published:
@@ -65,3 +63,11 @@ class Restaurant:
             # Cannot fix flaking error without breaking code
             raise ValueError(
                 "Cannot publish restaurant: 'open_time' must be before 'close_time'")
+
+        if not (1 <= self.price_level <= 4):
+            # Price Validation
+            raise ValueError("Price level must be between 1 (Low) and 4 (High)")
+
+        if not (-90 <= self.latitude <= 90) or not (-180 <= self.longitude <= 180):
+            # Coordinate validation
+            raise ValueError("Invalid GPS coordinates provided.")
