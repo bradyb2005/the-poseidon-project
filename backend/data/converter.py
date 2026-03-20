@@ -1,8 +1,9 @@
+# backend/data/converter.py
 import csv
 import json
 
 def convert_and_split():
-    csv_file = 'food_delivery.csv'
+    csv_file = 'backend/data/food_delivery.csv'
     orders = []
     items = []
 
@@ -44,5 +45,5 @@ def convert_and_split():
     
     print("Success")
 
-    if __name__ == "___main__":
-        convert_and_split()
+if __name__ == "__main__":
+    convert_and_split()
