@@ -4,7 +4,7 @@ tests/user/unit_tests/test_user_model.py
 
 *Screenshot attached in the folder*
 
-![User Model Tests](user_model_tests.jpeg)
+<img width="716" height="186" alt="Screenshot 2026-03-17 at 5 55 21 PM" src="https://github.com/user-attachments/assets/1408f8f3-1ec4-4937-8cba-1f649644b05f" />
 
 
 This pull request adds unit tests for the User model.  

@@ -1,6 +1,7 @@
 # backend/tests/customer/unit_tests/test_customer_model.py
 import pytest
 from backend.models.user.customer import Customer
+from backend.models.user.user_model import User
 
 
 def test_customer_initialization():
@@ -94,6 +95,7 @@ def test_customer_creation_with_string_coordinates():
         longitude="-122.6"
     )
     assert isinstance(c.latitude, float)
+    assert c.latitude == 45.5
 
 
 def test_customer_with_empty_address_logic():
@@ -105,3 +107,34 @@ def test_customer_with_empty_address_logic():
                  email="e@e.com", password_hash="h", address="")
     assert c.address == ""
     assert c.latitude == 0.0
+
+
+def test_customer_serialization_preserves_location():
+    """
+    Feat3-FR1: Closest restaurants
+    Functional test: Tests the full loop: Object -> Dict -> Object.
+    Ensures lat/long aren't lost during database/JSON storage.
+    """
+    c1 = Customer(
+        id=11,
+        username="geo_user",
+        email="geo@test.com",
+        password_hash="hash",
+        latitude=34.0522,
+        longitude=-118.2437,
+        address="Los Angeles"
+    )
+
+    # Convert to dict
+    data = c1.to_dict()
+
+    # Ensure keys exist in dict
+    assert data["latitude"] == 34.0522
+    assert data["longitude"] == -118.2437
+
+    # Load back from dict
+    c2 = User.from_dict(data)
+
+    assert isinstance(c2, Customer)
+    assert c2.latitude == 34.0522
+    assert c2.longitude == -118.2437

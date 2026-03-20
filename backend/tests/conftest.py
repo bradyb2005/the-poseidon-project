@@ -38,7 +38,11 @@ def sample_item():
     """
     return valid menu item for FR3
     """
-    return MenuItem(name="Burger", price=9.99, tags=["Popular"])
+    return MenuItem(
+        id=101,
+        name="Burger",
+        price=9.99,
+        tags=["Popular"])
 
 @pytest.fixture
 def restaurant(owner, sample_item):
@@ -46,6 +50,7 @@ def restaurant(owner, sample_item):
     Return default instance linked to owner
     """
     return Restaurant(
+        id=1,
         name="John's Diner",
         owner=owner,
         menu=[sample_item]
