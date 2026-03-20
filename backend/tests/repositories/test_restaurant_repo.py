@@ -53,6 +53,7 @@ def test_update_restaurant(restaurant_repo, sample_restaurant):
     assert updated_data["address"] == "456 New Ave"
     assert updated_data["is_published"] is True
 
+
 def test_create_restaurant_with_missing_coordinates(
         restaurant_repo, owner):
     """
