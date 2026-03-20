@@ -9,10 +9,11 @@ from backend.models.user.customer import Customer
 from backend.models.user.admin import Admin
 from backend.models.user.restaurant_owner_model import RestaurantOwner
 
+
 def test_user_valid_creation():
     """
     This test checks that we can create a valid user object without errors.
-    this also checks that the password is hashed and not placed in plain text.   
+    this also checks that the password is hashed and not placed in plain text.
     """
     u = User(
         id=1,
@@ -86,7 +87,9 @@ def test_check_password_true_and_false():
 
 
 def test_update_password_changes_hash_and_validates():
-    """This test checks that update_password() changes the stored password_hash,
+    """
+    This test checks that update_password() change
+    the stored password_hash,
     and that the new password works while the old one stops working.
     """
     u = User(
@@ -122,8 +125,8 @@ def test_to_dict_includes_user_type():
 
 @pytest.mark.parametrize("cls", [User, Customer, Admin, RestaurantOwner])
 def test_from_dict_creates_correct_subclass(cls):
-    """This test checks the inheritance + serialization workflow, 
-    helps reduce repitative tests for each subclass. 
+    """This test checks the inheritance + serialization workflow,
+    helps reduce repitative tests for each subclass.
       1) create a user object (User or subclass)
       2) convert it to dict using to_dict()
       3) load it back using User.from_dict()

@@ -19,6 +19,8 @@ class Restaurant:
     close_time: Optional[int] = None
     address: Optional[str] = None
     phone: Optional[str] = None
+    latitude: Optional[float] = 0.0
+    longitude: Optional[float] = 0.0
     distance_from_user: Optional[float] = None
     menu: List["MenuItem"] = field(default_factory=list)
 

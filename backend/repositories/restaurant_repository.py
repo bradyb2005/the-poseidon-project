@@ -32,9 +32,9 @@ class RestaurantRepository:
             "phone": restaurant.phone,
             "open_time": restaurant.open_time,
             "close_time": restaurant.close_time,
-            "is_published": restaurant.is_published,
             "latitude": getattr(restaurant, 'latitude', 0.0),
             "longitude": getattr(restaurant, 'longitude', 0.0),
+            "is_published": restaurant.is_published,
             "menu": [{
                 "id": item.id,
                 "name": item.name,
