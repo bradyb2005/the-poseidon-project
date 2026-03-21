@@ -6,13 +6,10 @@ from typing import TYPE_CHECKING, List, Optional
 # Read by VSCode for type checking but python ignores
 if TYPE_CHECKING:
     from backend.models.restaurant.menu_item_model import MenuItem
-    from backend.models.user.restaurant_owner_model import RestaurantOwner
-
 
 @dataclass
 class Restaurant:
     name: str
-    owner: 'RestaurantOwner'
     # FR3: Explicitly define attributes instead of using **kwargs
     # for better clarity and type checking
     open_time: Optional[int] = None

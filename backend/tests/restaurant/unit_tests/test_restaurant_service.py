@@ -1,10 +1,8 @@
 # backend/tests/restaurant/unit_tests/test_menu_item_model.py
 import pytest
 from unittest.mock import MagicMock
-from backend.models.user.customer import Customer
 from backend.services.restaurant_service import RestaurantService
 from backend.models.restaurant.restaurant_model import Restaurant
-from backend.models.user.restaurant_owner_model import RestaurantOwner
 
 @pytest.fixture
 def mock_repo():

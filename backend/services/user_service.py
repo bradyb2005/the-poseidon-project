@@ -3,9 +3,6 @@ from typing import Literal
 
 from backend.models.user.user_model import User
 from backend.repositories.user_repository import UserRepository
-from backend.models.user.customer import Customer
-from backend.models.user.restaurant_owner_model import RestaurantOwner
-from backend.models.user.admin import Admin
 
 RoleType = Literal["Customer", "RestaurantOwner", "Admin"]
 
