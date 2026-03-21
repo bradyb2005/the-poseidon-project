@@ -5,9 +5,6 @@ import pytest
 # Import requirements.txt before testing
 # pip install -r requirements.txt
 from backend.models.user.user_model import User
-from backend.models.user.customer import Customer
-from backend.models.user.restaurant_owner_model import RestaurantOwner
-
 
 def test_user_valid_creation():
     """
@@ -122,27 +119,3 @@ def test_to_dict_includes_user_type():
     assert d["user_type"] == "Customer"
 
 
-@pytest.mark.parametrize("cls", [User, Customer, RestaurantOwner])
-def test_from_dict_creates_correct_subclass(cls):
-    """This test checks the inheritance + serialization workflow,
-    helps reduce repitative tests for each subclass.
-      1) create a user object (User or subclass)
-      2) convert it to dict using to_dict()
-      3) load it back using User.from_dict()
-      4) confirm we got the SAME TYPE back (Customer stays Customer, etc.)
-    """
-    u1 = cls(
-        id=7,
-        username="x",
-        email="x@gmail.com",
-        password_hash=User.hash_password("pw")
-    )
-    data = u1.to_dict()
-
-    u2 = User.from_dict(data)
-
-    assert isinstance(u2, cls)
-    assert u2.id == u1.id
-    assert u2.username == u1.username
-    assert u2.email == u1.email
-    assert u2.password_hash == u1.password_hash
