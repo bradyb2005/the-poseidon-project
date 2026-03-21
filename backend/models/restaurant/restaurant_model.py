@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 @dataclass
 class Restaurant:
     name: str
-    owner: 'RestaurantOwner'
+    owner: Optional['RestaurantOwner'] = None
     # FR3: Explicitly define attributes instead of using **kwargs
     # for better clarity and type checking
     open_time: Optional[int] = None

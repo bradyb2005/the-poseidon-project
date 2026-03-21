@@ -1,32 +1,37 @@
 # backend/repositories/restaurant_repository.py
 import json
 import os
-from typing import List, Dict
+from pathlib import Path
+from dataclasses import asdict
+from typing import List
 from backend.models.restaurant.restaurant_model import Restaurant
 
 
 class RestaurantRepository:
-    def __init__(self, storage_service=None):
+    def __init__(self, file_path: str = None):
         # guide to our path to the data
-        self._storage = storage_service or open
-        self._file_path = os.path.join("backend", "data", "items.json")
-        
-        # Only create directories if we're using the real file system
-        if self._storage == open:
-            os.makedirs(os.path.dirname(self._file_path), exist_ok=True)
+        if file_path:
+            self._file_path = Path(file_path)
+        else:
+            self._file_path = Path(__file__).parent.parent / "data" / "restaurants.json"
+
+        self._file_path.parent.mkdir(parents=True, exist_ok=True)
 
     def load_all(self) -> List[Restaurant]:
         """
         Read JSON file and return list of Restaurant objects
         """
-        if self._storage == open and not os.path.exists(self._file_path):
-            return[]
+        if not self._file_path.exists():
+            return []
         
         try:
-            with self._storage(self._file_path, 'r') as f:
+            with open(self._file_path, 'r') as f:
+                content = f.read().strip()
+                if not content:
+                    return []
                 data = json.load(f)
-                return [Restaurant.from_dict(item) for item in data]
-        except (json.JSONDecodeError, KeyError, FileNotFoundError):
+                return [Restaurant(**item) for item in data]
+        except (json.JSONDecodeError, FileNotFoundError):
             return []
 
     def save_all(self, restaurants: List[Restaurant]) -> bool:
@@ -34,9 +39,9 @@ class RestaurantRepository:
         Writes list of objects back to JSON
         """
         try:
-            data = [res.to_dict() for res in restaurants]
-            with self._storage(self._file_path, 'w') as f:
+            data = [asdict(res) for res in restaurants]
+            with open(self._file_path, 'w') as f:
                 json.dump(data, f, indent=4)
             return True
-        except Exception:
+        except IOError:
             return False
