@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import Any
 
 
 class PaymentService:
@@ -26,6 +26,22 @@ class PaymentService:
 
         return round(subtotal, 2)
 
+    def calculate_fees_and_taxes(self, subtotal: float) -> dict:
+        """
+        Calculates delivery fee, service fee, and tax based on subtotal
+        """
+        self._validate_subtotal(subtotal)
+
+        delivery_fee = self._calculate_delivery_fee(subtotal)
+        service_fee = self._calculate_service_fee(subtotal)
+        tax = self._calculate_tax(subtotal)
+
+        return {
+            "delivery_fee": delivery_fee,
+            "service_fee": service_fee,
+            "tax": tax,
+        }
+
     # -------------------------
     # Private helpers
     # -------------------------
@@ -51,3 +67,18 @@ class PaymentService:
 
         if item.quantity <= 0:
             raise ValueError("item quantity must be positive")
+
+    def _validate_subtotal(self, subtotal: float) -> None:
+        if not isinstance(subtotal, (int, float)):
+            raise ValueError("subtotal must be a number")
+        if subtotal < 0:
+            raise ValueError("subtotal cannot be negative")
+
+    def _calculate_delivery_fee(self, subtotal: float) -> float:
+        return 5.00 if subtotal < 50 else 0.00
+
+    def _calculate_service_fee(self, subtotal: float) -> float:
+        return round(subtotal * 0.05, 2)
+
+    def _calculate_tax(self, subtotal: float) -> float:
+        return round(subtotal * 0.12, 2)

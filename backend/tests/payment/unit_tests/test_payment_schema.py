@@ -128,3 +128,30 @@ def test_calculate_subtotal_negative_price():
 
     with pytest.raises(ValueError):
         service.calculate_subtotal(order)
+
+
+def test_calculate_fees_and_taxes_valid():
+    service = PaymentService()
+
+    subtotal = 40.0
+    result = service.calculate_fees_and_taxes(subtotal)
+
+    assert result["delivery_fee"] == 5.00
+    assert result["service_fee"] == 2.00
+    assert result["tax"] == 4.80
+
+
+def test_calculate_fees_and_taxes_free_delivery():
+    service = PaymentService()
+
+    subtotal = 60.0
+    result = service.calculate_fees_and_taxes(subtotal)
+
+    assert result["delivery_fee"] == 0.00
+
+
+def test_calculate_fees_and_taxes_invalid_subtotal():
+    service = PaymentService()
+
+    with pytest.raises(ValueError):
+        service.calculate_fees_and_taxes(-10)
