@@ -1,18 +1,64 @@
 # backend/services/restaurant_service.py
-from backend.models.restaurant.menu_item_model import MenuItem
+from typing import List, Optional, Tuple, Dict
 import math
-from backend.models.user.restaurant_owner_model import RestaurantOwner
-from backend.models.user.admin import Admin
 from backend.models.restaurant.restaurant_model import Restaurant
 
 
 class RestaurantService:
-    def __init__(self, restaurant_repository):
-        self.restaurant_repository = restaurant_repository
+    def __init__(self, restaurant_repo):
+        self.restaurant_repos = restaurant_repo
+    
+    def get_restaurant_by_id(self, restaurant_id: int) -> Tuple[Optional[RestaurantSchema], int]:
+        """
+        Returns a single restaurant
+        Matches 200 OK or 404 Not Found
+        """
+        restaurants = self.restaurant_repo.load_all()
+        target = next((r for r in restaurants if r.id == restaurant_id), None)
+        
+        if not target:
+            return None, 404
+        return target, 200
 
-    def _is_authorized(self, user):
-        """Helper to standardize auth checks across the service"""
-        return isinstance(user, (RestaurantOwner, Admin))
+    def assign_owner_to_restaurant(self, restaurant_id: int, owner_id: int) -> Tuple[Dict, int]:
+        """
+        Assigns user as owner to pre-existing restaurant
+        """
+        restaurants = self.restaurant_repo.load_all()
+        target = next((r for r in restaurants if r.get_id() == restaurant_id), None)
+
+        if not target:
+            return {"error": "Restaurant not found"}, 404
+        
+        target.set_owner_id(owner_id)
+
+        self.restaurant_repo.save_all(restaurants)
+        return {"message": "Owner assigned successfully", "restaurant_id": restaurant_id}, 200
+
+
+    def update_restaurant_details(self, restaurant_id: int, update_data: dict) -> Tuple[bool, int]:
+        """
+        Feat2-FR3: Update restaurant info using private attribute setters.
+        """
+        restaurants = self.restaurant_repo.load_all()
+        target = next((r for r in restaurants if r.get_id() == restaurant_id), None)
+
+        if not target:
+            return False, 404
+
+        # Update fields if present in update_data
+        if "name" in update_data:
+            target.set_name(update_data["name"])
+        if "phone" in update_data:
+            target.set_phone(update_data["phone"])
+        if "open_time" in update_data:
+            target.set_open_time(update_data["open_time"])
+        if "close_time" in update_data:
+            target.set_close_time(update_data["close_time"])
+
+        self.restaurant_repo.save_all(restaurants)
+        return True, 200
+
 
     def add_tagged_item(self, user, restaurant_id: int, item_data: dict):
         """
