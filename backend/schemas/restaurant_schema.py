@@ -43,7 +43,7 @@ class RestaurantBase(BaseModel):
         return self
 
 
-class RestaurantSchema(RestaurantBase):
+class Restaurant(RestaurantBase):
     # Main Schema for loading JSON files
 
     id: int 
