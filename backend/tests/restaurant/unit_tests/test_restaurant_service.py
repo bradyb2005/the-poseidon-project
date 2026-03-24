@@ -83,6 +83,27 @@ def test_assign_owner_value_error_handling(service, mock_repo, restaurant):
 
 # --- Publishing ---
 
+def test_publish_restaurant_success(service, mock_repo, restaurant):
+    """
+    Functional test
+    Ensure a restaurant can be published 
+    """
+    restaurant.phone = "250-555-0123"
+    restaurant.latitude = 49.88
+    restaurant.longitude = -119.49
+    restaurant.is_published = False
+    
+    mock_repo.load_all.return_value = [restaurant]
+
+    response, status = service.publish_restaurant(restaurant.id)
+
+    assert status == 200
+    assert "is now published" in response["message"]
+
+    assert restaurant.is_published is True
+
+    mock_repo.save_all.assert_called_once()
+
 def test_publish_restaurant_missing_data(service, mock_repo, restaurant):
     """
     Equivalence Partitioning
