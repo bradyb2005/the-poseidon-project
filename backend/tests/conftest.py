@@ -5,7 +5,6 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from backend.models.user.user_model import User
-from backend.models.restaurant.restaurant_model import Restaurant
 from backend.models.restaurant.menu_item_model import MenuItem
 
 # updated imports for new project structure

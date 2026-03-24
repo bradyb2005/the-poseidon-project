@@ -1,9 +1,6 @@
 # backend/services/restaurant_service.py
 from backend.models.restaurant.menu_item_model import MenuItem
 import math
-from backend.models.user.restaurant_owner_model import RestaurantOwner
-from backend.models.user.admin import Admin
-from backend.models.restaurant.restaurant_model import Restaurant
 
 
 class RestaurantService:
