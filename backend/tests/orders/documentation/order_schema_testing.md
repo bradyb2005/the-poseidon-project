@@ -1,9 +1,9 @@
 Test documentation for order schema
 
-![1774237908442](image/order_schema_testing/1774237908442.png)
+![1774407423223](image/order_schema_testing/order_schema_testing.png)
 
 This new test file thoroughly validates the Pydantic schemas used for creating and updating orders (`OrderCreate`, `OrderUpdate`, `OrderItemCreate`, `OrderItemUpdate`).
 
-It utilizes Boundary Value Testing to ensure geographic coordinates (latitude and longitude) strictly fall within valid global ranges. 
-Additionally, it uses Equivalence Class Partitioning via `pytest.mark.parametrize` to test the Canadian postal code with regex, ensuring it accepts valid formats while properly rejecting various invalid cases (e.g., wrong format, bad separators, incorrect lengths). 
-Finally, it verifies that the OrderUpdate schema correctly enforces these same validation rules on optional fields.
+It will check that OrderCreate creates an order successfully, and that OrderUpdate updates attributes of an order successfully.
+
+It will also check that OrderItems can be created, and that only the quantity can be modified with OrderItemUpdate.

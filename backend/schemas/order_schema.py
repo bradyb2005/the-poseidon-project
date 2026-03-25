@@ -59,33 +59,6 @@ class OrderCreate(BaseModel):
     delivery_postal_code: str
     delivery_instructions: Optional[str] = None
 
-    # -- Validator methods --
-    @field_validator('delivery_postal_code')
-    @classmethod
-    def validate_delivery_postal_code(cls, value: str) -> str:
-        regex_pattern = r"^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$"
-        # This says that postal code must be, letter, number, letter, space/hyphen (optional), number, letter, number.
-        # To enforce simplicity, we aren't including the rule that the first letter can't be D, F, I, O, Q, or U.
-
-        if not re.match(regex_pattern, value):
-            # If it fails, FastAPI will automatically catch this as a ValueError 
-            raise ValueError("Must be a valid Canadian postal code (e.g., V1V 1V1)")
-        return value
-
-    @field_validator('delivery_latitude')
-    @classmethod
-    def validate_delivery_latitude(cls, value: float) -> float:
-        if value < -90 or value > 90:
-            raise ValueError("Latitude must be between -90 and 90")
-        return value
-
-    @field_validator('delivery_longitude')
-    @classmethod
-    def validate_delivery_longitude(cls, value: float) -> float:
-        if value < -180 or value > 180:
-            raise ValueError("Longitude must be between -180 and 180")
-        return value
-
 # Schema for updating an Order. Allows modification of everything from OrderCreate except id's or items. Also allows updating status.
 class OrderUpdate(BaseModel):
     status: Optional[OrderStatus] = None
@@ -94,39 +67,3 @@ class OrderUpdate(BaseModel):
     delivery_longitude: Optional[float] = None
     delivery_postal_code: Optional[str] = None
     delivery_instructions: Optional[str] = None
-
-    # -- Validator methods --
-    @field_validator('delivery_postal_code')
-    @classmethod
-    def validate_delivery_postal_code(cls, value: str) -> Optional[str]:
-        if value is None:
-            return value # Skip validation if they aren't trying to update it
-        
-        regex_pattern = r"^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$"
-        # This says that postal code must be, letter, number, letter, space/hyphen (optional), number, letter, number.
-        # To enforce simplicity, we aren't including the rule that the first letter can't be D, F, I, O, Q, or U.
- 
-        if not re.match(regex_pattern, value):
-            # If it fails, FastAPI will automatically catch this as a ValueError 
-            raise ValueError("Must be a valid Canadian postal code (e.g., V1V 1V1)")
-        return value
-
-    @field_validator('delivery_latitude')
-    @classmethod
-    def validate_delivery_latitude(cls, value: float) -> Optional[float]:
-        if value is None:
-            return value # Skip validation if they aren't trying to update it
-        
-        if value < -90 or value > 90:
-            raise ValueError("Latitude must be between -90 and 90")
-        return value
-
-    @field_validator('delivery_longitude')
-    @classmethod
-    def validate_delivery_longitude(cls, value: float) -> Optional[float]:
-        if value is None:
-            return value # Skip validation if they aren't trying to update it
-        
-        if value < -180 or value > 180:
-            raise ValueError("Longitude must be between -180 and 180")
-        return value
