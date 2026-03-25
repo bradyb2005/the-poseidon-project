@@ -50,6 +50,9 @@ class Restaurant(RestaurantBase):
     name: str 
     menu: List[str]
 
+    def get_id(self) -> int:
+        return self.id
+
 
 class UpdateRestaurantSchema(RestaurantBase):
     # Update schema for partial updates
