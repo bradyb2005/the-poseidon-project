@@ -1,209 +1,150 @@
 # backend/tests/restaurant/unit_tests/test_menu_item_model.py
 import pytest
 from unittest.mock import MagicMock
-from backend.models.user.customer import Customer
 from backend.services.restaurant_service import RestaurantService
-from backend.models.restaurant.restaurant_model import Restaurant
-from backend.models.user.restaurant_owner_model import RestaurantOwner
+from backend.schemas.restaurant_schema import Restaurant
 
-@pytest.fixture
-def mock_repo():
-    return MagicMock()
 
-@pytest.fixture
-def service(mock_repo):
-    return RestaurantService(mock_repo)
+# --- Get restaurant tests ---
 
-@pytest.fixture
-def customer():
-    return Customer(
-        id=2, 
-        username="Newbie",
-        password_hash="hashed_pw",
-        email="customer@mail.com",
-        latitude=0.0,
-        longitude=0.0
-    )
+def test_get_restaurant_by_id_success(service, mock_repo, restaurant):
+    """
+    Equivalience partitioning
+    Test getting a restaurant with a valid id
+    """
+    mock_repo.load_all.return_value = [restaurant]
 
-# ---  Registration and roles---
+    result, status = service.get_restaurant_by_id(restaurant.id)
 
-def test_create_restaurant_as_owner(service, owner, mock_repo):
-    # Positive functionality test: Owner can create a restaurant
-    data = {"name": "New Spot", "location": "789 Road"}
-    mock_repo.save.return_value = 123
-    result = service.register_restaurant(owner, data)
+    assert status == 200
+    assert result.id == restaurant.id
+    assert result.name == "John's Diner"
 
-    assert result["success"] is True
-    assert result["restaurant_id"] == 123
-    assert mock_repo.save.called
+def test_get_restaurant_by_id_not_found(service, mock_repo):
+    """
+    Equivalience partitioning
+    Test getting a restaurant without a valid id
+    """
+    mock_repo.load_all.return_value = []
 
-def test_create_restaurant_as_customer(service, customer):
-    # Edge case: A customer should not be able to create a restaurant
-    data = {"name": "Fake place", "location": "None"}
+    result, status = service.get_restaurant_by_id(999)
 
-    result = service.register_restaurant(customer, data)
+    assert status == 404
+    assert result is None
 
-    assert result["success"] == False
-    assert "unauthorized" in result["error"]
+# --- Assign owner to restaurant ---
 
-# --- Publishing logic ---
+def test_assign_owner_success(service, mock_repo, restaurant):
+    """
+    Equivalence Partitioning
+    Ensures a owner can be assigned to a restaurant
+    """
 
+    mock_repo.load_all.return_value = [restaurant]
+    new_owner_id = 505
+
+    response, status = service.assign_owner_to_restaurant(restaurant.id, new_owner_id)
+
+    assert status == 200
+    assert response["message"] == "Owner assigned"
+    assert response["restaurant_id"] == restaurant.id
+
+    mock_repo.save_all.assert_called_once()
+
+    assert restaurant.owner_id == str(new_owner_id)
+
+
+def test_assign_owner_not_found(service, mock_repo):
+    """
+    Exception handling
+    Ensure the proper error returns when we try to assign a restaurant
+    to a nonexistent owner
+    """
+    mock_repo.load_all.return_value = []
+    
+    response, status = service.assign_owner_to_restaurant(1, 101)
+    
+    assert status == 404
+    assert response["error"] == "Restaurant not found"
+
+def test_assign_owner_value_error_handling(service, mock_repo, restaurant):
+    """
+    Fault injection
+    Ensure the proper error is thrown during owner assignment
+    """
+    rest_id = restaurant.id
+    mock_repo.load_all.return_value = [restaurant]
+
+    mock_repo.save_all.side_effect = ValueError("Database constraint violated")
+    response, status = service.assign_owner_to_restaurant(rest_id, 101)
+
+    assert status == 400
+    assert "Database constraint violated" in response["error"]
+
+# --- Publishing ---
 
 def test_publish_restaurant_success(service, mock_repo, restaurant):
-    # Positive Functional test: Publish when all required fields are filled
-    # Complete partial conftest
-    restaurant.id = 1
-    restaurant.address = "123 Test Ave"
-    restaurant.phone = "555-555-5555"
-    restaurant.open_time = 900
-    restaurant.close_time = 2200
+    """
+    Functional test
+    Ensure a restaurant can be published 
+    """
+    restaurant.phone = "250-555-0123"
+    restaurant.latitude = 49.88
+    restaurant.longitude = -119.49
+    restaurant.is_published = False
+    
+    mock_repo.load_all.return_value = [restaurant]
 
-    mock_repo.get_by_id.return_value = restaurant
+    response, status = service.publish_restaurant(restaurant.id)
 
-    result = service.publish_restaurant(restaurant.id)
+    assert status == 200
+    assert "is now published" in response["message"]
 
-    assert result["success"] is True
     assert restaurant.is_published is True
 
-def test_publish_restaurant_fails_missing_info(service, mock_repo, restaurant):
-    # Edge test: Throw error if incomplete since our comftest doesn't have address/phone/time...
-    restaurant.id = 1
-    mock_repo.get_by_id.return_value = restaurant
-    result = service.publish_restaurant(restaurant.id)
+    mock_repo.save_all.assert_called_once()
 
-    assert result["success"] is False
-    assert "is required" in result["error"]
-    assert restaurant.is_published is False
-
-
-def test_publish_fails_without_menu(service, mock_repo, restaurant):
-    # Negative Edge Case: Cannot publish without menu
-    restaurant.id = 1
-    restaurant.address = "123 Test Ave"
-    restaurant.phone = "555-555-5555"
-    restaurant.open_time = 900
-    restaurant.close_time = 2200
-    # Clear menu
-    restaurant.menu = []
-    mock_repo.get_by_id.return_value = restaurant
-
-    result = service.publish_restaurant(restaurant.id)
-
-    assert result["success"] is False
-    assert "menu cannot be empty" in result["error"]
-
-# --- Feature 2 test ---
-
-def test_admin_customer_perspective(service, mock_repo, restaurant):
-    # Positive Functional Test: Tests that different perspectives can be used
-    # Customer perspective should not see unpublished restaurant
-    restaurant.address = "123 Test Ave"
-    restaurant.phone = "555-555-5555"
-    restaurant.open_time = 900
-    restaurant.close_time = 2200
-    restaurant.menu = ["Item"]
-
-    mock_repo.get_by_id.return_value = restaurant
-
-    # Ensure customer cant see restaurant before it is published
-    assert restaurant.get_view("Customer") is None
-
-    # Publish
-    service.publish_restaurant(restaurant.id)
-
-    # Check to see if customer can view it
-    view = restaurant.get_view("Customer")
-    assert view is not None
-    assert view["name"] == "John's Diner"
-
-
-# --- Nearby search ---
-
-def test_get_nearby_restaurants_filtering_and_sorting(service, mock_repo, customer):
+def test_publish_restaurant_missing_data(service, mock_repo, restaurant):
     """
-    Feat3-FR1:
-    Functional test: Test that restaurants are filtered
-    by radius and sorted by distance
+    Equivalence Partitioning
+    Testing the minimum requirements (phone/coords)
+    for the 'Published' state.
     """
-    # Setup Mock Data
-    mock_data = [
-        {"id": 1, "name": "Close Cafe", "latitude": 0.01, "longitude": 0.01, "is_published": True},
-        {"id": 2, "name": "Far Food", "latitude": 0.1, "longitude": 0.1, "is_published": True},
-        {"id": 3, "name": "Out of Bounds", "latitude": 1.0, "longitude": 1.0, "is_published": True}
-    ]
-    mock_repo.get_all_restaurants.return_value = mock_data
+    restaurant.phone = ""
+    mock_repo.load_all.return_value = [restaurant]
 
-    # Execution (Radius 20km)
-    results = service.get_nearby_restaurants(customer, radius_km=20.0)
+    response, status = service.publish_restaurant(restaurant.id)
 
-    assert len(results) == 2
-    assert results[0]["name"] == "Close Cafe"
+    assert status == 400
+    assert "Missing phone" in response["error"]
 
+# --- View filtering ---
 
-def test_get_nearby_restaurants_ignores_unpublished(service, mock_repo, customer):
+def test_get_filtered_view_forbidden_for_customer(service, mock_repo, restaurant):
     """
-    Feat3-FR1:
-    Negative functional test: Test that even if a
-    restaurant is close, it's hidden if not published
+    Exception Handling
+    Ensure a customer cannot access a restaurant that isnt published
     """
+    restaurant.is_published = False
+    mock_repo.load_all.return_value = [restaurant]
 
-    # Close but unpublished
-    mock_data = [{"id": 1, "name": "Ghost Kitchen", "latitude": 0.001, "longitude": 0.001, "is_published": False}]
-    mock_repo.get_all_restaurants.return_value = mock_data
+    response, status = service.get_filtered_view(restaurant.id, "customer")
 
-    results = service.get_nearby_restaurants(customer, radius_km=10.0)
-    assert len(results) == 0
+    assert status == 403
+    assert response["error"] == "Restaurant unavailable"
 
-
-def test_get_nearby_restaurants_at_zero_coordinates(service, mock_repo, customer):
+def test_get_filtered_view_strips_sensitive_data(service, mock_repo, restaurant):
     """
-    Feat3-FR1:
-    Edge Case: Customer and Restaurant are both at (0,0)
+    Equivalence Partitioning
+    Ensures that the customer only sees public information
+    Should not see owner id
     """
-    mock_data = [{"id": 1, "name": "Equator Eats", "latitude": 0.0, "longitude": 0.0, "is_published": True}]
-    mock_repo.get_all_restaurants.return_value = mock_data
+    restaurant.is_published = True
+    restaurant.owner_id = "secret_123"
+    mock_repo.load_all.return_value = [restaurant]
 
-    results = service.get_nearby_restaurants(customer, radius_km=10.0)
-    assert len(results) == 1
-    assert results[0]["distance_from_user"] == 0.0
+    response, status = service.get_filtered_view(restaurant.id, "customer")
 
-def test_get_nearby_restaurants_extreme_radius(service, mock_repo, customer):
-    """
-    Feat3-FR1:
-    Edge Case: Huge radius should include all published restaurants
-    """
-    mock_data = [
-        {"id": 1, "name": "London Pub", "latitude": 51.5, "longitude": -0.1, "is_published": True},
-        {"id": 2, "name": "Tokyo Sushi", "latitude": 35.6, "longitude": 139.6, "is_published": True}
-    ]
-    mock_repo.get_all_restaurants.return_value = mock_data
-
-    # Radius of 20,000km
-    results = service.get_nearby_restaurants(customer, radius_km=20000.0)
-    assert len(results) == 2
-
-def test_get_nearby_restaurants_zero_radius(service, mock_repo):
-    """
-    Feat3-FR1:
-    Edge Case: Radius of 0.0 should only return
-    exact matches
-    """
-    local_customer = Customer(id=5, username="u", email="e@mail.com", password_hash="p", latitude=10.0, longitude=10.0)
-    mock_data = [
-        {"id": 1, "name": "Exact", "latitude": 10.0, "longitude": 10.0, "is_published": True},
-        {"id": 2, "name": "Near", "latitude": 10.0001, "longitude": 10.0001, "is_published": True}
-    ]
-    mock_repo.get_all_restaurants.return_value = mock_data
-    
-    results = service.get_nearby_restaurants(local_customer, radius_km=0.0)
-    assert len(results) == 1
-
-
-def test_calculate_haversine_accuracy(service):
-    """
-    Feat3-FR1:
-    Positive Functional: Test the math helper directly with known distances.
-    Distance between Kelowna and Vancouver is ~270km
-    """
-    dist = service.calculate_haversine(49.88, -119.49, 49.28, -123.12)
-    assert 265 <= dist <= 275  # Allow small margin for earth curvature models
+    assert status == 200
+    assert "owner_id" not in response
+    assert response["id"] == restaurant.id
