@@ -12,7 +12,7 @@ router = APIRouter(prefix="/restaurants", tags=["restaurants"])
 
 # --- Get Methods ---
 
-@router.get("/{restaurant_id}", response_model=Dict)
+@router.get("", response_model=List[Dict])
 def get_restaurants():
     """
     GET: Retrieve all restaurants via load all from service
@@ -20,13 +20,15 @@ def get_restaurants():
     return service.get_all_published()
 
 @router.get("/{restaurant_id}")
-def get_restaurant(restaurant_id: int):
+def get_restaurant(restaurant_id: str):
     """
     GET: Get a specific restaurant by ID
     """
     result, code = service.get_filtered_view(restaurant_id, "customer")
     if code == 404:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Restaurant not found")
+    if code == 403:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Restaurant unavailable")
     return result
 
 # --- Post Methods ---

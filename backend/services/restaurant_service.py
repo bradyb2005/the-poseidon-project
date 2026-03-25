@@ -8,7 +8,7 @@ class RestaurantService:
     def __init__(self, restaurant_repo):
         self.restaurant_repo = restaurant_repo
     
-    def get_restaurant_by_id(self, restaurant_id: int) -> Tuple[Optional[Restaurant], int]:
+    def get_restaurant_by_id(self, restaurant_id: str) -> Tuple[Optional[Restaurant], int]:
         """
         Returns a single restaurant
         Matches 200 OK or 404 Not Found
@@ -30,7 +30,7 @@ class RestaurantService:
             for r in restaurants if r.is_published
         ]
 
-    def assign_owner_to_restaurant(self, restaurant_id: int, owner_id: int) -> Tuple[Dict, int]:
+    def assign_owner_to_restaurant(self, restaurant_id: str, owner_id: str) -> Tuple[Dict, int]:
         """
         Assigns user as owner to pre-existing restaurant
         """
@@ -48,7 +48,7 @@ class RestaurantService:
             return {"error": str(e)}, 400
 
 
-    def update_restaurant_details(self, restaurant_id: int, update_data: dict) -> Tuple[Dict, int]:
+    def update_restaurant_details(self, restaurant_id: str, update_data: dict) -> Tuple[Dict, int]:
         """
         Feat2-FR3: Update restaurant info
         """
@@ -68,13 +68,13 @@ class RestaurantService:
         except ValueError as e:
             return {"error": str(e)}, 400
 
-    def publish_restaurant(self, restaurant_id: int) -> Tuple[Dict, int]:
+    def publish_restaurant(self, restaurant_id: str) -> Tuple[Dict, int]:
         """
         Feat2-FR3:
         Ensure valid phone/coords before publishing
         """
         restaurants = self.restaurant_repo.load_all()
-        target = next((r for r in restaurants if r.id == restaurant_id), None)
+        target = next((r for r in restaurants if str(r.id) == str(restaurant_id)), None)
 
         if not target:
             return {"error": "Not Found"}, 404
@@ -86,7 +86,7 @@ class RestaurantService:
         self.restaurant_repo.save_all(restaurants)
         return {"message": "Restaurant is now published"}, 200
 
-    def get_filtered_view(self, restaurant_id: int, user_role: str) -> Tuple[Optional[Dict], int]:
+    def get_filtered_view(self, restaurant_id: str, user_role: str) -> Tuple[Optional[Dict], int]:
         """
         Feat2-FR4
         Throws a forbidden error if customer tries to view an unpublished restaurant

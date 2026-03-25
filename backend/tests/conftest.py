@@ -13,6 +13,18 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 @pytest.fixture
+def client():
+    from backend.main import app
+    from fastapi.testclient import TestClient
+    return TestClient(app)
+
+@pytest.fixture
+def mock_restaurant_service(monkeypatch):
+    mock = MagicMock()
+    monkeypatch.setattr("backend.routes.restaurant_router.service", mock)
+    return mock
+
+@pytest.fixture
 def restaurant():
         return Restaurant(
             id=1,
