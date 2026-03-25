@@ -19,6 +19,16 @@ class RestaurantService:
         if not target:
             return None, 404
         return target, 200
+    
+    def get_all_published(self) -> List[Dict]:
+        """
+        Returns a list of all published restaurants and remove sensitive data
+        """
+        restaurants = self.restaurant_repo.load_all()
+        return [
+            r.model_dump(by_alias=False, exclude={"owner_id"}) 
+            for r in restaurants if r.is_published
+        ]
 
     def assign_owner_to_restaurant(self, restaurant_id: int, owner_id: int) -> Tuple[Dict, int]:
         """

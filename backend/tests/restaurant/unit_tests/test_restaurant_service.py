@@ -1,4 +1,4 @@
-# backend/tests/restaurant/unit_tests/test_menu_item_model.py
+# backend/tests/restaurant/unit_tests/test_restaurant_service.py
 import pytest
 from unittest.mock import MagicMock
 from backend.services.restaurant_service import RestaurantService
@@ -31,6 +31,56 @@ def test_get_restaurant_by_id_not_found(service, mock_repo):
 
     assert status == 404
     assert result is None
+
+def test_get_all_published_success(service, mock_repo):
+    """
+    Equivalence Partitioning/ Mocking
+    Ensures only published restaurants with nonsensitive data is returned
+    """
+    res_published = Restaurant(
+        id=1, 
+        name="Published Diner",
+        menu=["Burgers"],
+        is_published=True, 
+        owner_id="owner_1"
+    )
+    res_draft = Restaurant(
+        id=2, 
+        name="Draft Cafe",
+        menu=["Tea"], 
+        is_published=False, 
+        owner_id="owner_2"
+    )
+    
+    mock_repo.load_all.return_value = [res_published, res_draft]
+
+    results = service.get_all_published()
+
+    assert len(results) == 1
+    assert results[0]["name"] == "Published Diner"
+
+    assert "owner_id" not in results[0]
+    assert "name" in results[0]
+
+
+def test_get_all_published_empty(service, mock_repo):
+    """
+    Boundary Value Analysis
+    Ensures that if no restaurants are published, an empty list is returned
+    """
+    res_draft = Restaurant(
+        id=1,
+        name="Testaurant",
+        menu=["Burger"],
+        owner_id="owner_3",
+        is_published=False)
+    mock_repo.load_all.return_value = [res_draft]
+
+    results = service.get_all_published()
+
+    assert isinstance(results, list)
+    assert len(results) == 0
+
 
 # --- Assign owner to restaurant ---
 
