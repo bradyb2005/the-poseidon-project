@@ -56,6 +56,21 @@ def test_post_assign_owner_success(client, mock_restaurant_service):
     assert response.status_code == 200
     assert response.json()["message"] == "Owner assigned"
 
+def test_post_publish_missing_coords(client, mock_restaurant_service):
+    """
+    Integration test
+    Ensures proper error is returned if it misses coordinates
+    """
+    mock_error = {"error": "Missing valid coordinates"}
+
+    mock_restaurant_service.publish_restaurant.return_value = (mock_error, 400)
+
+    response = client.post("/restaurants/1/publish")
+
+    assert response.status_code == 400
+    assert "Missing valid coordinates" in response.json()["detail"]
+
+# --- Put tests ---
 
 def test_put_restaurant_update(client, mock_restaurant_service):
     """
@@ -71,18 +86,3 @@ def test_put_restaurant_update(client, mock_restaurant_service):
 
     assert response.status_code == 200
     assert response.json()["message"] == "Updated successfully"
-
-
-def test_post_publish_missing_coords(client, mock_restaurant_service):
-    """
-    Integration test
-    Ensures proper error is returned if it misses coordinates
-    """
-    mock_error = {"error": "Missing valid coordinates"}
-
-    mock_restaurant_service.publish_restaurant.return_value = (mock_error, 400)
-
-    response = client.post("/restaurants/1/publish")
-
-    assert response.status_code == 400
-    assert "Missing valid coordinates" in response.json()["detail"]
