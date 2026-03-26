@@ -5,7 +5,6 @@ from decimal import Decimal
 from uuid import uuid4
 from unittest.mock import MagicMock
 from backend.models.user.user_schema import User
-from backend.schemas.items_schema import MenuItem
 from backend.schemas.restaurant_schema import Restaurant
 from backend.schemas.items_schema import MenuItem as MenuItemSchema
 
