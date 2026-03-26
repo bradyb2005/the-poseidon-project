@@ -4,8 +4,6 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock
 from backend.schemas.restaurant_schema import Restaurant
-from backend.models.user.restaurant_owner_model import RestaurantOwner
-from backend.models.restaurant.menu_item_model import MenuItem
 
 
 # add project root to import path
@@ -41,6 +39,13 @@ def restaurant():
     )
 
 @pytest.fixture
+def mock_search_service(monkeypatch):
+    mock = MagicMock()
+    # This will be used when we create the search_router
+    monkeypatch.setattr("backend.routes.search_router.service", mock)
+    return mock
+
+@pytest.fixture
 def mock_repo():
     return MagicMock()
 
@@ -48,31 +53,4 @@ def mock_repo():
 def service(mock_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_repo)
-
-# old fixtures
-
-@pytest.fixture
-def owner():
-    """
-    Return real RestaurantOwner
-    """
-    return RestaurantOwner(
-        id=1,
-        username="John_Doe",
-        email="john_doe@gmail.com",
-        password_hash="SecurePass123"
-    )
-
-@pytest.fixture
-def sample_item():
-    """
-    return valid menu item for FR3
-    """
-    return MenuItem(
-        id=101,
-        name="Burger",
-        price=9.99,
-        tags=["Popular"])
-
-
 
