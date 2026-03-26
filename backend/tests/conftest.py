@@ -2,8 +2,12 @@
 import pytest
 import sys
 from pathlib import Path
+from decimal import Decimal
+from uuid import uuid4
 from unittest.mock import MagicMock
 from backend.schemas.restaurant_schema import Restaurant
+from backend.schemas.items_schema import MenuItem as MenuItemSchema
+
 
 
 # add project root to import path
@@ -53,4 +57,31 @@ def mock_repo():
 def service(mock_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_repo)
+
+# old fixtures
+
+@pytest.fixture
+def owner():
+    """
+    Return real RestaurantOwner
+    """
+    return RestaurantOwner(
+        id=1,
+        username="John_Doe",
+        email="john_doe@gmail.com",
+        password_hash="SecurePass123"
+    )
+
+@pytest.fixture
+def sample_item():
+    """
+    return valid menu item for FR3
+    """
+    return MenuItem(
+        id=101,
+        name="Burger",
+        price=9.99,
+        tags=["Popular"])
+
+
 
