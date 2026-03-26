@@ -1,5 +1,3 @@
-# backend/tests/conftest.py
-import pytest
 import sys
 from pathlib import Path
 from decimal import Decimal
@@ -12,15 +10,9 @@ from backend.services.search_service import SearchService
 
 
 
-# add project root to import path
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-@pytest.fixture
-def client():
-    from backend.main import app
-    from fastapi.testclient import TestClient
-    return TestClient(app)
 
 @pytest.fixture
 def restaurant():
