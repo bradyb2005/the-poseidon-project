@@ -11,7 +11,6 @@ def test_get_search_success(client, mock_search_service):
     mock_items = [{"name": "Burger", "restaurant_id": "1", "price": 10.99}]
     mock_search_service.search_by_keyword.return_value = mock_items
 
-    # Testing the query parameter ?q=burger
     response = client.get("/search?q=burger")
 
     assert response.status_code == 200
