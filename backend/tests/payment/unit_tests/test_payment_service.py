@@ -1,13 +1,13 @@
 import pytest
 from pydantic import ValidationError
 
-from backend.models.payment.payment_schema import (
+from backend.schemas.payment_schema import (
     CostBreakdown,
     PaymentSchema,
     PaymentStatus,
     UpdatePaymentSchema,
 )
-from backend.models.payment.payment_service import PaymentService
+from backend.services.payment_service import PaymentService
 
 @pytest.fixture
 def base_payment_data():
