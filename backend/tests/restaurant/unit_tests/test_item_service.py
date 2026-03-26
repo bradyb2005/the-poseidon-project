@@ -12,7 +12,7 @@ def menu_service(mock_repo):
 
 def test_verify_ownership_not_found(menu_service, mock_repo):
     """
-    Exception Handling
+    Exception handling
     Ensure 404 is returned if the restaurant ID does not exist in the repo
     """
     mock_repo.get_by_id.return_value = None
