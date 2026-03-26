@@ -121,4 +121,17 @@ class PaymentService:
 
     def _calculate_tax(self, subtotal: float) -> float:
         return round(subtotal * 0.12, 2)
-        
+    
+    def process_payment(self, payment: PaymentSchema) -> PaymentSchema:
+        """
+        Simulates payment processing (gateway)
+        """
+        self._validate_payment(payment)
+
+        # Simple rule-based simulation
+        if payment.card_number and len(str(payment.card_number)) >= 12:
+            payment.status = payment.status.__class__.ACCEPTED
+        else:
+            payment.status = payment.status.__class__.DENIED
+
+        return payment

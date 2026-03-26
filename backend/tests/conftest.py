@@ -3,9 +3,9 @@ import pytest
 from pathlib import Path
 from decimal import Decimal
 from uuid import uuid4
+from fastapi.testclient import TestClient
 from unittest.mock import MagicMock
 from backend.models.user.user_schema import User
-from backend.schemas.items_schema import MenuItem
 from backend.schemas.restaurant_schema import Restaurant
 from backend.schemas.items_schema import MenuItem as MenuItemSchema
 from backend.services.search_service import SearchService
@@ -41,6 +41,10 @@ def mock_item_repo():
     return MagicMock()
 
 @pytest.fixture
+def mock_restaurant_repo():
+     return MagicMock
+
+@pytest.fixture
 def service(mock_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_repo)
@@ -49,22 +53,6 @@ def service(mock_repo):
 def restaurant_service(mock_restaurant_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_restaurant_repo)
-
-@pytest.fixture
-def restaurant():
-        return Restaurant(
-            id=1,
-            name="John's Diner",
-            menu=["Burger", "Fries"],
-            owner_id="1",
-            open_time=900,
-            close_time=2200,
-            phone="555-555-5555",
-            address="123 Main St",
-            latitude=34.34,
-            longitude=-118.34,
-            is_published=False,
-    )
 
 
 @pytest.fixture
@@ -88,13 +76,23 @@ def search_service(mock_restaurant_repo, mock_item_repo):
 # old fixtures
 
 @pytest.fixture
-def mock_repo():
-    return MagicMock()
+def mock_search_service(monkeypatch):
+
+    from unittest.mock import MagicMock
+    from backend.services.search_service import SearchService
+
+    mock = MagicMock(spec=SearchService)
+
+    monkeypatch.setattr("backend.routes.search_routes.service", mock)
+
+    return mock
 
 @pytest.fixture
-def service(mock_repo):
-    from backend.services.restaurant_service import RestaurantService
-    return RestaurantService(mock_repo)
+def search_service(mock_restaurant_repo, mock_item_repo):
+    return SearchService(
+        restaurant_repo=mock_restaurant_repo,
+        item_repo=mock_item_repo
+    )
 
 # old fixtures
 
