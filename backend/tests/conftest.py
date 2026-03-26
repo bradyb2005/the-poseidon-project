@@ -1,12 +1,15 @@
 import sys
 from pathlib import Path
+from decimal import Decimal
+from uuid import uuid4
 from unittest.mock import MagicMock
 
 import pytest
 
 from backend.models.user.user_schema import User
-from backend.models.restaurant.restaurant_model import Restaurant
 from backend.models.restaurant.menu_item_model import MenuItem
+from backend.schemas.items_schema import MenuItem as MenuItemSchema
+from backend.schemas.restaurant_schema import Restaurant as RestaurantSchema
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,6 +48,14 @@ def sample_item():
         tags=["Popular"],
     )
 
+@pytest.fixture
+def raw_menu_item_data():
+    return {
+        "item_name": "Beef Pie",
+        "restaurant_id": 10,
+        "price": "12.50",
+        "id": str(uuid4())
+    }
 
 @pytest.fixture
 def restaurant(owner, sample_item):
