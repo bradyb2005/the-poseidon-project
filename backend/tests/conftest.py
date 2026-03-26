@@ -2,10 +2,14 @@
 import pytest
 import sys
 from pathlib import Path
+from decimal import Decimal
+from uuid import uuid4
 from unittest.mock import MagicMock
 from backend.schemas.restaurant_schema import Restaurant
-from backend.models.user.restaurant_owner_model import RestaurantOwner
-from backend.models.restaurant.menu_item_model import MenuItem
+from backend.schemas.items_schema import MenuItem as MenuItemSchema
+from backend.repositories.items_repository import ItemRepository
+from backend.services.search_service import SearchService
+
 
 
 # add project root to import path
@@ -17,12 +21,6 @@ def client():
     from backend.main import app
     from fastapi.testclient import TestClient
     return TestClient(app)
-
-@pytest.fixture
-def mock_restaurant_service(monkeypatch):
-    mock = MagicMock()
-    monkeypatch.setattr("backend.routes.restaurant_router.service", mock)
-    return mock
 
 @pytest.fixture
 def restaurant():
@@ -41,7 +39,11 @@ def restaurant():
     )
 
 @pytest.fixture
-def mock_repo():
+def mock_restaurant_repo():
+    return MagicMock()
+
+@pytest.fixture
+def mock_item_repo():
     return MagicMock()
 
 @pytest.fixture
@@ -49,30 +51,31 @@ def service(mock_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_repo)
 
+@pytest.fixture
+def restaurant_service(mock_restaurant_repo):
+    from backend.services.restaurant_service import RestaurantService
+    return RestaurantService(mock_restaurant_repo)
+
+
+@pytest.fixture
+def search_service(mock_restaurant_repo, mock_item_repo):
+    return SearchService(
+        restaurant_repo=mock_restaurant_repo,
+        item_repo=mock_item_repo
+    )
+
 # old fixtures
 
 @pytest.fixture
-def owner():
-    """
-    Return real RestaurantOwner
-    """
-    return RestaurantOwner(
-        id=1,
-        username="John_Doe",
-        email="john_doe@gmail.com",
-        password_hash="SecurePass123"
-    )
+def raw_menu_item_data():
+    return {
+        "item_name": "Beef Pie",
+        "restaurant_id": 10,
+        "price": "12.50",
+        "id": str(uuid4())
+    }
 
 @pytest.fixture
-def sample_item():
-    """
-    return valid menu item for FR3
-    """
-    return MenuItem(
-        id=101,
-        name="Burger",
-        price=9.99,
-        tags=["Popular"])
-
-
+def sample_menu_item(raw_menu_item_data):
+    return MenuItemSchema(**raw_menu_item_data)
 
