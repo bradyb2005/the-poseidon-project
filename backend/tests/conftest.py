@@ -1,4 +1,5 @@
 import sys
+import pytest
 from pathlib import Path
 from decimal import Decimal
 from uuid import uuid4
