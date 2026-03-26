@@ -1,29 +1,39 @@
-# backend/tests/conftest.py
-import pytest
 import sys
+import pytest
 from pathlib import Path
 from decimal import Decimal
 from uuid import uuid4
 from unittest.mock import MagicMock
+from backend.models.user.user_schema import User
+from backend.schemas.items_schema import MenuItem
 from backend.schemas.restaurant_schema import Restaurant
 from backend.schemas.items_schema import MenuItem as MenuItemSchema
 
 
 
-# add project root to import path
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-@pytest.fixture
-def client():
-    from backend.main import app
-    from fastapi.testclient import TestClient
-    return TestClient(app)
 
 @pytest.fixture
-def mock_restaurant_service(monkeypatch):
-    mock = MagicMock()
-    monkeypatch.setattr("backend.routes.restaurant_router.service", mock)
+def owner():
+    """Return a user representing a restaurant owner."""
+    return User(
+        id="1",
+        username="John_Doe",
+        email="john_doe@gmail.com",
+        password_hash="SecurePass123",
+        owned_restaurants_id=["1"],
+    )
+
+
+@pytest.fixture
+def mock_owner():
+    """Return a mock user for owner-related tests."""
+    mock = MagicMock(spec=User)
+    mock.id = "99"
+    mock.username = "MockUser"
+    mock.owned_restaurants_id = ["1"]
     return mock
 
 @pytest.fixture
@@ -42,6 +52,7 @@ def restaurant():
             is_published=False,
     )
 
+
 @pytest.fixture
 def mock_repo():
     return MagicMock()
@@ -51,7 +62,7 @@ def service(mock_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_repo)
 
-# old fixtures
+
 
 @pytest.fixture
 def restaurant():
