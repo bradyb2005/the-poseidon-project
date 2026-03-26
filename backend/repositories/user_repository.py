@@ -1,6 +1,7 @@
 import json
 import os
-from typing import List, Dict
+from typing import Optional, List, Dict
+from backend.models.user.user_schema import User
 
 
 DATA_FILE = os.path.join(
