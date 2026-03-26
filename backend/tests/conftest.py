@@ -8,7 +8,6 @@ from unittest.mock import MagicMock
 from backend.models.user.user_schema import User
 from backend.schemas.restaurant_schema import Restaurant
 from backend.schemas.items_schema import MenuItem as MenuItemSchema
-from backend.repositories.items_repository import ItemRepository
 from backend.services.search_service import SearchService
 
 
@@ -16,36 +15,6 @@ from backend.services.search_service import SearchService
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-
-@pytest.fixture
-def client():
-    """
-    Creates a FastAPI TestClient for integration testing.
-    Make sure your 'app' is defined in backend/main.py.
-    """
-    from backend.main import app
-    return TestClient(app)
-
-@pytest.fixture
-def owner():
-    """Return a user representing a restaurant owner."""
-    return User(
-        id="1",
-        username="John_Doe",
-        email="john_doe@gmail.com",
-        password_hash="SecurePass123",
-        owned_restaurants_id=["1"],
-    )
-
-
-@pytest.fixture
-def mock_owner():
-    """Return a mock user for owner-related tests."""
-    mock = MagicMock(spec=User)
-    mock.id = "99"
-    mock.username = "MockUser"
-    mock.owned_restaurants_id = ["1"]
-    return mock
 
 @pytest.fixture
 def restaurant():
@@ -84,6 +53,27 @@ def service(mock_repo):
 def restaurant_service(mock_restaurant_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_restaurant_repo)
+
+
+@pytest.fixture
+def mock_repo():
+    return MagicMock()
+
+@pytest.fixture
+def service(mock_repo):
+    from backend.services.restaurant_service import RestaurantService
+    return RestaurantService(mock_repo)
+
+
+
+@pytest.fixture
+def search_service(mock_restaurant_repo, mock_item_repo):
+    return SearchService(
+        restaurant_repo=mock_restaurant_repo,
+        item_repo=mock_item_repo)
+      
+
+# old fixtures
 
 @pytest.fixture
 def mock_search_service(monkeypatch):
