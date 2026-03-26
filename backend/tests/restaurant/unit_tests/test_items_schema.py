@@ -102,6 +102,27 @@ def test_update_item_invalid_price():
     with pytest.raises(ValidationError):
         UpdateMenuItemSchema(price="-5.00")
 
+# --- Tag logic tests ---
+
+def test_menu_item_tags_standardization(raw_menu_item_data):
+    """
+    Data Transformation
+    Ensures tags are lowercased, stripped, and deduplicated.
+    """
+    raw_menu_item_data["tags"] = [" Spicy ", "spicy", "VEGAN", "  "]
+    item = MenuItem(**raw_menu_item_data)
+
+    assert item.tags == ["spicy", "vegan"]
+
+
+def test_menu_item_invalid_tags(raw_menu_item_data):
+    """
+    Fault Injection
+    Ensures tags must be a list of strings.
+    """
+    raw_menu_item_data["tags"] = [123, None]
+    with pytest.raises(ValidationError) as exc_info:
+        MenuItem(**raw_menu_item_data)
 
 # --- Serialization Test ---
 

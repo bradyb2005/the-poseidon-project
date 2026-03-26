@@ -50,6 +50,19 @@ class MenuItemBase(BaseModel):
             return UUID(v)
         except (ValueError, AttributeError):
             raise ValueError("item_id must be a valid UUID string")
+        
+    @field_validator("tags")
+    @classmethod
+    def validate_and_clean_tags(cls, v: List[str]):
+        """
+        Standardizes tags: lowercase, no whitespace, no duplicates
+        """
+        if not all(isinstance(t, str) for t in v):
+            raise TypeError("All tags must be strings")
+
+        cleaned = [t.strip().lower() for t in v if t.strip()]
+
+        return list(dict.fromkeys(cleaned))
 
 
 class MenuItem(MenuItemBase):
