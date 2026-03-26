@@ -42,6 +42,7 @@ class SearchService:
 
     def get_homepage_featured(self) -> List[Dict]:
         """
+        Feat3-FR3
         Returns a random or 'featured' selection of published items
         """
         published_ids = {str(r.id) for r in self.restaurant_repo.load_all() if r.is_published}
@@ -52,3 +53,36 @@ class SearchService:
             if str(item.restaurant_id) in published_ids
         ][:5]
 
+    def browse_homepage(self) -> List[Dict]:
+        """
+        Feat3-FR3: Returns all published restaurants for the homepage list.
+        """
+        all_res = self.restaurant_repo.load_all()
+        
+        return [
+            res.model_dump(by_alias=True) 
+            for res in all_res 
+            if res.is_published
+        ]
+
+    def get_restaurant_details(self, restaurant_id: int) -> Optional[Dict]:
+        """
+        Feat3-FR3: Fetches a specific restaurant and injects its full menu.
+        """
+        all_restaurants = self.restaurant_repo.load_all()
+        restaurant = next((r for r in all_restaurants if r.id == restaurant_id), None)
+
+        if not restaurant or not restaurant.is_published:
+            return None
+
+        all_items = self.item_repo.load_all()
+        menu_details = [
+            item.model_dump(by_alias=True) 
+            for item in all_items 
+            if item.restaurant_id == restaurant_id
+        ]
+
+        data = restaurant.model_dump(by_alias=True)
+        data["full_menu_details"] = menu_details
+        
+        return data

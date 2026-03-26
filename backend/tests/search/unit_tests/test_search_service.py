@@ -93,3 +93,52 @@ def test_get_homepage_featured_limit(search_service, mock_restaurant_repo, mock_
     featured = search_service.get_homepage_featured()
 
     assert len(featured) == 5
+
+def test_browse_homepage_filters_unpublished(search_service, mock_restaurant_repo):
+    """
+    Requirement Test: Homepage list only contains published restaurants.
+    """
+    mock_res_active = MagicMock(id=1, is_published=True)
+    mock_res_hidden = MagicMock(id=2, is_published=False)
+    
+    mock_res_active.model_dump.return_value = {"id": 1, "name": "Active Diner"}
+    mock_restaurant_repo.load_all.return_value = [mock_res_active, mock_res_hidden]
+
+    results = search_service.browse_homepage()
+
+    assert len(results) == 1
+    assert results[0]["name"] == "Active Diner"
+
+
+def test_get_restaurant_details_success(search_service, mock_restaurant_repo, mock_item_repo):
+    """
+    Functional Test:
+    Fetches a restaurant and successfully injects its menu items
+    """
+
+    mock_res = MagicMock(id=101, is_published=True)
+    mock_res.model_dump.return_value = {"id": 101, "name": "Test Cafe"}
+    mock_restaurant_repo.load_all.return_value = [mock_res]
+
+    mock_item = MagicMock(restaurant_id=101)
+    mock_item.model_dump.return_value = {"item_name": "Coffee"}
+    mock_item_repo.load_all.return_value = [mock_item]
+
+    result = search_service.get_restaurant_details(101)
+
+    assert result is not None
+    assert result["name"] == "Test Cafe"
+    assert len(result["full_menu_details"]) == 1
+    assert result["full_menu_details"][0]["item_name"] == "Coffee"
+
+
+def test_get_restaurant_details_not_found_or_hidden(search_service, mock_restaurant_repo):
+    """
+    Security Test: Returns None for non-existent or unpublished IDs.
+    """
+    mock_res = MagicMock(id=50, is_published=False)
+    mock_restaurant_repo.load_all.return_value = [mock_res]
+
+    assert search_service.get_restaurant_details(50) is None
+
+    assert search_service.get_restaurant_details(999) is None
