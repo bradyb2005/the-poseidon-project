@@ -1,10 +1,12 @@
 Resaturant Service Test Documentation
+<img width="614" height="125" alt="Screenshot 2026-03-25 at 2 36 28 PM" src="https://github.com/user-attachments/assets/38dd5f8b-d4bd-403b-bbaa-81bd2cc40be1" />
 
-<img width="708" height="129" alt="Screenshot 2026-03-24 at 1 37 48 PM" src="https://github.com/user-attachments/assets/b063a13e-982a-4077-824f-eda6819069a8" />
 
-
-There are two get by id methods to ensure sucess and error are both handled correctly. The successful one uses equivalence partitioning to test and returns a successful code in status.
+There are two get by id methods to ensure success and error are both handled correctly. The successful one uses equivalence partitioning to test and returns a successful code in status.
 The id not found also uses equivalence partitioning and returns a 404 error when the id is invalid.
+
+There are two get all methods to ensure success and empty list are both handled correctly. The successful one uses Equivalence partitioning and mocking to get all published restaurants with nonsensitive data.
+The get all published empty method is a boundary test to ensure an empty list is returned if no restaurants are published.
 
 There are three tests for owner assignment to restaurants. The successful case uses equivalence partitioning and ensures a owner can be assigned to a restaurant.
 There is an exception handling test that tries to assign a nonexistent owner to a restaurant.
