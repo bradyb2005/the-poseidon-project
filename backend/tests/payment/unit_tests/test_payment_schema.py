@@ -7,6 +7,7 @@ from backend.models.payment.payment_schema import (
     PaymentStatus,
     UpdatePaymentSchema,
 )
+from backend.models.payment.payment_service import PaymentService
 
 
 @pytest.fixture
@@ -32,6 +33,17 @@ def valid_cost_breakdown_data():
         "tax": 3.60,
         "total": 40.60,
     }
+
+
+class DummyItem:
+    def __init__(self, price, quantity):
+        self.price = price
+        self.quantity = quantity
+
+
+class DummyOrder:
+    def __init__(self, items):
+        self.items = items
 
 
 def test_payment_schema_initialization(base_payment_data):
