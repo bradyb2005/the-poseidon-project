@@ -1,0 +1,27 @@
+# Docker Setup Documentation
+
+## What was added
+This update adds Docker support for the backend by creating:
+- a FastAPI entrypoint in `backend/main.py`
+- a `Dockerfile`
+- a `.dockerignore` file
+- updated runtime dependency support in `requirements.txt`
+- Docker run instructions in `README.md`
+
+## Why this was needed
+Docker was added so the backend can run in a consistent environment across different machines. Without Docker, running the project depends on each person's local Python installation and package setup. With Docker, the backend can be built into an image that includes Python, the required dependencies, the project files, and the startup command.
+
+## How it works
+The `Dockerfile` defines the steps to build the backend image:
+1. start from a lightweight Python image
+2. set the working directory inside the container
+3. copy `requirements.txt`
+4. install dependencies
+5. copy the project files
+6. expose port 8000
+7. start the FastAPI app using Uvicorn
+
+The backend is started with:
+
+```bash
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000

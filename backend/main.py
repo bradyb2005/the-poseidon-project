@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 
-app = FastAPI(title="The Poseidon Project")
+app = FastAPI()
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to The Poseidon Project"}
+    return {"message": "Poseidon backend is running"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
