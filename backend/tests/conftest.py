@@ -5,8 +5,8 @@ from uuid import uuid4
 from unittest.mock import MagicMock
 from backend.models.user.user_schema import User
 from backend.models.restaurant.menu_item_model import MenuItem
-from backend.schemas.items_schema import MenuItem as MenuItemSchema
-from backend.schemas.restaurant_schema import Restaurant as RestaurantSchema
+from backend.schemas.items_schema import MenuItemSchema
+from backend.schemas.restaurant_schema import RestaurantSchema
 
 
 ROOT = Path(__file__).resolve().parents[1]
