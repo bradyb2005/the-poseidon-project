@@ -1,15 +1,12 @@
 import sys
+import pytest
 from pathlib import Path
 from decimal import Decimal
 from uuid import uuid4
 from unittest.mock import MagicMock
-
-import pytest
-
 from backend.models.user.user_schema import User
-from backend.models.restaurant.menu_item_model import MenuItem
-from backend.schemas.items_schema import MenuItem as MenuItemSchema
-from backend.schemas.restaurant_schema import Restaurant as RestaurantSchema
+from backend.schemas.items_schema import MenuItem
+from backend.schemas.restaurant_schema import Restaurant
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,16 +34,32 @@ def mock_owner():
     mock.owned_restaurants_id = ["1"]
     return mock
 
+@pytest.fixture
+def restaurant():
+        return Restaurant(
+            id=1,
+            name="John's Diner",
+            menu=["Burger", "Fries"],
+            owner_id="1",
+            open_time=900,
+            close_time=2200,
+            phone="555-555-5555",
+            address="123 Main St",
+            latitude=34.34,
+            longitude=-118.34,
+            is_published=False,
+    )
 
 @pytest.fixture
-def sample_item():
-    """Return a valid menu item."""
-    return MenuItem(
-        id=101,
-        name="Burger",
-        price=9.99,
-        tags=["Popular"],
-    )
+def mock_repo():
+    return MagicMock()
+
+@pytest.fixture
+def service(mock_repo):
+    from backend.services.restaurant_service import RestaurantService
+    return RestaurantService(mock_repo)
+
+# old fixtures
 
 @pytest.fixture
 def raw_menu_item_data():
@@ -58,12 +71,6 @@ def raw_menu_item_data():
     }
 
 @pytest.fixture
-def restaurant(owner, sample_item):
-    """Return a default restaurant linked to an owner."""
-    return Restaurant(
-        id=1,
-        name="John's Diner",
-        owner=owner,
-        menu=[sample_item],
-    )
+def sample_menu_item(raw_menu_item_data):
+    return MenuItemSchema(**raw_menu_item_data)
 
