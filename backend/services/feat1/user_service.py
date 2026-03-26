@@ -82,3 +82,15 @@ class UserService:
                 return user
 
         raise ValueError("user not found")
+    
+    def forgot_password(self, email: str, new_password: str) -> dict:
+        """Reset a user's password using their email."""
+        users = self.user_repo.load_all()
+
+        for user in users:
+            if user["email"] == email:
+                user["password_hash"] = self.hash_password(new_password)
+                self.user_repo.save_all(users)
+                return user
+
+        raise ValueError("user not found")

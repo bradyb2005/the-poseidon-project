@@ -126,3 +126,34 @@ def test_update_password_raises_error_when_user_not_found():
 
     with pytest.raises(ValueError, match="user not found"):
         service.update_password("1", "oldpassword", "newpassword123")
+
+
+def test_forgot_password_updates_password_hash_by_email():
+    repo = MagicMock()
+    service = UserService(repo)
+
+    old_hash = service.hash_password("oldpassword")
+    repo.load_all.return_value = [
+        {
+            "id": "1",
+            "username": "anjana",
+            "email": "anjana@gmail.com",
+            "password_hash": old_hash
+        }
+    ]
+
+    updated_user = service.forgot_password("anjana@gmail.com", "newpassword123")
+
+    assert updated_user["password_hash"] != old_hash
+    assert service.verify_password("newpassword123", updated_user["password_hash"])
+    repo.save_all.assert_called_once()
+
+
+def test_forgot_password_raises_error_when_email_not_found():
+    repo = MagicMock()
+    repo.load_all.return_value = []
+
+    service = UserService(repo)
+
+    with pytest.raises(ValueError, match="user not found"):
+        service.forgot_password("anjana@gmail.com", "newpassword123")
