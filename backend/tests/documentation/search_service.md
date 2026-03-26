@@ -1,15 +1,7 @@
-Search Service Test Documentation
+Search service test documentation
 
-<img width="691" height="130" alt="Screenshot 2026-03-25 at 8 57 56 PM" src="https://github.com/user-attachments/assets/b7f5147b-d61c-4ac0-8fd5-102d804de482" />
+<img width="662" height="126" alt="Screenshot 2026-03-16 at 6 37 24 PM" src="https://github.com/user-attachments/assets/70ecddad-2ea4-4324-98f3-1be802be8117" />
 
-There is a Boundary test that ignores small and unnecessary queries.
+We have functional tests to test browsing homepage and ensure it only returns published and another tests to get restaurant details.
 
-There is a positive functional test for keyword search.
-
-There is a search filtering test that ensures unpublished restaurants are not shown.
-
-There is a positive search test by tags.
-
-There is a homepage feature test that ensures a limit is to the homepage.
-
-
+We have edge case tests to try to get restaurant details of an unpublished restaurant, get details of a nonexistent restaurant, and tests that homepage does not crash if no restaurants are published.
