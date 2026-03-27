@@ -26,16 +26,10 @@ class RestaurantRepository:
         if not self._file_path.exists():
             return []
 
-        try:
-            with open(self._file_path, 'r') as f:
-                data = json.load(f)
+        with open(self._file_path, 'r') as f:
+            data = json.load(f)
+            return [Restaurant(**item) for item in data]
 
-                if not isinstance(data, list):
-                    return[]
-
-                return [Restaurant(**item) for item in data]
-        except (json.JSONDecodeError, FileNotFoundError):
-            return []
 
     def save_all(self, restaurants: List[Restaurant]) -> bool:
         """
