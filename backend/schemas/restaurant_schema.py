@@ -38,6 +38,8 @@ class RestaurantBase(BaseModel):
     @model_validator(mode="after")
     def validate_business_hours(self) -> "RestaurantBase":
         if self.open_time is not None and self.close_time is not None:
+            if self.open_time == 0 and self.close_time == 0:
+                return self
             if self.open_time >= self.close_time:
                 raise ValueError("open_time must be before close_time")
         return self
