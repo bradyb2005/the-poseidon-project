@@ -18,25 +18,23 @@ class RestaurantRepository:
         if not self._file_path.parent.exists():
             self._file_path.parent.mkdir(parents=True, exist_ok=True)
 
+    
     def load_all(self) -> List[Restaurant]:
-        print(f"DEBUG: Reading from {self._file_path.absolute()}") # Check the path!
-    
+        """
+        Read JSON file and return list of Restaurant objects
+        """
         if not self._file_path.exists():
-            print("DEBUG: File does not exist at that path.")
             return []
-    
+
         try:
             with open(self._file_path, 'r') as f:
                 data = json.load(f)
-                print(f"DEBUG: Raw data loaded: {data}")
-            
+
                 if not isinstance(data, list):
-                    print(f"DEBUG: Data is {type(data)}, not a list!")
-                    return []
+                    return[]
 
                 return [Restaurant(**item) for item in data]
-        except Exception as e:
-            print(f"DEBUG: Error occurred: {e}")
+        except (json.JSONDecodeError, FileNotFoundError):
             return []
 
     def save_all(self, restaurants: List[Restaurant]) -> bool:
