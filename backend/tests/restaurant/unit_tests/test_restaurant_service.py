@@ -256,7 +256,6 @@ def test_restaurant_time_limits(service, mock_repo, restaurant):
 
 # --- Model Validators ---
 
-
 def test_restaurant_edge_case_equal_times(service, mock_repo, restaurant):
     """
     Edge Case
