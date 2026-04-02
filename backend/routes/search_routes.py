@@ -20,7 +20,7 @@ def get_search(q: Optional[str] = None):
     GET: Search for menu items by keyword (name or tags)
     Only returns items from published restaurants
     """
-    if not q:
+    if not q or not q.strip():
         return []
     return service.search_by_keyword(q)
 
@@ -50,5 +50,4 @@ def get_restaurant_details(restaurant_id: str):
             status_code=status.HTTP_404_NOT_FOUND, 
             detail="Restaurant not found or is not published"
         )
-        
     return result
