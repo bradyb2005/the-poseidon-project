@@ -42,7 +42,7 @@ def mock_item_repo():
 
 @pytest.fixture
 def mock_restaurant_repo():
-     return MagicMock
+     return MagicMock()
 
 @pytest.fixture
 def service(mock_repo):
@@ -63,8 +63,6 @@ def mock_repo():
 def service(mock_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_repo)
-
-
 
 @pytest.fixture
 def search_service(mock_restaurant_repo, mock_item_repo):
