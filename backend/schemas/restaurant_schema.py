@@ -1,6 +1,8 @@
 # backend/schemas/restaurant_schema.py
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Optional
+
+from backend.schemas.items_schema import MenuItem
 
 class RestaurantBase(BaseModel):
     model_config = ConfigDict(
@@ -19,7 +21,6 @@ class RestaurantBase(BaseModel):
     longitude: Optional[float] = Field(default=0.0, alias="_longitude")
     is_published: Optional[bool] = Field(default=False, alias="_is_published")
 
-
 class Restaurant(RestaurantBase):
     # Main Schema for loading JSON files
 
@@ -30,7 +31,23 @@ class Restaurant(RestaurantBase):
     def get_id(self) -> int:
         return self.id
 
+class PaginatedRestaurantResponse(BaseModel):
+    """
+    Specific schema for paginated homepage results of Restaurants
+    """
+    items: List[Restaurant]
+    total_count: int
+    page: int
+    per_page: int
+    has_next: bool
+    total_pages: int
 
 class UpdateRestaurantSchema(RestaurantBase):
     # Update schema for partial updates
     pass
+
+class RestaurantDetailResponse(Restaurant):
+    """
+    Makes full menu item objects instead of just a list of strings.
+    """
+    full_menu_details: List[MenuItem] = Field(default_factory=list)
