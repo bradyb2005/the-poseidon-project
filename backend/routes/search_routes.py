@@ -1,5 +1,5 @@
 # backend/routes/search_routes.py
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Query
 from typing import List, Dict, Optional
 from backend.services.search_service import SearchService
 from backend.repositories.restaurant_repository import RestaurantRepository
