@@ -4,6 +4,7 @@ anyio==4.12.1
 bcrypt==5.0.0
 fastapi==0.129.2
 flake8==7.3.0
+httpx==0.28.1
 idna==3.11
 iniconfig==2.3.0
 mccabe==0.7.0
@@ -18,3 +19,5 @@ pytest==9.0.2
 starlette==0.52.1
 typing-inspection==0.4.2
 typing_extensions==4.15.0
+uvicorn==0.34.0
+

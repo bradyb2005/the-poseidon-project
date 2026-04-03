@@ -1,274 +1,88 @@
 # backend/tests/restaurant/unit_tests/test_restaurant_repo.py
-import pytest
-from backend.models.restaurant.restaurant_model import Restaurant
-from backend.models.restaurant.menu_item_model import MenuItem
+import json
+from unittest.mock import mock_open, patch
 from backend.repositories.restaurant_repository import RestaurantRepository
-from backend.models.restaurant.menu_item_model import MenuItem
+from backend.schemas.restaurant_schema import Restaurant
 
-
-# --- Fixtures ---
-
-
-@pytest.fixture
-def restaurant_repo():
-    mock_db = []
-    return RestaurantRepository(mock_db)
-
-
-@pytest.fixture
-def sample_restaurant(owner):
-    return Restaurant(
-        name="Testaurant",
-        owner=owner,
-        address="123 Test st",
-        phone="555-555-5555",
-        open_time=900,
-        close_time=2200
-    )
-
-# --- Restaurant Information ---
-
-
-def test_create_restaurant(restaurant_repo, sample_restaurant):
-    # Test for Feat2-FR1: Storing information
-    # Verifies data passed to repo is saved
-
-    result = restaurant_repo.create_restaurant(sample_restaurant)
-    assert result == sample_restaurant.id
-    assert len(restaurant_repo.get_all_restaurants()) == 1
-
-
-def test_update_restaurant(restaurant_repo, sample_restaurant):
-    # Test for Feat2-FR3: Correct and accurate information
-    # Verifies updates to restaurant data are saved
-    res_id = restaurant_repo.create_restaurant(sample_restaurant)
-
-    sample_restaurant.address = "456 New Ave"
-    sample_restaurant.is_published = True
-
-    success = restaurant_repo.update_restaurant(sample_restaurant)
-
-    assert success is True
-    updated_data = restaurant_repo.get_by_id(res_id)
-    assert updated_data["address"] == "456 New Ave"
-    assert updated_data["is_published"] is True
-
-
-def test_create_restaurant_with_missing_coordinates(
-        restaurant_repo, owner):
+@patch("backend.repositories.restaurant_repository.open", new_callable=mock_open)
+@patch("pathlib.Path.exists")
+def test_load_valid_data(mock_exists, mock_file):
     """
-    Feat3-FR1: Ensures that if the restaurant object
-    lacks lat/long attributes,
-    the repo defaults them to 0.0 instead of crashing.
+    Valid Equivalence Partitioning
+    Load all of the data
     """
-    minimal_res = Restaurant(name="Minimal", owner=owner)
+    mock_exists.return_value = True
+    fake_data = json.dumps([{
+        "id": 1,
+        "name": "The Poseidon",
+        "menu": ["Burger"],
+        "phone": "555-555-5555"}
+    ])
+    mock_file.return_value.read.return_value = fake_data
 
-    if hasattr(minimal_res, 'latitude'):
-        del minimal_res.latitude
-    if hasattr(minimal_res, 'longitude'):
-        del minimal_res.longitude
-
-    res_id = restaurant_repo.create_restaurant(minimal_res)
-    stored_data = restaurant_repo.get_by_id(res_id)
-
-    assert stored_data["latitude"] == 0.0
-    assert stored_data["longitude"] == 0.0
-
-# --- Coordinates ---
-
-
-def test_repository_safety_net_forces_false_publication(
-        restaurant_repo, sample_restaurant):
-    """
-    Safety Net: Verifies that update_restaurant overrides is_published to False
-    if latitude or longitude are 0.0.
-    """
-    res_id = restaurant_repo.create_restaurant(sample_restaurant)
-
-    sample_restaurant.latitude = 0.0
-    sample_restaurant.longitude = 0.0
-    sample_restaurant.is_published = False
-
-    restaurant_repo.update_restaurant(sample_restaurant)
-
-    updated_data = restaurant_repo.get_by_id(res_id)
-    assert updated_data["is_published"] is False
-    assert updated_data["latitude"] == 0.0
-
-# --- Tagging ---
-
-
-def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
-    # Test for Feat2-FR2: Tagging Menu items
-    # Functional test: Add tags to new menu item
-    res_id = restaurant_repo.create_restaurant(restaurant)
-
-    restaurant_repo.add_menu_item(res_id, sample_item)
-
-    stored_res = restaurant_repo.get_by_id(res_id)
-    stored_item = stored_res["menu"][0]
-    assert "Popular" in stored_item["tags"]
-
-# --- Updating menu ---
-
-
-def test_update_menu_item(restaurant_repo, restaurant, sample_item):
-    # Feat2-FR4: Verifies existing menu item data can be edited
-    res_id = restaurant_repo.create_restaurant(restaurant)
-    restaurant_repo.add_menu_item(res_id, sample_item)
-
-    stored_res = restaurant_repo.get_by_id(res_id)
-    stored_item_id = stored_res["menu"][0]["id"]
-
-    updated_item = MenuItem(
-        name="Premium Burger", price=15.0)
-    success = restaurant_repo.update_menu_item(
-        res_id, stored_item_id, updated_item)
-
-    assert success is True
-    final_data = restaurant_repo.get_by_id(res_id)
-    assert final_data["menu"][0]["name"] == "Premium Burger"
-
-
-def test_remove_menu_item(restaurant_repo, restaurant, sample_item):
-    # FR4: Verifies an item can be removed from the menu.
-    res_id = restaurant_repo.create_restaurant(restaurant)
-
-    # Grab the ID of the first item (the burger)
-    stored_res = restaurant_repo.get_by_id(res_id)
-    item_id_to_remove = stored_res["menu"][0]["id"]
-
-    success = restaurant_repo.remove_menu_item(
-        res_id, item_id_to_remove)
-
-    assert success is True
-    updated_res = restaurant_repo.get_by_id(restaurant.id)
-    assert len(updated_res["menu"]) == 0
-
-
-def test_update_menu_item_preserves_extra_fields(
-        restaurant_repo, restaurant, sample_item):
-    res_id = restaurant_repo.create_restaurant(restaurant)
-    restaurant_repo.add_menu_item(res_id, sample_item)
-
-    # Simulate a field we didn't account for in the model
-    stored_res = restaurant_repo.get_by_id(res_id)
-    stored_res["menu"][0]["calories"] = 500
-    item_id = stored_res["menu"][0]["id"]
-
-    updated_item = MenuItem(name="Lean Burger", price=12.0)
-    restaurant_repo.update_menu_item(res_id, item_id, updated_item)
-
-    final_data = restaurant_repo.get_by_id(res_id)
-    assert final_data["menu"][0]["calories"] == 500
-    assert final_data["menu"][0]["name"] == "Lean Burger"
-
-# --- Tagging ---
-
-
-def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
-    # Test for Feat2-FR2: Tagging Menu items
-    # Functional test: Add tags to new menu item
-    restaurant_repo.create_restaurant(restaurant)
-
-    restaurant_repo.add_menu_item(restaurant.id, sample_item)
-
-    stored_res = restaurant_repo.get_by_id(restaurant.id)
-    stored_item = stored_res["menu"][0]
-    assert "Popular" in stored_item["tags"]
-
-# --- Tagging ---
-
-
-def test_add_menu_item_with_tags(restaurant_repo, restaurant, sample_item):
-    # Test for Feat2-FR2: Tagging Menu items
-    # Functional test: Add tags to new menu item
-    restaurant_repo.create_restaurant(restaurant)
-
-    restaurant_repo.add_menu_item(restaurant.id, sample_item)
-
-    stored_res = restaurant_repo.get_by_id(restaurant.id)
-    stored_item = stored_res["menu"][0]
-    assert "Popular" in stored_item["tags"]
-
-# --- Updating menu ---
-
-
-def test_update_menu_item(restaurant_repo, restaurant, sample_item):
-    # Feat2-FR4: Verifies existing menu item data can be edited
-    restaurant_repo.create_restaurant(restaurant)
-
-    stored_res = restaurant_repo.get_by_id(restaurant.id)
-    stored_item_id = stored_res["menu"][0]["id"]  # The burger from conftest
-
-    updated_item = MenuItem(
-        name="Premium Burger", price=15.0, id=stored_item_id)
-    success = restaurant_repo.update_menu_item(
-        restaurant.id, stored_item_id, updated_item)
-
-    assert success is True
-    final_data = restaurant_repo.get_by_id(restaurant.id)
-    assert final_data["menu"][0]["name"] == "Premium Burger"
-
-
-def test_remove_menu_item(restaurant_repo, restaurant, sample_item):
-    # FR4: Verifies an item can be removed from the menu.
-    restaurant_repo.create_restaurant(restaurant)
-
-    # Grab the ID of the first item (the burger)
-    stored_res = restaurant_repo.get_by_id(restaurant.id)
-    item_id_to_remove = stored_res["menu"][0]["id"]
-
-    success = restaurant_repo.remove_menu_item(
-        restaurant.id, item_id_to_remove)
-
-    assert success is True
-    updated_res = restaurant_repo.get_by_id(restaurant.id)
-    assert len(updated_res["menu"]) == 0
-
-# --- Browsing and Search ---
-
-
-def test_search_by_cuisine(restaurant_repo, owner):
-    # Test for Feat3-FR4: Filtering search results
-    # Verifies searching by cuisine returns correct results
-    res1 = Restaurant(name="Sushi Place", owner=owner)
-    res_id = restaurant_repo.create_restaurant(res1)
-
-    restaurant_repo.get_by_id(res1.id)["cuisine"] = "Japanese"
-
-    results = restaurant_repo.search_by_cuisine("Japanese")
+    repo = RestaurantRepository()
+    results = repo.load_all()
+    
     assert len(results) == 1
-    assert isinstance(results[0]["id"], int)
+    assert results[0].name == "The Poseidon"
 
 
-"""
-May use this in Feat3, commented out to avoid errors
-def test_pagination(restaurant_repo):
-    # Test for Feat3-FR5: Paginated results
-    # Verifies pagination returns correct number of results
-    for i in range(10):
-        restaurant_repo.create_restaurant({"name": f"Restaurant {i}",
-        "cuisine": "Test"})
-
-    page1 = restaurant_repo.get_restaurants_paginated(page=1, limit=5)
-    page2 = restaurant_repo.get_restaurants_paginated(page=2, limit=5)
-
-    assert len(page1) == 5
-    assert len(page2) == 5
-
-"""
-
-# Edge case: Get non-existent restaurant
+@patch("pathlib.Path.exists")
+def test_load_all_missing_file(mock_exists):
+    """
+    Invalid Equivalence Partitioning
+    Handles loading a file that doesnt exist and pass
+    a FileNotFoundError
+    """
+    mock_exists.return_value = False
+    repo = RestaurantRepository()
+    results = repo.load_all()
+    
+    # Should return an empty list instead of crashing
+    assert results == []
 
 
-def test_get_nonexistent_restaurant(restaurant_repo):
-    # Verifies getting a non-existent restaurant returns None
-    result = restaurant_repo.get_by_id(999)
-    assert result is None
+@patch("backend.repositories.restaurant_repository.json.load")
+@patch("pathlib.Path.exists")
+def test_load_all_corrupted_data(mock_exists, mock_json_load):
+    """
+    Fault Injection/ Exception Handling:
+    Injects corrupted JSON to trigger a JSONDecodeError
+    """
+    mock_exists.return_value = True
+
+    mock_json_load.side_effect = json.JSONDecodeError("Invalid JSON", "INVALID_JSON_STREAM", 0)
+
+    repo = RestaurantRepository()
+    results = repo.load_all()
+    
+    # Repo should catch the error and return []
+    assert results == []
 
 
-def update_nonexistent_restaurant(restaurant_repo, sample_restaurant):
-    # Verifies we cannot update a nonexistent restaurant
-    success = restaurant_repo.update_restaurant(sample_restaurant)
-    assert success is False
+@patch("backend.repositories.restaurant_repository.open", new_callable=mock_open)
+def test_save_all_serialization(mock_file):
+    """
+    Mocking Functionality
+    Verifies that the repository correctly writes data.
+    """
+    repo = RestaurantRepository()
+
+    test_res = Restaurant(
+        id=10,
+        name="Grayson's Grill",
+        menu=["Burger"],
+        address="123 Street",
+        phone="555-555-5555"
+        )
+    
+    success = repo.save_all([test_res])
+    
+    assert success is True
+    
+    # Check that the file was actually written to
+    handle = mock_file()
+
+    written_content = "".join(call.args[0] for call in handle.write.call_args_list)
+    assert '"id": 10' in written_content
+    assert "Grayson's Grill" in written_content
