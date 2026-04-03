@@ -176,3 +176,4 @@ def test_process_payment_none():
 
     with pytest.raises(ValueError):
         service.process_payment(None)
+#PR6: reopened for review.

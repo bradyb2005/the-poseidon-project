@@ -135,3 +135,4 @@ class PaymentService:
             payment.status = payment.status.__class__.DENIED
 
         return payment
+    #PR6: reopened for review.

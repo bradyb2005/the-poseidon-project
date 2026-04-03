@@ -9,3 +9,5 @@ test_payment_service.py: [Feat6-3] This test file now includes additional tests 
 test_payment_service.py: [Feat7-1] This test file now includes additional tests for retrieving payment information in the PaymentService. It verifies that valid payment data can be extracted and returned in a structured format, including fields such as payment ID, order details, card information, status, and amount. It also ensures proper validation by checking that invalid input, such as a missing payment object, raises errors. These additions further extend the test coverage to include payment information retrieval functionality.
 
 test_payment_service.py: [Feat7-3] This test file now includes additional tests for payment processing in the PaymentService. It verifies that payments are correctly accepted or denied based on card validity using a simulated gateway, and ensures proper validation by checking that invalid inputs, such as a missing payment object, raise errors. These additions extend the test coverage to include payment processing functionality.
+
+#PR6: reopened for review.

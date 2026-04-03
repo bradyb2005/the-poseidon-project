@@ -114,3 +114,5 @@ class PaymentSchema(PaymentBase):
 
 class UpdatePaymentSchema(PaymentBase):
     pass
+
+#PR6: reopened for review.
