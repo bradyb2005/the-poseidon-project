@@ -204,3 +204,5 @@ def test_retrieve_payment_info_none():
 
     with pytest.raises(ValueError):
         service.retrieve_payment_info(None)
+
+#PR5: reopened for review.
