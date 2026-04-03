@@ -5,3 +5,5 @@ test_payment_service.py: [Feat6-1] This test file includes tests for subtotal ca
 test_payment_service.py: [Feat6-2] This test file now includes additional tests for fee and tax calculation in the PaymentService. It verifies that delivery fee, service fee, and tax are correctly computed based on the subtotal, including scenarios where delivery fees are waived. It also ensures proper validation by checking that invalid inputs, such as negative subtotals, raise errors. These additions further extend the test coverage to include additional cost components in the overall calculation.
 
 test_payment_service.py: [Feat6-3] This test file now includes additional tests for total cost calculation in the PaymentService. It verifies that the total is correctly computed by combining subtotal, delivery fee, service fee, and tax into a CostBreakdown object, including scenarios where delivery fees are waived. It also ensures proper validation by checking that invalid inputs, such as negative subtotals, raise errors. These additions further extend the test coverage to include complete cost breakdown and aggregation logic.
+
+#PR4: reopened for review

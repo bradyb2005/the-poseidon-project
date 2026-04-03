@@ -153,3 +153,5 @@ def test_calculate_total_invalid_subtotal():
 
     with pytest.raises(ValueError):
         service.calculate_total(-10)
+
+#PR4: reopened for review
