@@ -1,6 +1,7 @@
 # backend/tests/restaurant/unit_tests/test_item_service.py
 import pytest
 from unittest.mock import MagicMock
+from pydantic import ValidationError
 from backend.services.item_service import MenuService
 from backend.schemas.items_schema import CreateMenuItemSchema
 
@@ -151,3 +152,68 @@ def test_remove_menu_item_success(menu_service, mock_item_repo, restaurant):
     assert status == 200
     assert "removed successfully" in response["message"]
     mock_item_repo.remove_menu_item.assert_called_once_with(str(restaurant.id), item_id)
+
+# --- Validation & Boundary Tests ---
+
+def test_add_menu_item_negative_price(menu_service, mock_item_repo, restaurant, raw_menu_item_data):
+    """
+    Boundary Value Analysis
+    Tests that negative values returns 400
+    """
+    mock_item_repo.get_by_id.return_value = restaurant
+    raw_menu_item_data["price"] = -0.01
+    
+    response, status = menu_service.add_menu_item(
+        restaurant.owner_id, str(restaurant.id), raw_menu_item_data
+    )
+
+    assert status == 400
+    assert "Price cannot be negative" in response["error"]
+
+def test_add_menu_item_empty_name(menu_service, mock_item_repo, restaurant, raw_menu_item_data):
+    """
+    Fault Injection
+    Tests that names cannot be empty strings or whitespace
+    """
+    mock_item_repo.get_by_id.return_value = restaurant
+    raw_menu_item_data["item_name"] = "   "
+    
+    response, status = menu_service.add_menu_item(
+        restaurant.owner_id, str(restaurant.id), raw_menu_item_data
+    )
+
+    assert status == 400
+    assert "Name cannot be empty" in response["error"]
+
+def test_add_menu_item_invalid_uuid_format(menu_service, mock_item_repo, restaurant, raw_menu_item_data):
+    """
+    Validation test
+    catches bad UUIDS and returns 400
+    """
+    mock_item_repo.get_by_id.return_value = restaurant
+    raw_menu_item_data["id"] = "not-a-valid-uuid"
+    
+    response, status = menu_service.add_menu_item(
+        restaurant.owner_id, str(restaurant.id), raw_menu_item_data
+    )
+
+    assert status == 400
+    assert "valid UUID" in response["error"]
+
+def test_add_menu_item_tags_standardization(menu_service, mock_item_repo, restaurant, raw_menu_item_data):
+    """
+    Functional logic
+    Ensures tags are all lowercase, stripped, no duplicates before being saved
+    """
+    mock_item_repo.get_by_id.return_value = restaurant
+    raw_menu_item_data["tags"] = [" Pizza ", "pizza", "  HOT  "]
+    
+    menu_service.add_menu_item(
+        restaurant.owner_id, str(restaurant.id), raw_menu_item_data
+    )
+
+    args, _ = mock_item_repo.add_menu_item.call_args
+    passed_schema = args[1]
+    
+    assert passed_schema.tags == ["pizza", "hot"]
+    assert len(passed_schema.tags) == 2
