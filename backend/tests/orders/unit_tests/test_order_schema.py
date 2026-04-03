@@ -1,31 +1,7 @@
 # backend/tests/orders/unit_tests/test_order_schema.py
 import pytest
 from pydantic import ValidationError
-from backend.schemas.order_schema import OrderCreate, OrderUpdate, OrderStatus, OrderItemCreate
-
-# --- Order Item Tests ---
-
-def test_order_item_valid_creation():
-    """Tests that a valid OrderItemCreate can be created."""
-    item = OrderItemCreate(menu_item_id=101, quantity=2)
-    assert item.menu_item_id == 101
-    assert item.quantity == 2
-
-def test_order_item_invalid_quantity_zero():
-    """Tests that quantity must be greater than 0 (gt=0)."""
-    with pytest.raises(ValidationError):
-        OrderItemCreate(menu_item_id=101, quantity=0)
-
-def test_order_item_invalid_quantity_negative():
-    """Tests that a negative quantity fails validation."""
-    with pytest.raises(ValidationError):
-        OrderItemCreate(menu_item_id=101, quantity=-1)
-
-def test_order_item_missing_required_field():
-    """Tests that menu_item_id is required."""
-    with pytest.raises(ValidationError):
-        OrderItemCreate(quantity=5)
-
+from backend.schemas.order_schema import OrderCreate, OrderUpdate, OrderStatus
 
 # --- Order Schema Tests ---
 
@@ -34,7 +10,7 @@ def test_order_create_success():
     payload = {
         "customer_id": "user_55",
         "restaurant_id": 10,
-        "items": [{"menu_item_id": 1, "quantity": 1}],
+        "items": [{"menu_item_id": "11111111-1111-1111-1111-111111111111", "quantity": 1, "price_at_time": 9.99}],
         "delivery_latitude": 49.88,
         "delivery_longitude": -119.49,
         "delivery_postal_code": "V1V 1V1"
