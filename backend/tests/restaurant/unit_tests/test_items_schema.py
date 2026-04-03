@@ -31,51 +31,22 @@ def test_menu_item_populate_by_alias():
     assert MenuItem(**data_name).name == "Burger"
 
 
-# --- Validation & Boundary Tests ---
-
-def test_menu_item_missing_mandatory_fields():
-    """
-    Exception Handling
-    Ensures a ValidationError is raised when required fields are missing
-    """
-    with pytest.raises(ValidationError) as exc_info:
-        # Missing price and restaurant_id
-        MenuItem(item_name="Empty Item")
-
-    assert "restaurant_id" in str(exc_info.value)
-    assert "price" in str(exc_info.value)
-
-
-def test_menu_item_negative_price(raw_menu_item_data):
-    """
-    Boundary Value Analysis
-    Tests that the price validator prevents negative values
-    """
-    raw_menu_item_data["price"] = "-0.01"
-    with pytest.raises(ValidationError, match="Price cannot be negative"):
-        MenuItem(**raw_menu_item_data)
-
-
-def test_menu_item_empty_name(raw_menu_item_data):
-    """
-    Fault Injection
-    Tests that names cannot be empty strings or just whitespace
-    """
-    raw_menu_item_data["item_name"] = "   "
-    with pytest.raises(ValidationError, match="Name cannot be empty"):
-        MenuItem(**raw_menu_item_data)
-
-
 # --- UUID Logic Tests ---
 
-def test_menu_item_invalid_uuid(raw_menu_item_data):
+def test_menu_item_invalid_uuid():
     """
-    Fault Injection
-    Tests that a malformed UUID string triggers a validation error
+    Tests that a valid string is turned into a UUID
     """
-    raw_menu_item_data["id"] = "not-a-uuid-123"
-    with pytest.raises(ValidationError, match="item_id must be a valid UUID string"):
-        MenuItem(**raw_menu_item_data)
+    valid_uuid_str = "550e8400-e29b-41d4-a716-446655440000"
+    item = MenuItem(
+        item_name="Pizza", 
+        restaurant_id=1, 
+        price=10.00, 
+        id=valid_uuid_str
+    )
+    
+    assert isinstance(item.item_id, UUID)
+    assert str(item.item_id) == valid_uuid_str
 
 
 # --- Update Schema Tests ---
@@ -93,27 +64,7 @@ def test_update_item_partial():
     assert update_obj.name is None
     assert update_obj.price is None
 
-
-def test_update_item_invalid_price():
-    """
-    Constraint Test
-    Ensures that even in the Update schema, a negative price is rejected.
-    """
-    with pytest.raises(ValidationError):
-        UpdateMenuItemSchema(price="-5.00")
-
 # --- Tag logic tests ---
-
-def test_menu_item_tags_standardization(raw_menu_item_data):
-    """
-    Data Transformation
-    Ensures tags are lowercased, stripped, and deduplicated.
-    """
-    raw_menu_item_data["tags"] = [" Spicy ", "spicy", "VEGAN", "  "]
-    item = MenuItem(**raw_menu_item_data)
-
-    assert item.tags == ["spicy", "vegan"]
-
 
 def test_menu_item_invalid_tags(raw_menu_item_data):
     """

@@ -1,12 +1,32 @@
 # backend/services/restaurant_service.py
 from typing import List, Optional, Tuple, Dict
 import math
-from backend.schemas.restaurant_schema import Restaurant
+from backend.schemas.restaurant_schema import Restaurant, RestaurantBase
+from pydantic import Field, field_validator, model_validator
 
 
 class RestaurantService:
     def __init__(self, restaurant_repo):
         self.restaurant_repo = restaurant_repo
+    
+    def _validate_business_rules(self, data: dict):
+        lat = data.get("latitude")
+        lon = data.get("longitude")
+        open_time = data.get("open_time")
+        close_time = data.get("close_time")
+
+        if lat is not None and not (-90 <= lat <= 90):
+            raise ValueError("Latitude must be between -90 and 90")
+        if lon is not None and not (-180 <= lon <= 180):
+            raise ValueError("Longitude must be between -180 and 180")
+        
+        if open_time is not None:
+            if not (0 <= open_time <= 2400):
+                raise ValueError("Invalid time format (0-2400)")
+        
+        if open_time is not None and close_time is not None:
+            if open_time >= close_time:
+                raise ValueError("open_time must be before close_time")
     
     def get_restaurant_by_id(self, restaurant_id: str) -> Tuple[Optional[Restaurant], int]:
         """
@@ -59,6 +79,7 @@ class RestaurantService:
             return {"error": "Not Found"}, 404
 
         try:
+            self._validate_business_rules(update_data)
             for key, value in update_data.items():
                 if hasattr(target, key):
                     setattr(target, key, value)

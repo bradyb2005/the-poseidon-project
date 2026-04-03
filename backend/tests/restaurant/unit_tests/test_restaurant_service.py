@@ -4,12 +4,16 @@ from unittest.mock import MagicMock
 from backend.services.restaurant_service import RestaurantService
 from backend.schemas.restaurant_schema import Restaurant
 
+@pytest.fixture
+def base_json_data():
+    """Provides the minimum required data for a restaurant."""
+    return {
+        "id": 1,
+        "name": "Restaurant 1",
+        "menu": ["Beef Pie", "Burger"]
+    }
 
 # --- Get restaurant tests ---
-
-import pytest
-
-pytestmark = pytest.mark.skip(reason="Skipping due to user schema refactor (will fix in later PR)")
 
 def test_get_restaurant_by_id_success(service, mock_repo, restaurant):
     """
@@ -202,3 +206,65 @@ def test_get_filtered_view_strips_sensitive_data(service, mock_repo, restaurant)
     assert status == 200
     assert "owner_id" not in response
     assert response["id"] == restaurant.id
+
+
+# --- Handling Boundaries ---
+
+
+def test_restaurant_latitude_limits(service, mock_repo, restaurant):
+    """
+    Test Boundary Value
+    Tests the edges of the latitude
+    """
+    mock_repo.load_all.return_value = [restaurant]
+
+    for invalid_lat in [90.1, -90.1]:
+        update_data = {"latitude": invalid_lat}
+        response, status = service.update_restaurant_details(restaurant.id, update_data)
+        
+        assert status == 400
+        assert "Latitude must be between -90 and 90" in response["error"]
+    
+
+def test_restaurant_longitude_limits(service, mock_repo, restaurant):
+    """
+    Test Boundary Value
+    Tests the edges of the longitude
+    """
+    mock_repo.load_all.return_value = [restaurant]
+
+    for invalid_lon in [180.1, -180.1]:
+        update_data = {"longitude": invalid_lon}
+        response, status = service.update_restaurant_details(restaurant.id, update_data)
+        
+        assert status == 400
+        assert "Longitude must be between -180 and 180" in response["error"]
+
+def test_restaurant_time_limits(service, mock_repo, restaurant):
+    """
+    Test Boundary Value
+    Test edges of the 2400 clock
+    """
+    mock_repo.load_all.return_value = [restaurant]
+    update_data = {"open_time": 2500}
+    
+    response, status = service.update_restaurant_details(restaurant.id, update_data)
+    
+    assert status == 400
+    assert "Invalid time format" in response["error"]
+
+
+# --- Model Validators ---
+
+def test_restaurant_edge_case_equal_times(service, mock_repo, restaurant):
+    """
+    Edge Case
+    Tests open and close times cannot equal one another
+    """
+    mock_repo.load_all.return_value = [restaurant]
+    update_data = {"open_time": 1200, "close_time": 1200}
+    
+    response, status = service.update_restaurant_details(restaurant.id, update_data)
+    
+    assert status == 400
+    assert "open_time must be before close_time" in response["error"]

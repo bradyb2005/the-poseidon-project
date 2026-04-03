@@ -1,12 +1,9 @@
 item schema test documentation
-<img width="632" height="131" alt="Screenshot 2026-03-25 at 8 20 27 PM" src="https://github.com/user-attachments/assets/8771d507-db91-4f2f-9f78-8f910cbe7707" />
+
+<img width="602" height="129" alt="Screenshot 2026-04-02 at 10 05 42 AM" src="https://github.com/user-attachments/assets/8f25555e-f5c3-4bef-a7c6-1f6888b81a6b" />
 
 For initialization tests there is equivalence partitioning that ensures data from conftest is correctly mapped to schema
 Another test is functional and ensures alias and data name are both accepted.
-
-For validation and boundary tests, There is a missing mandatory field using exception handling. It ensures a ValidationError is raised.
-Another test tests negative price through boundary value analysis to ensure the price validator prevents negative values
-Another test is for empty name and uses fault injection to test that names cannot be empty strings or whitespaces
 
 For UUID logic tests, there is a fault injection test that tests that an invalid uuid string triggers a validation error.
 

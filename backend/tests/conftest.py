@@ -3,6 +3,7 @@ import pytest
 from pathlib import Path
 from decimal import Decimal
 from uuid import uuid4
+from backend.main import app
 from fastapi.testclient import TestClient
 from unittest.mock import MagicMock
 <<<<<<< HEAD
@@ -12,12 +13,13 @@ from backend.schemas.restaurant_schema import Restaurant
 from backend.schemas.items_schema import MenuItem as MenuItemSchema
 from backend.services.search_service import SearchService
 
->>>>>>> origin/m3-demo
-
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+@pytest.fixture
+def client():
+    with TestClient(app) as c:
+        yield c
 
 @pytest.fixture
 def restaurant():
@@ -45,7 +47,7 @@ def mock_item_repo():
 
 @pytest.fixture
 def mock_restaurant_repo():
-     return MagicMock
+     return MagicMock()
 
 @pytest.fixture
 def service(mock_repo):
@@ -57,7 +59,6 @@ def restaurant_service(mock_restaurant_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_restaurant_repo)
 
-
 @pytest.fixture
 def mock_repo():
     return MagicMock()
@@ -67,35 +68,23 @@ def service(mock_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_repo)
 
+# Search fixtures
 
-
+# For unit tests
 @pytest.fixture
 def search_service(mock_restaurant_repo, mock_item_repo):
     return SearchService(
-        restaurant_repo=mock_restaurant_repo,
-        item_repo=mock_item_repo)
-      
+        restaurant_repo = mock_restaurant_repo,
+        item_repo = mock_item_repo)
 
-# old fixtures
-
+# For integration tests
 @pytest.fixture
 def mock_search_service(monkeypatch):
-
-    from unittest.mock import MagicMock
-    from backend.services.search_service import SearchService
-
-    mock = MagicMock(spec=SearchService)
-
-    monkeypatch.setattr("backend.routes.search_routes.service", mock)
-
+    mock = MagicMock()
+    import backend.routes.search_routes as search_module
+    monkeypatch.setattr(search_module, "service", mock)
     return mock
 
-@pytest.fixture
-def search_service(mock_restaurant_repo, mock_item_repo):
-    return SearchService(
-        restaurant_repo=mock_restaurant_repo,
-        item_repo=mock_item_repo
-    )
 
 # old fixtures
 
