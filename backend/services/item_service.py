@@ -1,11 +1,37 @@
 # backend/services/item_service.py
+from decimal import Decimal, DecimalException
 from typing import List, Optional, Tuple, Dict, Any
 from uuid import UUID
+from pydantic import ValidationError
 from backend.schemas.items_schema import MenuItem, CreateMenuItemSchema, UpdateMenuItemSchema
 
 class MenuService:
     def __init__(self, repository):
         self.repository = repository
+    
+    def _validate_menu_item_data(self, data: dict):
+        name = data.get("name") or data.get("item_name")
+        price = data.get("price")
+        tags = data.get("tags")
+
+        if name is not None and not str(name).strip():
+            raise ValueError("Name cannot be empty or whitespace")
+
+        if price is not None:
+            try:
+                decimal_price = Decimal(str(price))
+            except (ValueError, TypeError, DecimalException):
+                raise ValueError("Invalid price format")
+            
+            if Decimal(str(price)) < 0:
+                    raise ValueError("Price cannot be negative")
+
+        if tags is not None:
+            if not isinstance(tags, list):
+                raise TypeError("Tags must be a list")
+
+            cleaned_tags = [str(t).strip().lower() for t in tags if str(t).strip()]
+            data["tags"] = list(dict.fromkeys(cleaned_tags))
 
     def _get_and_verify_owner(self, restaurant_id: str, owner_id: str) -> Tuple[Optional[Any], int]:
         restaurant = self.repository.get_by_id(restaurant_id)
@@ -29,6 +55,8 @@ class MenuService:
             return _, status
 
         try:
+            self._validate_menu_item_data(item_data)
+
             item_data['restaurant_id'] = restaurant_id
             new_item_schema = CreateMenuItemSchema(**item_data)
 
@@ -40,7 +68,7 @@ class MenuService:
                 "message": "Item added successfully", 
                 "item_id": str(new_item_schema.item_id)
             }, 201
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError, ValidationError) as e:
             return {"error": str(e)}, 400
 
     def edit_menu_item(self, owner_id: str, restaurant_id: str, item_id: str, updated_data: dict) -> Tuple[Dict, int]:
@@ -53,6 +81,7 @@ class MenuService:
             return _, status
 
         try:
+            self._validate_menu_item_data(updated_data)
             update_schema = UpdateMenuItemSchema(**updated_data)
             
             success = self.repository.update_menu_item(restaurant_id, item_id, update_schema)
@@ -60,7 +89,7 @@ class MenuService:
                 return {"error": f"Menu item {item_id} not found"}, 404
 
             return {"message": "Menu item updated successfully"}, 200
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError, ValidationError) as e:
             return {"error": str(e)}, 400
 
 

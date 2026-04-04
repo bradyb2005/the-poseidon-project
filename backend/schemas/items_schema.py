@@ -1,5 +1,5 @@
 # backend/schemas/items_schema.py
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Optional
 from decimal import Decimal
 from uuid import uuid4, UUID
@@ -19,38 +19,6 @@ class MenuItemBase(BaseModel):
     availability: bool = Field(default=True)
     tags: List[str] = Field(default_factory=list)
     description: Optional[str] = None
-
-    @field_validator("name")
-    @classmethod
-    def name_must_not_be_empty(cls, v: Optional[str]):
-        if v is not None and not v.strip():
-            raise ValueError("Name cannot be empty or whitespace")
-        return v
-
-    @field_validator("price")
-    @classmethod
-    def price_must_be_positive(cls, v: float):
-        if v < 0:
-            raise ValueError("Price cannot be negative")
-        return v
-
-    @field_validator("tags")
-    @classmethod
-    def validate_tags_content(cls, v: List[str]):
-        if not all(isinstance(t, str) for t in v):
-            raise TypeError("All tags must be strings")
-        return v
-    
-    @field_validator("item_id", mode="before")
-    @classmethod
-    def validate_uuid(cls, v):
-        if isinstance(v, UUID):
-            return v
-        try:
-            return UUID(v)
-        except (ValueError, AttributeError):
-            raise ValueError("item_id must be a valid UUID string")
-
 
 class MenuItem(MenuItemBase):
     """
