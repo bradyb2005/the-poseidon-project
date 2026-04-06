@@ -36,13 +36,17 @@ class ItemRepository:
                 for raw_item in data:
                     if "price" not in raw_item:
                         raw_item["price"] = Decimal("0.00")
-                    if "id" not in raw_item and "item_id" not in raw_item:
+                    
+                    if "id" not in raw_item:
                         raw_item["id"] = str(uuid4())
-                        
+                    
+                    if "restaurant_id" not in raw_item:
+                        raw_item["restaurant_id"] = 0
+
                     try:
                         items.append(MenuItem(**raw_item))
                     except ValidationError as e:
-                        print(f"Skipping invalid item {raw_item.get('item_name')}: {e}")
+                        raise ValueError(f"Schema Validation Error for {raw_item.get('item_name', 'Unknown')}: {e}")
                 
                 return items
         except (json.JSONDecodeError, FileNotFoundError):
