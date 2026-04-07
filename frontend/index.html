@@ -1,0 +1,22 @@
+<!-- frontend/index.html -->
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <div onclick="showHome()">🔱 Poseidon</div>
+        <input type="text" id="search-input" placeholder="Search for food...">
+        <button id="cart-btn">Cart (0)</button>
+    </nav>
+
+    <main id="app-root"></main>
+    <!-- Add your JavaScript files here -->
+    <script src="js/api.js"></script>
+
+    <script>
+        // Start the app on the homepage
+        window.onload = showHome;
+    </script>
+</body>
+</html>
