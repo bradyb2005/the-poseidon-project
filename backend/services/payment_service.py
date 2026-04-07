@@ -11,21 +11,22 @@ class PaymentService:
         """
         Calculates subtotal from order items
 
-        Assumes order is a dict like:
-        {
-            "items": [
-                {"price": 10.0, "quantity": 2},
-                ...
-            ]
-        }
+        Supports both:
+        - dict-style orders from frontend JSON
+        - object-style orders used in unit tests
         """
         self._validate_order(order)
 
         subtotal = 0.0
+        items = order["items"] if isinstance(order, dict) else order.items
 
-        for item in order["items"]:
+        for item in items:
             self._validate_item(item)
-            subtotal += item["price"] * item["quantity"]
+
+            price = item["price"] if isinstance(item, dict) else item.price
+            quantity = item["quantity"] if isinstance(item, dict) else item.quantity
+
+            subtotal += price * quantity
 
         return round(subtotal, 2)
 
@@ -112,30 +113,52 @@ class PaymentService:
     def _validate_order(self, order: Any) -> None:
         if order is None:
             raise ValueError("order cannot be None")
-        if not isinstance(order, dict):
-            raise ValueError("order must be a dictionary")
-        if "items" not in order:
+
+        if isinstance(order, dict):
+            if "items" not in order:
+                raise ValueError("order must have items")
+            if not isinstance(order["items"], list):
+                raise ValueError("order items must be a list")
+
+        elif hasattr(order, "items"):
+            if not isinstance(order.items, list):
+                raise ValueError("order items must be a list")
+
+        else:
             raise ValueError("order must have items")
-        if not isinstance(order["items"], list):
-            raise ValueError("order items must be a list")
 
     def _validate_item(self, item: Any) -> None:
-        if not isinstance(item, dict):
-            raise ValueError("item must be a dictionary")
-        if "price" not in item or "quantity" not in item:
-            raise ValueError("item must have price and quantity")
+        if isinstance(item, dict):
+            if "price" not in item or "quantity" not in item:
+                raise ValueError("item must have price and quantity")
 
-        if not isinstance(item["price"], (int, float)):
-            raise ValueError("item price must be a number")
+            if not isinstance(item["price"], (int, float)):
+                raise ValueError("item price must be a number")
 
-        if not isinstance(item["quantity"], int):
-            raise ValueError("item quantity must be an integer")
+            if not isinstance(item["quantity"], int):
+                raise ValueError("item quantity must be an integer")
 
-        if item["price"] < 0:
-            raise ValueError("item price cannot be negative")
+            if item["price"] < 0:
+                raise ValueError("item price cannot be negative")
 
-        if item["quantity"] <= 0:
-            raise ValueError("item quantity must be positive")
+            if item["quantity"] <= 0:
+                raise ValueError("item quantity must be positive")
+
+        elif hasattr(item, "price") and hasattr(item, "quantity"):
+            if not isinstance(item.price, (int, float)):
+                raise ValueError("item price must be a number")
+
+            if not isinstance(item.quantity, int):
+                raise ValueError("item quantity must be an integer")
+
+            if item.price < 0:
+                raise ValueError("item price cannot be negative")
+
+            if item.quantity <= 0:
+                raise ValueError("item quantity must be positive")
+
+        else:
+            raise ValueError("invalid item format")
 
     def _validate_subtotal(self, subtotal: float) -> None:
         if not isinstance(subtotal, (int, float)):
