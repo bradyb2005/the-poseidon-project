@@ -1,10 +1,12 @@
 # backend/services/search_service.py
 import math
 from typing import List, Dict, Optional
-import math
 
 
 class SearchService:
+
+    DEFAULT_FEATURE_LIMIT = 5
+
     def __init__(self, restaurant_repo, item_repo):
         """
         Connects to the repository
@@ -27,7 +29,7 @@ class SearchService:
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         return R * c
 
-    def get_nearby_restaurants(self, user_lat: float, user_lon: float, limit: int = 10) -> List[Dict]:
+    def get_nearby_restaurants(self, user_lat: float, user_lon: float, page: int = 1, limit: int = 10) -> Dict:
         """
         Feat3-FR1: Shows restaurants sorted by proximity to the user's location
         """
@@ -44,7 +46,7 @@ class SearchService:
 
 
         results.sort(key=lambda x: x["distance_km"])
-        return results[:limit]
+        return self._paginate(results, page, limit)
 
     def _paginate(self, data: List[Dict], page: int, limit: int) -> Dict:
         """
@@ -64,7 +66,7 @@ class SearchService:
             "total_pages": math.ceil(total_results / limit) if total_results > 0 else 1
         }
 
-    def search_by_keyword(self, keyword: str, page: int = 1, limit: int = 20) -> List[Dict]:
+    def search_by_keyword(self, keyword: str, page: int = 1, limit: int = 20) -> Dict:
         """
         Feat3-FR2: Searching
         Combines keyword matching with specific attribute filters.
@@ -88,7 +90,7 @@ class SearchService:
 
         return self._paginate(all_matches, page, limit)
 
-    def get_homepage_featured(self) -> List[Dict]:
+    def get_homepage_featured(self, page: int = 1) -> Dict:
         """
         Feat3-FR3
         Returns a random or 'featured' selection of published items
@@ -96,12 +98,14 @@ class SearchService:
         published_ids = {str(r.id) for r in self.restaurant_repo.load_all() if r.is_published}
         all_items = self.item_repo.load_all()
         
-        return [
+        featured_items = [
             item.model_dump() for item in all_items 
             if str(item.restaurant_id) in published_ids
-        ][:5]
+        ]
 
-    def browse_homepage(self, page: int = 1, limit: int = 20) -> List[Dict]:
+        return self._paginate(featured_items, page, self.DEFAULT_FEATURE_LIMIT)
+
+    def browse_homepage(self, page: int = 1, limit: int = 20) -> Dict:
         """
         Feat3-FR3: Returns all published restaurants for the homepage list.
         """

@@ -96,7 +96,7 @@ def test_get_homepage_featured_limit(search_service, mock_restaurant_repo, mock_
 
     featured = search_service.get_homepage_featured()
 
-    assert len(featured) == 5
+    assert len(featured["items"]) == 5
 
 def test_browse_homepage_filters_unpublished(search_service, mock_restaurant_repo):
     """
@@ -209,9 +209,9 @@ def test_get_nearby_restaurants_sorting(search_service, mock_restaurant_repo):
 
     results = search_service.get_nearby_restaurants(user_lat=0.0, user_lon=0.0)
 
-    assert len(results) == 2
-    assert results[0]["name"] == "Close Place"
-    assert results[0]["distance_km"] < results[1]["distance_km"]
+    assert len(results["items"]) == 2
+    assert results["items"][0]["name"] == "Close Place"
+    assert results["items"][0]["distance_km"] < results["items"][1]["distance_km"]
 
 
 def test_get_nearby_restaurants_filters_unpublished(search_service, mock_restaurant_repo):
@@ -227,8 +227,8 @@ def test_get_nearby_restaurants_filters_unpublished(search_service, mock_restaur
 
     results = search_service.get_nearby_restaurants(user_lat=0.0, user_lon=0.0)
 
-    assert len(results) == 1
-    assert results[0]["id"] == 1
+    assert len(results["items"]) == 1
+    assert results["items"][0]["id"] == 1
 
 
 def test_get_nearby_restaurants_limit(search_service, mock_restaurant_repo):
@@ -246,4 +246,4 @@ def test_get_nearby_restaurants_limit(search_service, mock_restaurant_repo):
 
     results = search_service.get_nearby_restaurants(user_lat=0.0, user_lon=0.0, limit=3)
 
-    assert len(results) == 3
+    assert len(results["items"]) == 3
