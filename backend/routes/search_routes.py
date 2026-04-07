@@ -32,6 +32,7 @@ def get_homepage(
     q: Optional[str] = None,
     page: int = 1, 
     limit: int = 20):
+    return service.browse_homepage(page=page, limit=limit)
  
 @router.get("/nearby", response_model=List[Dict])
 def get_nearby(
