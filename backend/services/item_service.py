@@ -14,18 +14,26 @@ class MenuService:
         price = data.get("price")
         tags = data.get("tags")
 
-        if name is not None and not str(name).strip():
-            raise ValueError("Name cannot be empty or whitespace")
+        if name is not None:
+            if not isinstance(name, str):
+                raise ValueError("Item name must be a string")
+            if not name.strip():
+                raise ValueError("Name cannot be empty or whitespace")
 
+        price = data.get("price")
         if price is not None:
             try:
                 decimal_price = Decimal(str(price))
-            except (ValueError, TypeError, DecimalException):
-                raise ValueError("Invalid price format")
             
-            if Decimal(str(price)) < 0:
+                if Decimal(str(price)) < 0:
                     raise ValueError("Price cannot be negative")
+                data["price"] = decimal_price
+            except (TypeError, DecimalException):
+                raise ValueError("Invalid price format")
+            except ValueError as e:
+                raise e
 
+        tags = data.get("tags")
         if tags is not None:
             if not isinstance(tags, list):
                 raise TypeError("Tags must be a list")

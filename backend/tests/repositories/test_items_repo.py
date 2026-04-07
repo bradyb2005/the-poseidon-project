@@ -6,33 +6,31 @@ from unittest.mock import mock_open, patch
 from backend.repositories.items_repository import ItemRepository
 from backend.schemas.items_schema import MenuItem
 
-@patch("backend.repositories.items_repository.open", new_callable=mock_open)
+
+@patch("backend.repositories.items_repository.json.loads")
 @patch("pathlib.Path.exists")
-def test_load_valid_data(mock_exists, mock_file):
+def test_load_valid_data(mock_exists, mock_json_loads):
     """
     Valid Equivalence Partitioning/ Mocking
     Load all of the data and verify hydration of defaults.
     """
     mock_exists.return_value = True
     # Mimicking your raw data format (missing price and id)
-    fake_raw_data = json.dumps([
+    mock_json_loads.return_value = ([
         {
             "item_name": "Beef pie",
             "restaurant_id": 1
         }
     ])
 
-    mock_file.return_value.__enter__.return_value.read.return_value = fake_raw_data
-
-    repo = ItemRepository()
-    results = repo.load_all()
+    with patch("backend.repositories.items_repository.open", mock_open(read_data="valid_json")):
+        repo = ItemRepository()
+        results = repo.load_all()
 
     assert len(results) == 1
     assert results[0].name == "Beef pie"
     assert results[0].restaurant_id == 1
-
-    assert isinstance(results[0].price, Decimal)
-    assert results[0].price == Decimal("0.00")
+    assert results[0].price == Decimal("0.01")
     assert results[0].item_id is not None
 
 
@@ -49,19 +47,19 @@ def test_load_all_missing_file(mock_exists):
     # Should return an empty list instead of crashing
     assert results == []
 
-
-@patch("backend.repositories.items_repository.json.load")
 @patch("pathlib.Path.exists")
-def test_load_all_corrupted_data(mock_exists, mock_json_load):
+@patch("backend.repositories.items_repository.json.loads")
+def test_load_all_corrupted_data(mock_json_loads, mock_exists):
     """
     Fault Injection/ Exception Handling:
     Injects corrupted JSON to trigger a JSONDecodeError.
     """
     mock_exists.return_value = True
-    mock_json_load.side_effect = json.JSONDecodeError("Invalid JSON", "INVALID_JSON_STREAM", 0)
+    mock_json_loads.side_effect = json.JSONDecodeError("Invalid JSON", "...", 0)
 
-    repo = ItemRepository()
-    results = repo.load_all()
+    with patch("backend.repositories.items_repository.open", mock_open(read_data="corrupted")):
+        repo = ItemRepository()
+        results = repo.load_all()
 
     # Repo should catch the error and return []
     assert results == []

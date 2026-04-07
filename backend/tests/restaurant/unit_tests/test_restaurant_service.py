@@ -210,7 +210,6 @@ def test_get_filtered_view_strips_sensitive_data(service, mock_repo, restaurant)
 
 # --- Handling Boundaries ---
 
-
 def test_restaurant_latitude_limits(service, mock_repo, restaurant):
     """
     Test Boundary Value
@@ -252,6 +251,23 @@ def test_restaurant_time_limits(service, mock_repo, restaurant):
     
     assert status == 400
     assert "Invalid time format" in response["error"]
+
+def test_update_restaurant_invalid_time_order(service, mock_repo, restaurant):
+    """
+    Logic/Boundary Test
+    Ensures that open_time cannot be after close_time.
+    """
+    mock_repo.load_all.return_value = [restaurant]
+
+    invalid_times = {
+        "open_time": 1800,
+        "close_time": 900
+    }
+    
+    response, status = service.update_restaurant_details(restaurant.id, invalid_times)
+    
+    assert status == 400
+    assert "open_time must be before close_time" in response["error"]
 
 
 # --- Model Validators ---
