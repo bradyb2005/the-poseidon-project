@@ -5,7 +5,10 @@ from datetime import datetime
 # This is a dummy file to allow for review service to be tested
 
 class ReviewBase(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        populate_by_name=True,
+        validate_assignment=True)
     rating: int = Field(..., ge=1, le=5)
 
 class ReviewCreate(ReviewBase):
