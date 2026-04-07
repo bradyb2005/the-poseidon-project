@@ -3,8 +3,6 @@ import pytest
 
 # --- GET tests ---
 
-import pytest
-
 pytestmark = pytest.mark.skip(reason="Skipping due to user schema refactor (will fix in later PR)")
 
 

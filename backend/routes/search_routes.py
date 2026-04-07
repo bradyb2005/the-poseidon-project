@@ -32,10 +32,16 @@ def get_homepage(
     q: Optional[str] = None,
     page: int = 1, 
     limit: int = 20):
+ 
+@router.get("/nearby", response_model=List[Dict])
+def get_nearby(
+    lat: float = Query(..., description="Latitude of the user (-90 to 90)", ge=-90, le=90),
+    lon: float = Query(..., description="Longitude of the user (-180 to 180)", ge=-180, le=180)):
     """
-    GET: Feat3-FR3 - Returns all published restaurants for the homepage list
+    GET: Returns restaurants sorted by distance from the provided lat/lon
+    Calculated in Kilometers
     """
-    return service.browse_homepage(keyword=q, page=page, limit=limit)
+    return service.get_nearby_restaurants(lat, lon)
 
 @router.get("/featured", response_model=List[Dict])
 def get_featured():
