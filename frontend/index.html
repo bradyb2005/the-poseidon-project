@@ -1,22 +1,56 @@
 <!-- frontend/index.html -->
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Poseidon Project</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav>
-        <div onclick="showHome()">🔱 Poseidon</div>
-        <input type="text" id="search-input" placeholder="Search for food...">
-        <button id="cart-btn">Cart (0)</button>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo" onclick="renderHomepage()">
+                🔱 <span>Poseidon</span>
+            </div>
+            
+            <div class="nav-links">
+                <a href="#" onclick="renderHomepage()">Home</a>
+                <a href="#" onclick="alert('Orders coming soon!')">Orders</a>
+                <button class="nav-auth-btn" id="auth-btn" onclick="handleAuthAction()">Login</button>
+            </div>
+        </div>
     </nav>
 
     <main id="app-root"></main>
     <!-- Add your JavaScript files here -->
     <script src="js/api.js"></script>
+    <script src="js/homepage.js"></script>
 
     <script>
         // Start the app on the homepage
-        window.onload = showHome;
+        window.onload = () => {
+            updateNav(); 
+            renderHomepage();
+        };
+    
+        function updateNav() {
+            const btn = document.getElementById('auth-btn');
+            if (localStorage.getItem("user")) {
+                btn.textContent = "Logout";
+            } else {
+                btn.textContent = "Login";
+            }
+        }
+
+        // Logic for the Nav button
+        function handleAuthAction() {
+            if (localStorage.getItem("user")) {
+                localStorage.removeItem("user");
+                window.location.href = "login.html";
+            } else {
+                window.location.href = "login.html";
+            }
+        }
     </script>
 </body>
 </html>

@@ -6,6 +6,7 @@ from backend.routes.payment_router import router as payment_router
 from backend.routes.delivery_router import router as delivery_router
 from fastapi.middleware.cors import CORSMiddleware
 from backend.routes.items_routes import router as items_routes
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="The Poseidon Project")
 
