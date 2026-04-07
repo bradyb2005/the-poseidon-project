@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notifications – Poseidon</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body { align-items: flex-start; padding: 2rem; }
+
+    .page-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .page-header {
+      background: #1a1a2e;
+      color: white;
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-header h1 {
+      color: white;
+      font-size: 1.3rem;
+      margin: 0;
+      text-align: left;
+    }
+
+    .nav-links a {
+      color: #aac4ff;
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-left: 1rem;
+    }
+
+    .nav-links a:hover { color: white; }
+
+    .notifications-list {
+      padding: 1rem;
+    }
+
+    .notif-item {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      border-left: 4px solid #4f8ef7;
+      background: #f8f9ff;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .notif-item.unread {
+      background: #eef2ff;
+      border-left-color: #4f8ef7;
+    }
+
+    .notif-item.read {
+      background: #f5f5f5;
+      border-left-color: #ccc;
+      opacity: 0.8;
+    }
+
+    .notif-item.disabled {
+      background: #fff3f3;
+      border-left-color: #ff8080;
+    }
+
+    .notif-message {
+      font-size: 0.95rem;
+      color: #333;
+      flex: 1;
+    }
+
+    .notif-type {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 0.3rem;
+    }
+
+    .notif-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 20px;
+      background: #4f8ef7;
+      color: white;
+      margin-left: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .notif-badge.read { background: #aaa; }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #999;
+    }
+
+    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #999;
+    }
+
+    .toolbar {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .toolbar button {
+      width: auto;
+      padding: 0.4rem 1rem;
+      font-size: 0.85rem;
+      margin: 0;
+      border-radius: 20px;
+    }
+
+    .btn-secondary {
+      background: #eee;
+      color: #333;
+    }
+
+    .btn-secondary:hover { background: #ddd; }
+
+    .user-info {
+      font-size: 0.8rem;
+      color: #aac4ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-card">
+    <div class="page-header">
+      <h1>🔱 Poseidon</h1>
+      <div class="nav-links">
+        <span class="user-info" id="user-info"></span>
+        <a href="login.html" onclick="logout()">Log out</a>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button onclick="loadNotifications()">🔄 Refresh</button>
+      <button class="btn-secondary" onclick="window.location.href='login.html'">← Back to Login</button>
+    </div>
+
+    <div class="notifications-list" id="notifications-list">
+      <div class="loading">Loading notifications...</div>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script>
+    // Check if user is logged in
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+
+    if (!user) {
+      // Not logged in, send to login page
+      window.location.href = "login.html";
+    }
+
+    // Show who is logged in
+    document.getElementById("user-info").textContent = `👤 ${user.username}`;
+
+    function logout() {
+      localStorage.removeItem("user");
+    }
+
+    async function loadNotifications() {
+      const list = document.getElementById("notifications-list");
+      list.innerHTML = '<div class="loading">Loading...</div>';
+
+      try {
+        const response = await fetch(`${API_BASE}/notifications/${user.id}`);
+        const data = await response.json();
+
+        const notifications = data.notifications || [];
+
+        if (notifications.length === 0) {
+          list.innerHTML = `
+            <div class="empty-state">
+              <div class="icon">🔔</div>
+              <p>No notifications yet!</p>
+              <p style="font-size:0.85rem; margin-top:0.5rem;">
+                Notifications will appear here when orders are placed,
+                payments are made, or reviews are flagged.
+              </p>
+            </div>`;
+          return;
+        }
+
+        // Sort: unread first, then by id descending
+        notifications.sort((a, b) => {
+          if (a.is_read !== b.is_read) return a.is_read ? 1 : -1;
+          return parseInt(b.id) - parseInt(a.id);
+        });
+
+        list.innerHTML = notifications.map(n => `
+          <div class="notif-item ${n.is_read ? 'read' : 'unread'} ${!n.enabled ? 'disabled' : ''}">
+            <div>
+              <div class="notif-message">${n.message}</div>
+              <div class="notif-type">
+                Type: ${n.type}
+                ${!n.enabled ? '· <span style="color:#e55">disabled</span>' : ''}
+              </div>
+            </div>
+            <span class="notif-badge ${n.is_read ? 'read' : ''}">
+              ${n.is_read ? 'read' : 'new'}
+            </span>
+          </div>
+        `).join("");
+
+      } catch (err) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">⚠️</div>
+            <p>Could not load notifications.</p>
+            <p style="font-size:0.85rem;">Is the backend running?</p>
+          </div>`;
+      }
+    }
+
+    // Load on page open
+    loadNotifications();
+  </script>
+
+</body>
+</html>
