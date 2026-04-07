@@ -3,7 +3,7 @@ import pytest
 from pydantic import ValidationError
 from decimal import Decimal
 from uuid import UUID
-from backend.schemas.items_schema import MenuItem, UpdateMenuItemSchema
+from backend.schemas.items_schema import MenuItem, PaginatedItemResponse, UpdateMenuItemSchema
 
 # --- Initialization Tests ---
 
@@ -116,3 +116,50 @@ def test_menu_item_serialization(sample_menu_item):
     assert exported["item_name"] == "Beef Pie"
     assert isinstance(exported["id"], UUID)
     assert isinstance(exported["price"], Decimal)
+
+# --- Pagination Schema Tests ---
+
+def test_paginated_item_response_initialization(raw_menu_item_data):
+    """
+    Functional
+    Ensures the pagination wrapper correctly accepts metadata and a list of items.
+    This proves that the outer schema triggers validation for the inner MenuItem objects.
+    """
+    paginated_data = {
+        "items": [raw_menu_item_data], # List containing one raw dict
+        "total_count": 1,
+        "page": 1,
+        "per_page": 20,
+        "has_next": False,
+        "total_pages": 1
+    }
+
+    response = PaginatedItemResponse(**paginated_data)
+
+    assert len(response.items) == 1
+    assert isinstance(response.items[0], MenuItem)
+    assert response.items[0].name == "Beef Pie"
+    assert response.total_count == 1
+    assert response.per_page == 20
+    assert response.has_next is False
+
+
+def test_paginated_item_response_empty():
+    """
+    Edge Case
+    Ensures the schema handles an empty list of items (e.g., zero search results).
+    """
+    empty_response = {
+        "items": [],
+        "total_count": 0,
+        "page": 1,
+        "per_page": 20,
+        "has_next": False,
+        "total_pages": 1
+    }
+
+    response = PaginatedItemResponse(**empty_response)
+
+    assert response.items == []
+    assert response.total_count == 0
+    assert response.total_pages == 1

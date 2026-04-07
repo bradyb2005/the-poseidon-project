@@ -42,3 +42,14 @@ class UpdateMenuItemSchema(MenuItemBase):
     availability: Optional[bool] = None
     tags: Optional[List[str]] = None
     description: Optional[str] = None
+
+class PaginatedItemResponse(BaseModel):
+    """
+    Specific schema for paginated search results of MenuItems
+    """
+    items: List[MenuItem]
+    total_count: int
+    page: int
+    per_page: int
+    has_next: bool
+    total_pages: int
