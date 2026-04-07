@@ -47,7 +47,7 @@ class RestaurantService:
         restaurants = self.restaurant_repo.load_all()
         return [
             r.model_dump(by_alias=False, exclude={"owner_id"}) 
-            for r in restaurants if r.is_published
+            for r in restaurants
         ]
 
     def assign_owner_to_restaurant(self, restaurant_id: str, owner_id: str) -> Tuple[Dict, int]:
