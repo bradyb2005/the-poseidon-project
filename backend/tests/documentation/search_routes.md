@@ -1,8 +1,13 @@
 Search routes test documentation
 
-<img width="683" height="126" alt="Screenshot 2026-03-25 at 10 01 55 PM" src="https://github.com/user-attachments/assets/ffce20cc-fc71-48e0-835d-6abc21c399b9" />
+<img width="600" height="123" alt="Screenshot 2026-04-02 at 3 12 42 PM" src="https://github.com/user-attachments/assets/c12654eb-7360-4e00-8d37-085ee48b1ad2" />
 
 For get serch tests, we have a successful test that uses equivalence partitioning and an empty query that uses BVA.
+
+We have location based tests for the getter method. 
+First is a successful functional test that ensures nearby restaurants are able to be gotten.
+Next we use BVA and error handling to try and get nearby restaurants with invalid parameters.
+The third is same as the last, using BVA but for missing parameters
 
 For homepage and feature tests, we have 2.
 One test ensures we can get a proper list from the homepage.

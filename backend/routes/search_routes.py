@@ -1,5 +1,5 @@
 # backend/routes/search_routes.py
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, Query, status, HTTPException
 from typing import List, Dict, Optional
 from backend.services.search_service import SearchService
 from backend.repositories.restaurant_repository import RestaurantRepository
@@ -23,6 +23,16 @@ def get_search(q: Optional[str] = None):
     if not q or not q.strip():
         return []
     return service.search_by_keyword(q)
+
+@router.get("/nearby", response_model=List[Dict])
+def get_nearby(
+    lat: float = Query(..., description="Latitude of the user (-90 to 90)", ge=-90, le=90),
+    lon: float = Query(..., description="Longitude of the user (-180 to 180)", ge=-180, le=180)):
+    """
+    GET: Returns restaurants sorted by distance from the provided lat/lon
+    Calculated in Kilometers
+    """
+    return service.get_nearby_restaurants(lat, lon)
 
 @router.get("/homepage", response_model=List[Dict])
 def get_homepage():

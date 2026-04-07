@@ -1,5 +1,6 @@
 # backend/services/search_service.py
 from typing import List, Dict, Optional
+import math
 
 
 class SearchService:
@@ -9,6 +10,40 @@ class SearchService:
         """
         self.restaurant_repo = restaurant_repo
         self.item_repo = item_repo
+    
+    def _calculate_distance(self, user_lat: float, user_lon: float, res_lat: float, res_lon: float) -> float:
+        """
+        Haversine formula to calculate distance in kilometers
+        """
+        R = 6371.0
+        
+        dis_lat = math.radians(res_lat - user_lat)
+        dis_lon = math.radians(res_lon - user_lon)
+        
+        a = (math.sin(dis_lat / 2)**2 + 
+             math.cos(math.radians(user_lat)) * math.cos(math.radians(res_lat)) * math.sin(dis_lon / 2)**2)
+        
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return R * c
+
+    def get_nearby_restaurants(self, user_lat: float, user_lon: float, limit: int = 10) -> List[Dict]:
+        """
+        Feat3-FR1: Shows restaurants sorted by proximity to the user's location
+        """
+        all_res = self.restaurant_repo.load_all()
+        published = [r for r in all_res if r.is_published]
+
+        results = []
+        for res in published:
+            dist = self._calculate_distance(user_lat, user_lon, res.latitude, res.longitude)
+            
+            data = res.model_dump(by_alias=True)
+            data["distance_km"] = round(dist, 2)
+            results.append(data)
+
+
+        results.sort(key=lambda x: x["distance_km"])
+        return results[:limit]
 
     def search_by_keyword(self, keyword: str) -> List[Dict]:
         """

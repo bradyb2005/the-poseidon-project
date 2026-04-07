@@ -147,3 +147,60 @@ def test_get_restaurant_details_not_found_or_hidden(search_service, mock_restaur
     assert search_service.get_restaurant_details(50) is None
 
     assert search_service.get_restaurant_details(999) is None
+
+# --- Location-Based Search Tests ---
+
+def test_get_nearby_restaurants_sorting(search_service, mock_restaurant_repo):
+    """
+    Functional Test
+    Ensures restaurants are sorted by distance (closest first)
+    """
+    mock_res_a = MagicMock(id=1, latitude=0.1, longitude=0.1, is_published=True)
+    mock_res_b = MagicMock(id=2, latitude=1.0, longitude=1.0, is_published=True)
+    
+    mock_res_a.model_dump.return_value = {"id": 1, "name": "Close Place"}
+    mock_res_b.model_dump.return_value = {"id": 2, "name": "Far Place"}
+    
+    # wrong order to ensure sorting is tested
+    mock_restaurant_repo.load_all.return_value = [mock_res_b, mock_res_a]
+
+    results = search_service.get_nearby_restaurants(user_lat=0.0, user_lon=0.0)
+
+    assert len(results) == 2
+    assert results[0]["name"] == "Close Place"
+    assert results[0]["distance_km"] < results[1]["distance_km"]
+
+
+def test_get_nearby_restaurants_filters_unpublished(search_service, mock_restaurant_repo):
+    """
+    Equivalence Partitioning
+    Unpublished restaurants should not appear in nearby results.
+    """
+    mock_res_pub = MagicMock(id=1, latitude=0.1, longitude=0.1, is_published=True)
+    mock_res_hid = MagicMock(id=2, latitude=0.1, longitude=0.1, is_published=False)
+    
+    mock_res_pub.model_dump.return_value = {"id": 1}
+    mock_restaurant_repo.load_all.return_value = [mock_res_pub, mock_res_hid]
+
+    results = search_service.get_nearby_restaurants(user_lat=0.0, user_lon=0.0)
+
+    assert len(results) == 1
+    assert results[0]["id"] == 1
+
+
+def test_get_nearby_restaurants_limit(search_service, mock_restaurant_repo):
+    """
+    Boundary Value Analysis
+    Ensures the 'limit' parameter restricts the number of results.
+    """
+    restaurants = []
+    for i in range(10):
+        res = MagicMock(id=i, latitude=0.1, longitude=0.1, is_published=True)
+        res.model_dump.return_value = {"id": i}
+        restaurants.append(res)
+        
+    mock_restaurant_repo.load_all.return_value = restaurants
+
+    results = search_service.get_nearby_restaurants(user_lat=0.0, user_lon=0.0, limit=3)
+
+    assert len(results) == 3

@@ -30,6 +30,47 @@ def test_get_search_empty_query(client, mock_search_service):
 
     mock_search_service.search_by_keyword.assert_not_called()
 
+def test_get_nearby_restaurants_success(client, mock_search_service):
+    """
+    Functional Test
+    Verifies that passing lat/lon returns a sorted list of restaurants from the service.
+    """
+    mock_nearby = [
+        {"name": "Close Cafe", "distance_km": 1.2},
+        {"name": "Far Bistro", "distance_km": 5.5}
+    ]
+    mock_search_service.get_nearby_restaurants.return_value = mock_nearby
+
+    response = client.get("/search/nearby?lat=34.05&lon=-118.24")
+
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    assert response.json()[0]["name"] == "Close Cafe"
+
+    mock_search_service.get_nearby_restaurants.assert_called_once_with(34.05, -118.24)
+
+
+def test_get_nearby_restaurants_invalid_params(client, mock_search_service):
+    """
+    Boundary Value Analysis / Error Handling
+    Ensures that if latitude/longitude strings are not valid numbers, error is returned
+    """
+    response = client.get("/search/nearby?lat=not_a_number&lon=-118.24")
+
+    assert response.status_code == 422
+    mock_search_service.get_nearby_restaurants.assert_not_called()
+
+
+def test_get_nearby_restaurants_missing_params(client, mock_search_service):
+    """
+    Boundary Value Analysis
+    Ensures that missing required coordinates returns a 422.
+    """
+    response = client.get("/search/nearby?lat=34.05") # Missing 'lon'
+
+    assert response.status_code == 422
+    mock_search_service.get_nearby_restaurants.assert_not_called()
+
 
 # --- Homepage & Featured Tests ---
 
