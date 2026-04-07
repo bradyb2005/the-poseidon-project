@@ -1,12 +1,23 @@
 # backend/tests/restaurant/integration_tests/test_restaurant_router.py
 import pytest
+from backend.main import app
+from backend.routes.restaurant_router import get_restaurant_service
+
+@pytest.fixture
+def mock_restaurant_service(client):
+    """
+    Injects the mock service into the FastAPI dependency system
+    """
+    from unittest.mock import MagicMock
+    mock = MagicMock()
+    
+    app.dependency_overrides[get_restaurant_service] = lambda: mock
+    
+    yield mock
+
+    app.dependency_overrides = {}
 
 # --- GET tests ---
-
-import pytest
-
-pytestmark = pytest.mark.skip(reason="Skipping due to user schema refactor (will fix in later PR)")
-
 
 def test_get_restaurants_list(client, mock_restaurant_service, restaurant):
     """

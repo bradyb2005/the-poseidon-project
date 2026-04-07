@@ -1,5 +1,5 @@
 from typing import Any
-from backend.models.payment.payment_schema import CostBreakdown, PaymentSchema
+from backend.schemas.payment_schema import CostBreakdown, PaymentSchema, PaymentStatus
 
 
 class PaymentService:
@@ -77,6 +77,33 @@ class PaymentService:
             "amount": payment.amount,
         }
 
+    def process_payment(self, payment: PaymentSchema) -> PaymentSchema:
+        """
+        Simulates payment processing through a payment gateway
+        """
+        self._validate_payment(payment)
+
+        if payment.card_number and len(str(payment.card_number)) >= 12:
+            payment.status = PaymentStatus.ACCEPTED
+        else:
+            payment.status = PaymentStatus.DENIED
+
+        return payment
+
+    def create_fulfillment_request(self, payment: PaymentSchema) -> dict:
+        """
+        Creates a fulfillment request only for accepted payments
+        """
+        self._validate_payment(payment)
+        self._validate_accepted_payment(payment)
+
+        return {
+            "payment_id": payment.id,
+            "order": payment.order,
+            "status": "fulfillment_requested",
+            "message": "Fulfillment request created successfully",
+        }
+
     # -------------------------
     # Private helpers
     # -------------------------
@@ -113,6 +140,10 @@ class PaymentService:
         if payment is None:
             raise ValueError("payment cannot be None")
 
+    def _validate_accepted_payment(self, payment: PaymentSchema) -> None:
+        if payment.status != PaymentStatus.ACCEPTED:
+            raise ValueError("fulfillment request can only be created for accepted payments")
+
     def _calculate_delivery_fee(self, subtotal: float) -> float:
         return 5.00 if subtotal < 50 else 0.00
 
@@ -121,17 +152,3 @@ class PaymentService:
 
     def _calculate_tax(self, subtotal: float) -> float:
         return round(subtotal * 0.12, 2)
-    
-    def process_payment(self, payment: PaymentSchema) -> PaymentSchema:
-        """
-        Simulates payment processing (gateway)
-        """
-        self._validate_payment(payment)
-
-        # Simple rule-based simulation
-        if payment.card_number and len(str(payment.card_number)) >= 12:
-            payment.status = payment.status.__class__.ACCEPTED
-        else:
-            payment.status = payment.status.__class__.DENIED
-
-        return payment

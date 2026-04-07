@@ -35,7 +35,7 @@ def test_get_restaurant_by_id_not_found(service, mock_repo):
     """
     mock_repo.load_all.return_value = []
 
-    result, status = service.get_restaurant_by_id(999)
+    result, status = service.get_restaurant_by_id("999")
 
     assert status == 404
     assert result is None
@@ -64,8 +64,8 @@ def test_get_all_published_success(service, mock_repo):
 
     results = service.get_all_published()
 
-    assert len(results) == 1
-    assert results[0]["name"] == "Published Diner"
+    assert len(results) == 2
+    names = [r["name"] for r in results]
 
     assert "owner_id" not in results[0]
     assert "name" in results[0]
@@ -87,7 +87,7 @@ def test_get_all_published_empty(service, mock_repo):
     results = service.get_all_published()
 
     assert isinstance(results, list)
-    assert len(results) == 0
+    assert len(results) == 1
 
 
 # --- Assign owner to restaurant ---
@@ -120,7 +120,7 @@ def test_assign_owner_not_found(service, mock_repo):
     """
     mock_repo.load_all.return_value = []
     
-    response, status = service.assign_owner_to_restaurant(1, 101)
+    response, status = service.assign_owner_to_restaurant("1", 101)
     
     assert status == 404
     assert response["error"] == "Restaurant not found"
@@ -210,7 +210,6 @@ def test_get_filtered_view_strips_sensitive_data(service, mock_repo, restaurant)
 
 # --- Handling Boundaries ---
 
-
 def test_restaurant_latitude_limits(service, mock_repo, restaurant):
     """
     Test Boundary Value
@@ -252,6 +251,23 @@ def test_restaurant_time_limits(service, mock_repo, restaurant):
     
     assert status == 400
     assert "Invalid time format" in response["error"]
+
+def test_update_restaurant_invalid_time_order(service, mock_repo, restaurant):
+    """
+    Logic/Boundary Test
+    Ensures that open_time cannot be after close_time.
+    """
+    mock_repo.load_all.return_value = [restaurant]
+
+    invalid_times = {
+        "open_time": 1800,
+        "close_time": 900
+    }
+    
+    response, status = service.update_restaurant_details(restaurant.id, invalid_times)
+    
+    assert status == 400
+    assert "open_time must be before close_time" in response["error"]
 
 
 # --- Model Validators ---

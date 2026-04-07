@@ -1,10 +1,11 @@
 # backend/routes/search_routes.py
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Query
 from typing import List, Dict, Optional
 from backend.services.search_service import SearchService
 from backend.repositories.restaurant_repository import RestaurantRepository
 from backend.repositories.items_repository import ItemRepository 
-
+from backend.schemas.items_schema import PaginatedItemResponse
+from backend.schemas.restaurant_schema import PaginatedRestaurantResponse, RestaurantDetailResponse
 
 restaurant_repo = RestaurantRepository("backend/data/restaurants.json")
 item_repo = ItemRepository("backend/data/items.json")
@@ -14,22 +15,37 @@ router = APIRouter(prefix="/search", tags=["search"])
 
 # --- Get Methods ---
 
-@router.get("", response_model=List[Dict])
-def get_search(q: Optional[str] = None):
+@router.get("", response_model=PaginatedItemResponse)
+def get_search(
+    q: Optional[str] = Query(None, description="Search keyword for items or tags"),
+    page: int = Query(1, ge=1, description="Page number"),
+    limit: int = Query(20, ge=1, le=100, description="Items per page")
+):
     """
     GET: Search for menu items by keyword (name or tags)
     Only returns items from published restaurants
     """
-    if not q or not q.strip():
-        return []
-    return service.search_by_keyword(q)
+    return service.search_by_keyword(q, page=page, limit=limit)
 
-@router.get("/homepage", response_model=List[Dict])
-def get_homepage():
+@router.get("/homepage", response_model=PaginatedRestaurantResponse)
+def get_homepage(
+    q: Optional[str] = None,
+    page: int = 1, 
+    limit: int = 20):
     """
-    GET: Feat3-FR3 - Returns all published restaurants for the homepage list
+    GET: Feat3-FR1 - Browse restaurants for homepage with optional search query
     """
-    return service.browse_homepage()
+    return service.browse_homepage(page=page, limit=limit)
+ 
+@router.get("/nearby", response_model=List[Dict])
+def get_nearby(
+    lat: float = Query(..., description="Latitude of the user (-90 to 90)", ge=-90, le=90),
+    lon: float = Query(..., description="Longitude of the user (-180 to 180)", ge=-180, le=180)):
+    """
+    GET: Returns restaurants sorted by distance from the provided lat/lon
+    Calculated in Kilometers
+    """
+    return service.get_nearby_restaurants(lat, lon)
 
 @router.get("/featured", response_model=List[Dict])
 def get_featured():
@@ -38,8 +54,8 @@ def get_featured():
     """
     return service.get_homepage_featured()
 
-@router.get("/details/{restaurant_id}", response_model=Dict)
-def get_restaurant_details(restaurant_id: str):
+@router.get("/details/{restaurant_id}", response_model=RestaurantDetailResponse)
+def get_restaurant_details(restaurant_id: int):
     """
     GET: Feat3-FR3 - Fetches a specific restaurant and its full menu
     """

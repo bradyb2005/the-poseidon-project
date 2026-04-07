@@ -1,7 +1,9 @@
 # backend/tests/restaurant/unit_tests/test_restaurant_schema.py
+from decimal import Decimal
+
 import pytest
 from pydantic import ValidationError
-from backend.schemas.restaurant_schema import Restaurant, UpdateRestaurantSchema
+from backend.schemas.restaurant_schema import PaginatedRestaurantResponse, Restaurant, UpdateRestaurantSchema
 
 @pytest.fixture
 def base_json_data():
@@ -101,3 +103,64 @@ def test_restaurant_serialization(full_restaurant_data):
     assert "id" in db_ready_data
     assert "_phone" in db_ready_data
     assert "_open_time" in db_ready_data
+
+# --- Pagination Schema Tests ---
+
+def test_paginated_restaurant_response_initialization(base_json_data):
+    """
+    Functional
+    Ensures the pagination wrapper correctly accepts metadata and a list of restaurants.
+    """
+    paginated_data = {
+        "items": [base_json_data],  # List containing one raw dict
+        "total_count": 1,
+        "page": 1,
+        "per_page": 20,
+        "has_next": False,
+        "total_pages": 1
+    }
+    
+    response = PaginatedRestaurantResponse(**paginated_data)
+    
+    assert len(response.items) == 1
+    assert isinstance(response.items[0], Restaurant)
+    assert response.items[0].name == "Restaurant 1"
+    assert response.total_count == 1
+
+
+def test_paginated_restaurant_response_empty():
+    """
+    Edge Case
+    Ensures the schema handles an empty list of restaurants for the homepage.
+    """
+    empty_data = {
+        "items": [],
+        "total_count": 0,
+        "page": 1,
+        "per_page": 20,
+        "has_next": False,
+        "total_pages": 0
+    }
+    
+    response = PaginatedRestaurantResponse(**empty_data)
+    assert response.items == []
+    assert response.total_count == 0
+
+def test_restaurant_detail_response_logic(base_json_data, raw_menu_item_data):
+    """
+    Functional
+    Tests that RestaurantDetailResponse correctly nests MenuItem objects.
+    """
+    from backend.schemas.restaurant_schema import RestaurantDetailResponse
+
+    detail_data = {
+        **base_json_data,
+        "full_menu_details": [raw_menu_item_data]
+    }
+    
+    response = RestaurantDetailResponse(**detail_data)
+    
+    assert response.id == base_json_data["id"]
+    assert len(response.full_menu_details) == 1
+    assert response.full_menu_details[0].name == "Beef Pie"
+    assert isinstance(response.full_menu_details[0].price, Decimal)

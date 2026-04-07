@@ -1,4 +1,6 @@
 # backend/tests/restaurant/unit_tests/test_item_service.py
+from decimal import Decimal
+
 import pytest
 from unittest.mock import MagicMock
 from pydantic import ValidationError
@@ -57,6 +59,17 @@ def test_add_menu_item_success(menu_service, mock_item_repo, restaurant, raw_men
     args, _ = mock_item_repo.add_menu_item.call_args
     assert isinstance(args[1], CreateMenuItemSchema)
     assert args[1].name == raw_menu_item_data["item_name"]
+
+def test_validate_data_efficiency_decimal_reuse(menu_service):
+    """
+    Efficiency Test:
+    Ensures the service converts the price to Decimal and puts it back in the dict
+    """
+    item_data = {"price": "19.99"}
+    menu_service._validate_menu_item_data(item_data)
+    
+    assert isinstance(item_data["price"], Decimal)
+    assert item_data["price"] == Decimal("19.99")
 
 def test_add_menu_item_invalid_price(menu_service, mock_item_repo, restaurant, raw_menu_item_data):
     """
@@ -184,6 +197,21 @@ def test_add_menu_item_empty_name(menu_service, mock_item_repo, restaurant, raw_
 
     assert status == 400
     assert "Name cannot be empty" in response["error"]
+
+def test_add_menu_item_name_non_string_rejects(menu_service, mock_item_repo, restaurant, raw_menu_item_data):
+    """
+    Fault Injection
+    Tests that a non-string name is rejected
+    """
+    mock_item_repo.get_by_id.return_value = restaurant
+    raw_menu_item_data["item_name"] = 12345
+    
+    response, status = menu_service.add_menu_item(
+        restaurant.owner_id, str(restaurant.id), raw_menu_item_data
+    )
+
+    assert status == 400
+    assert "must be a string" in response["error"].lower()
 
 def test_add_menu_item_invalid_uuid_format(menu_service, mock_item_repo, restaurant, raw_menu_item_data):
     """

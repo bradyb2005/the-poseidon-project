@@ -15,7 +15,7 @@ class MenuItemBase(BaseModel):
     restaurant_id: int = Field(...)
 
     item_id: UUID = Field(default_factory=uuid4, alias="id")
-    price: Decimal = Field(..., decimal_places=2)
+    price: Decimal = Field(..., decimal_places=2, gt=0)
     availability: bool = Field(default=True)
     tags: List[str] = Field(default_factory=list)
     description: Optional[str] = None
@@ -42,3 +42,14 @@ class UpdateMenuItemSchema(MenuItemBase):
     availability: Optional[bool] = None
     tags: Optional[List[str]] = None
     description: Optional[str] = None
+
+class PaginatedItemResponse(BaseModel):
+    """
+    Specific schema for paginated search results of MenuItems
+    """
+    items: List[MenuItem]
+    total_count: int
+    page: int
+    per_page: int
+    has_next: bool
+    total_pages: int
