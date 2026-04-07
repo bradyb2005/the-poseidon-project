@@ -1,5 +1,5 @@
 from typing import Any
-from backend.models.payment.payment_schema import CostBreakdown, PaymentSchema, PaymentStatus
+from backend.schemas.payment_schema import CostBreakdown, PaymentSchema, PaymentStatus
 
 
 class PaymentService:

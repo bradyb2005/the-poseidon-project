@@ -3,11 +3,11 @@ from typing import Any, Dict
 
 from fastapi import APIRouter, HTTPException, status
 
-from backend.models.payment.payment_schema import (
+from backend.schemas.payment_schema import (
     CostBreakdown,
     PaymentSchema,
 )
-from backend.models.payment.payment_service import PaymentService
+from backend.services.payment_service import PaymentService
 
 service = PaymentService()
 
