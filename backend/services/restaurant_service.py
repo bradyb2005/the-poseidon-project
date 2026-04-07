@@ -34,7 +34,7 @@ class RestaurantService:
         Matches 200 OK or 404 Not Found
         """
         restaurants = self.restaurant_repo.load_all()
-        target = next((r for r in restaurants if r.id == restaurant_id), None)
+        target = next((r for r in restaurants if str(r.id) == str(restaurant_id)), None)
         
         if not target:
             return None, 404
@@ -113,7 +113,7 @@ class RestaurantService:
         Throws a forbidden error if customer tries to view an unpublished restaurant
         """
         restaurants = self.restaurant_repo.load_all()
-        target = next((r for r in restaurants if r.id == restaurant_id), None)
+        target = next((r for r in restaurants if str(r.id) == str(restaurant_id)), None)
 
         if not target:
             return None, 404
