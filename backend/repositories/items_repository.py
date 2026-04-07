@@ -27,7 +27,10 @@ class ItemRepository:
         
         try:
             with open(self._file_path, 'r') as f:
-                data = json.load(f)
+                content = f.read().strip()
+                if not content:
+                    return []
+                data = json.loads(content)
                 
                 if not isinstance(data, list):
                     return []
@@ -35,18 +38,16 @@ class ItemRepository:
                 items = []
                 for raw_item in data:
                     if "price" not in raw_item:
-                        raw_item["price"] = Decimal("0.00")
-                    
+                        raw_item["price"] = Decimal("0.01")
                     if "id" not in raw_item:
                         raw_item["id"] = str(uuid4())
-                    
                     if "restaurant_id" not in raw_item:
                         raw_item["restaurant_id"] = 0
 
                     try:
                         items.append(MenuItem(**raw_item))
                     except ValidationError as e:
-                        raise ValueError(f"Schema Validation Error for {raw_item.get('item_name', 'Unknown')}: {e}")
+                        raise ValueError(f"Pydantic Validation Error: {e}")
                 
                 return items
         except (json.JSONDecodeError, FileNotFoundError):
