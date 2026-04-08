@@ -157,3 +157,40 @@ def test_forgot_password_raises_error_when_email_not_found():
 
     with pytest.raises(ValueError, match="user not found"):
         service.forgot_password("anjana@gmail.com", "newpassword123")
+
+def test_authenticate_user_success():
+    repo = MagicMock()
+    service = UserService(repo)
+
+    password_hash = service.hash_password("password123")
+    repo.load_all.return_value = [
+        {
+            "id": "1",
+            "username": "anjana",
+            "email": "anjana@gmail.com",
+            "password_hash": password_hash,
+        }
+    ]
+
+    user = service.authenticate_user("anjana", "password123")
+
+    assert user["username"] == "anjana"
+    assert user["email"] == "anjana@gmail.com"
+
+
+def test_authenticate_user_raises_error_for_invalid_credentials():
+    repo = MagicMock()
+    service = UserService(repo)
+
+    password_hash = service.hash_password("password123")
+    repo.load_all.return_value = [
+        {
+            "id": "1",
+            "username": "anjana",
+            "email": "anjana@gmail.com",
+            "password_hash": password_hash,
+        }
+    ]
+
+    with pytest.raises(ValueError, match="invalid credentials"):
+        service.authenticate_user("anjana", "wrongpassword")
