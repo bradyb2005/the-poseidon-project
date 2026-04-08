@@ -14,8 +14,8 @@ class OrderStatus(str, Enum):
     CANCELLED = "cancelled"
 
 class OrderItem(BaseModel):
-    menu_item_id: UUID = Field(default_factory=uuid4)
-    quantity: int = Field(..., gt=0)  # Quantity must be greater than 0
+    menu_item_id: UUID
+    quantity: int = Field(..., gt=0)  
     price_at_time: float
 
 class Order(BaseModel):
