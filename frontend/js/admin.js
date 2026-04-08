@@ -10,6 +10,11 @@ function renderAdmin() {
     return;
   }
 
+  if (user.role !== "admin") {
+    renderHomepage();
+    return;
+  }
+
   root.innerHTML = `
     <div class="admin-wrapper">
       <div class="admin-header">
@@ -390,7 +395,7 @@ async function loadAnalytics() {
     document.getElementById("analytics-top-restaurants").innerHTML =
       d.top_restaurants.map((r, i) => `
         <li>
-          <span>${i + 1}. Restaurant #${r.restaurant_id}</span>
+          <span>${i + 1}. ${r.restaurant_name || 'Restaurant #' + r.restaurant_id}</span>   
           <strong>${r.order_count} orders</strong>
         </li>
       `).join("") || "<li>No data</li>";
