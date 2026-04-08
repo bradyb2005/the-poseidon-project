@@ -19,7 +19,6 @@ def test_load_all_valid_data(mock_exists, mock_file, mock_json_load):
          "customer_id": "brady_b", 
          "status": "unpaid"}
     ]
-    # Set the return value of the read operation
     mock_json_load.return_value = fake_orders
 
     repo = OrderRepository()
@@ -41,7 +40,6 @@ def test_load_all_missing_file(mock_exists):
     repo = OrderRepository()
     results = repo.load_all()
     
-    # Should return empty list, not crash
     assert results == []
 
 
@@ -60,7 +58,6 @@ def test_load_all_corrupted_data(mock_exists, mock_file, mock_json_load):
     repo = OrderRepository()
     results = repo.load_all()
     
-    # Repo should catch the error and return []
     assert results == []
 
 
@@ -81,7 +78,6 @@ def test_save_all_serialization(mock_file):
     
     mock_file.assert_called_once_with(Path('backend/data/orders.json'), 'w')
     
-    # Verify the content written to the file
     handle = mock_file()
     written_content = "".join(call.args[0] for call in handle.write.call_args_list)
     
