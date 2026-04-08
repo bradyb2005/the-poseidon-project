@@ -8,7 +8,7 @@ from backend.schemas.payment_schema import (
     PaymentStatus,
     UpdatePaymentSchema,
 )
-from backend.models.payment.payment_service import PaymentService
+from backend.services.payment_service import PaymentService
 
 @pytest.fixture
 def base_payment_data():

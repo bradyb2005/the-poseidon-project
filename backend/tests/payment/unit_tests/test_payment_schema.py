@@ -1,21 +1,13 @@
 import pytest
 from pydantic import ValidationError
 
-<<<<<<< HEAD
-from backend.schemas.payment.payment_schema import (
-=======
 from backend.schemas.payment_schema import (
->>>>>>> e058d932c49e94b811b6eecee6781201cb952a01
     CostBreakdown,
     PaymentSchema,
     PaymentStatus,
     UpdatePaymentSchema,
 )
-<<<<<<< HEAD
-from backend.schemas.payment.payment_service import PaymentService
-=======
 from backend.services.payment_service import PaymentService
->>>>>>> e058d932c49e94b811b6eecee6781201cb952a01
 
 
 @pytest.fixture
