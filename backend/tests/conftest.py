@@ -1,4 +1,5 @@
 import sys
+from backend.routes.review_routes import get_review_service
 from backend.schemas.review_schema import ReviewDisplay
 import pytest
 from pathlib import Path
@@ -52,11 +53,19 @@ def service(mock_repo):
     return RestaurantService(mock_repo)
 
 @pytest.fixture
+def valid_uuids():
+    """Provides consistent valid UUID strings for testing across the app."""
+    return {
+        "item_1": "11111111-1111-1111-1111-111111111111",
+        "item_2": "22222222-2222-2222-2222-222222222222",
+        "item_3": "33333333-3333-3333-3333-333333333333",
+        "item_4": "44444444-4444-4444-4444-444444444444",
+        "user_uuid": "55555555-5555-5555-5555-555555555555"
+    }
 def restaurant_service(mock_restaurant_repo):
     from backend.services.restaurant_service import RestaurantService
     return RestaurantService(mock_restaurant_repo)
 
-# For unit tests
 @pytest.fixture
 def search_service(mock_restaurant_repo, mock_item_repo):
     return SearchService(
@@ -79,6 +88,23 @@ def review_service(mock_review_repo, mock_order_repo, mock_restaurant_repo):
         order_repo=mock_order_repo, 
         restaurant_repo=mock_restaurant_repo
     )
+
+# --- Monkeypatch fixtures ---
+
+@pytest.fixture
+def mock_review_service(client):
+    """
+    Revamped: Uses FastAPI dependency_overrides instead of monkeypatch.
+    Injects a mock ReviewService directly into the router's dependency system.
+    """
+
+    mock = MagicMock()
+
+    app.dependency_overrides[get_review_service] = lambda: mock
+    
+    yield mock
+
+    app.dependency_overrides = {}
 
 # --- Data fixtures ---
 

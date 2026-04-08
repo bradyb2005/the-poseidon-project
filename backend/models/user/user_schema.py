@@ -1,9 +1,11 @@
-# backend/models/user/user_model.py
+# backend/models/user/user_schema.py
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import List, Optional
+
+from backend.schemas.cart_schema import Cart
 
 """Represents a user and validates required user data."""
 
@@ -19,7 +21,7 @@ class User:
     postal_code: str = ""
     latitude: Optional[float] = None
     longitude: Optional[float] = None
-    cart: List[str] = field(default_factory=list)
+    cart: Cart = field(init = False)
     orders: List[str] = field(default_factory=list)
     owned_restaurants_id: List[str] = field(default_factory=list)
 
@@ -59,8 +61,9 @@ class User:
         if self.longitude is not None and not isinstance(self.longitude, (int, float)):
             raise ValueError("longitude must be a number or None")
 
+        self.cart = Cart(customer_id=self.id)
+
         list_fields = {
-            "cart": self.cart,
             "orders": self.orders,
             "owned_restaurants_id": self.owned_restaurants_id,
         }
