@@ -19,7 +19,7 @@ def mock_cart_service(client):
 
 # --- POST tests ---
 
-def test_post_add_item_to_cart_success(client, mock_cart_service):
+def test_post_add_item_to_cart_success(client, mock_cart_service, valid_uuids):
     """
     Equivalence Partitioning
     Ensures you can add an item to the cart
@@ -27,14 +27,14 @@ def test_post_add_item_to_cart_success(client, mock_cart_service):
     mock_response = {"message": "Item added"}
     mock_cart_service.add_to_cart.return_value = (mock_response, 200)
     
-    payload = {"menu_item_id": "item_123", "quantity": 2}
+    payload = {"menu_item_id": valid_uuids["item_1"], "quantity": 2}
     response = client.post("/cart/user_1/items", json=payload)
 
     assert response.status_code == 200
     assert response.json()["message"] == "Item added"
 
 
-def test_post_add_item_to_cart_not_found(client, mock_cart_service):
+def test_post_add_item_to_cart_not_found(client, mock_cart_service, valid_uuids):
     """
     Exception Handling
     Tries to add an item that doesn't exist
@@ -42,7 +42,7 @@ def test_post_add_item_to_cart_not_found(client, mock_cart_service):
     mock_error = {"error": "Menu item not found"}
     mock_cart_service.add_to_cart.return_value = (mock_error, 404)
 
-    payload = {"menu_item_id": "bad_item", "quantity": 1}
+    payload = {"menu_item_id": valid_uuids["item_1"], "quantity": 1}
     response = client.post("/cart/user_1/items", json=payload)
 
     assert response.status_code == 404
@@ -50,7 +50,7 @@ def test_post_add_item_to_cart_not_found(client, mock_cart_service):
 
 # --- PUT tests ---
 
-def test_put_update_cart_item_quantity(client, mock_cart_service):
+def test_put_update_cart_item_quantity(client, mock_cart_service, valid_uuids):
     """
     Equivalence Partitioning
     Ensures you can update the quantity of a cart item
@@ -59,14 +59,14 @@ def test_put_update_cart_item_quantity(client, mock_cart_service):
     mock_cart_service.update_quantity.return_value = (mock_response, 200)
 
     payload = {"new_quantity": 5}
-    response = client.put("/cart/user_1/items/item_123", json=payload)
+    response = client.put(f"/cart/user_1/items/{valid_uuids['item_1']}", json=payload)
 
     assert response.status_code == 200
     assert response.json()["message"] == "Updated"
 
 # --- DELETE tests ---
 
-def test_delete_remove_cart_item(client, mock_cart_service):
+def test_delete_remove_cart_item(client, mock_cart_service, valid_uuids):
     """
     Equivalence Partitioning
     Ensures you can remove an item from the cart
@@ -74,7 +74,7 @@ def test_delete_remove_cart_item(client, mock_cart_service):
     mock_response = {"message": "Removed"}
     mock_cart_service.remove_from_cart.return_value = (mock_response, 200)
 
-    response = client.delete("/cart/user_1/items/item_123")
+    response = client.delete(f"/cart/user_1/items/{valid_uuids['item_1']}")
 
     assert response.status_code == 200
     assert response.json()["message"] == "Removed"
