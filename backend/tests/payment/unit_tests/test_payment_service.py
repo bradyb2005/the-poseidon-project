@@ -35,23 +35,6 @@ def valid_cost_breakdown_data():
         "total": 40.60,
     }
 
-@pytest.fixture
-def dummy_order_data(valid_uuids):
-    return {
-        "id": str(valid_uuids["item_1"]), 
-        "customer_id": "user_1",
-        "restaurant_id": 1,
-        "items": [{"menu_item_id": str(valid_uuids["item_2"]), "quantity": 2, "price_at_time": 9.99}],
-        "status": "unpaid",
-        "cost_breakdown": {
-            "_subtotal": 19.98,
-            "_delivery_fee": 5.00,
-            "_service_fee": 1.00,
-            "_tax": 1.30,
-            "_total": 27.28
-        }
-    }
-
 
 def test_calculate_subtotal_valid():
     service = PaymentService()
