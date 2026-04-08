@@ -9,6 +9,18 @@ from backend.routes.user_routes import router as user_router
 
 app = FastAPI(title="The Poseidon Project")
 app.include_router(user_router)
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI(title="The Poseidon Project")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(restaurant_router)
 app.include_router(search_router)
 app.include_router(notification_router)
