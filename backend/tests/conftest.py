@@ -1,4 +1,5 @@
 import sys
+from backend.routes.review_routes import get_review_service
 from backend.schemas.review_schema import ReviewDisplay
 import pytest
 from pathlib import Path
@@ -79,6 +80,23 @@ def review_service(mock_review_repo, mock_order_repo, mock_restaurant_repo):
         order_repo=mock_order_repo, 
         restaurant_repo=mock_restaurant_repo
     )
+
+# --- Monkeypatch fixtures ---
+
+@pytest.fixture
+def mock_review_service(client):
+    """
+    Revamped: Uses FastAPI dependency_overrides instead of monkeypatch.
+    Injects a mock ReviewService directly into the router's dependency system.
+    """
+
+    mock = MagicMock()
+
+    app.dependency_overrides[get_review_service] = lambda: mock
+    
+    yield mock
+
+    app.dependency_overrides = {}
 
 # --- Data fixtures ---
 
