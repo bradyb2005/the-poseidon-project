@@ -10,13 +10,20 @@ const API_BASE = "http://localhost:8000";
 async function submitReview(event, restaurantId, orderId) {
     event.preventDefault(); // Prevents the page from refreshing automatically
     
-    // Grab the data from the form fields
-    const ratingValue = document.getElementById('rev-rating').value;
-    const commentValue = document.getElementById('rev-comment').value;
-    
-    // Get the logged-in user from localStorage
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) {
+    // Safe extraction of user data
+    let user = null;
+    try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            user = JSON.parse(storedUser);
+        }
+    } catch (parseError) {
+        console.error("Critical: User data in localStorage is corrupted.", parseError);
+        localStorage.removeItem("user"); // Clear the bad data
+    }
+
+    // Check for user and user.id
+    if (!user || !user.id) {
         alert("You must be logged in to leave a review!");
         return;
     }
@@ -41,7 +48,6 @@ async function submitReview(event, restaurantId, orderId) {
 
         if (response.ok) {
             alert("🔱 Review sent! Poseidon appreciates your feedback.");
-            
             // Refresh the restaurant view to show the new review in the list
             viewRestaurant(restaurantId); 
         } else {
