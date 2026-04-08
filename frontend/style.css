@@ -1,0 +1,207 @@
+/* --- 0. NAVIGATION BAR --- */
+.navbar {
+  background: #1a1a2e; /* Dark theme to match Poseidon */
+  color: white;
+  padding: 0.8rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.nav-links a {
+  color: #ddd;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: #4f8ef7;
+}
+
+.nav-auth-btn {
+  background: #4f8ef7;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background 0.2s;
+  /* Resets from global button styles */
+  width: auto;
+  margin: 0;
+}
+
+.nav-auth-btn:hover {
+  background: #3a7de0;
+}
+/* 1. LAYOUT FIX */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
+  /* Removed the flex-center from body so content can flow down */
+  min-height: 100vh;
+}
+
+#app-root {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 2. HERO & SEARCH BOX */
+.hero-banner {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #4f8ef7 100%);
+  color: white;
+  border-radius: 15px;
+  margin-bottom: 40px;
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  max-width: 600px;
+  margin: 20px auto 0;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* 3. HORIZONTAL SCROLLING (Trending) */
+.featured-section {
+  margin-bottom: 40px;
+}
+
+.horizontal-scroll {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 15px 5px;
+  /* Hide scrollbar for clean look */
+  scrollbar-width: none; 
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.item-card-mini {
+  min-width: 220px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  position: relative;
+}
+
+.price {
+  font-weight: bold;
+  color: #28a745;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* 4. RESTAURANT GRID */
+.res-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.res-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  position: relative;
+  transition: transform 0.2s;
+  padding: 20px;
+  cursor: pointer;
+}
+
+.res-card:hover {
+  transform: translateY(-5px);
+}
+
+/* 5. STATUS BADGES */
+.res-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+}
+
+.status-open { background: #28a745; }
+.status-closed { background: #dc3545; }
+
+.res-closed-fade {
+  opacity: 0.7;
+  filter: grayscale(0.5);
+}
+
+/* 6. UTILITIES */
+.view-btn {
+  margin-top: 15px;
+  background: #1a1a2e;
+  width: auto;
+  padding: 8px 20px;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 100px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #4f8ef7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

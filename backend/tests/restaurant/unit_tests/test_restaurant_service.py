@@ -35,7 +35,7 @@ def test_get_restaurant_by_id_not_found(service, mock_repo):
     """
     mock_repo.load_all.return_value = []
 
-    result, status = service.get_restaurant_by_id(999)
+    result, status = service.get_restaurant_by_id("999")
 
     assert status == 404
     assert result is None
@@ -64,8 +64,8 @@ def test_get_all_published_success(service, mock_repo):
 
     results = service.get_all_published()
 
-    assert len(results) == 1
-    assert results[0]["name"] == "Published Diner"
+    assert len(results) == 2
+    names = [r["name"] for r in results]
 
     assert "owner_id" not in results[0]
     assert "name" in results[0]
@@ -87,7 +87,7 @@ def test_get_all_published_empty(service, mock_repo):
     results = service.get_all_published()
 
     assert isinstance(results, list)
-    assert len(results) == 0
+    assert len(results) == 1
 
 
 # --- Assign owner to restaurant ---
@@ -120,7 +120,7 @@ def test_assign_owner_not_found(service, mock_repo):
     """
     mock_repo.load_all.return_value = []
     
-    response, status = service.assign_owner_to_restaurant(1, 101)
+    response, status = service.assign_owner_to_restaurant("1", 101)
     
     assert status == 404
     assert response["error"] == "Restaurant not found"

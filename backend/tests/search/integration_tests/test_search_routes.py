@@ -162,3 +162,18 @@ def test_get_restaurant_details_not_found(client, mock_search_service):
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Restaurant not found or is not published"
+
+def test_get_landing_page_aggregation(client, mock_search_service):
+    """
+    Functional Test: Verifies the single-call homepage data aggregation.
+    """
+    mock_search_service.get_homepage_featured.return_value = [{"item_name": "Pie"}]
+    mock_search_service.browse_homepage.return_value = {"items": [{"name": "Diner"}], "total_count": 1}
+
+    response = client.get("/search/landing")
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "featured" in data
+    assert "restaurants" in data
+    assert data["restaurants"]["items"][0]["name"] == "Diner"

@@ -67,3 +67,15 @@ def get_restaurant_details(restaurant_id: int):
             detail="Restaurant not found or is not published"
         )
     return result
+
+@router.get("/landing", response_model=Dict)
+def get_full_landing_page():
+    """
+    GET: Homepage landing data - combines featured items and restaurant list
+    It returns featured items AND the restaurant list in one go.
+    """
+    return {
+        "featured": service.get_homepage_featured(),
+        "restaurants": service.browse_homepage(page=1, limit=10),
+        "message": "Welcome to Poseidon"
+    }
