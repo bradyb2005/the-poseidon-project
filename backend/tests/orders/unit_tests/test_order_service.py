@@ -135,7 +135,6 @@ def test_update_order_status_success(valid_uuids):
     assert result.status == OrderStatus.PENDING
     mock_repo.save_all.assert_called_once()
 
-
 def test_update_order_not_found():
     """Test updating an order that doesn't exist"""
     mock_repo = MagicMock()
@@ -151,3 +150,74 @@ def test_update_order_not_found():
 
     assert exc.value.status_code == 404
     assert exc.value.detail == "Order not found"
+
+def test_update_completed_order_fails(valid_uuids):
+    """Ensure a completed order cannot be edited (e.g., changing address)"""
+    mock_repo = MagicMock()
+    
+    existing_order = {
+        "id": valid_uuids["item_3"],
+        "customer_id": valid_uuids["user_uuid"],
+        "restaurant_id": 1,                 
+        "status": OrderStatus.COMPLETED, # <-- Order is already completed
+        "delivery_latitude": 49.8,              
+        "delivery_longitude": -119.4,          
+        "delivery_postal_code": "V1V 1V1",      
+        "order_date": "2026-03-25T12:00:00",    
+        "cost_breakdown": {
+            "_subtotal": 30.00,
+            "_delivery_fee": 5.00,
+            "_service_fee": 2.00,
+            "_tax": 3.60,
+            "_total": 40.60,
+        },                    
+        "items": []
+    }
+    mock_repo.find_by_id.return_value = existing_order
+    
+    service = OrderService(mock_repo, MagicMock(), MagicMock(), MagicMock())
+    
+    # Try to change the postal code
+    update_data = OrderUpdate(delivery_postal_code="V2V 2V2")
+
+    with pytest.raises(HTTPException) as exc:
+        service.update_order(valid_uuids["item_3"], update_data)
+
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "Cannot update a completed or cancelled order"
+
+
+def test_update_cancelled_order_fails(valid_uuids):
+    """Ensure a cancelled order cannot be marked as complete"""
+    mock_repo = MagicMock()
+    
+    existing_order = {
+        "id": valid_uuids["item_3"],
+        "customer_id": valid_uuids["user_uuid"],
+        "restaurant_id": 1,                 
+        "status": OrderStatus.CANCELLED, # <-- Order is already cancelled
+        "delivery_latitude": 49.8,              
+        "delivery_longitude": -119.4,          
+        "delivery_postal_code": "V1V 1V1",      
+        "order_date": "2026-03-25T12:00:00",    
+        "cost_breakdown": {
+            "_subtotal": 30.00,
+            "_delivery_fee": 5.00,
+            "_service_fee": 2.00,
+            "_tax": 3.60,
+            "_total": 40.60,
+        },                    
+        "items": []
+    }
+    mock_repo.find_by_id.return_value = existing_order
+    
+    service = OrderService(mock_repo, MagicMock(), MagicMock(), MagicMock())
+    
+    # Try to mark it as completed
+    update_data = OrderUpdate(status=OrderStatus.COMPLETED)
+
+    with pytest.raises(HTTPException) as exc:
+        service.update_order(valid_uuids["item_3"], update_data)
+
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "Cannot update a completed or cancelled order"

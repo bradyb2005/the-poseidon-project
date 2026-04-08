@@ -142,6 +142,10 @@ class OrderService:
         
         if current_order is None:
             raise HTTPException(status_code=404, detail="Order not found")
+        
+        current_status = current_order.get("status")
+        if current_status in [OrderStatus.COMPLETED, OrderStatus.CANCELLED]:
+            raise HTTPException(status_code=400, detail="Cannot update a completed or cancelled order")
 
         try:
             if payload.status: current_order["status"] = payload.status
