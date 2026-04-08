@@ -29,7 +29,10 @@ function renderLogin() {
     </div>
   `;
 
-  document.addEventListener("keydown", function onEnter(e) {
+  document.getElementById("username").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") handleLogin();
+  });
+  document.getElementById("password").addEventListener("keydown", (e) => {
     if (e.key === "Enter") handleLogin();
   });
 }
