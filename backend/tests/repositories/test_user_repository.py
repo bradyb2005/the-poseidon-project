@@ -1,3 +1,4 @@
+# backend/tests/repositories/test_user_repository.py
 import json
 
 from backend.repositories.user_repository import UserRepository
@@ -131,3 +132,29 @@ def test_load_all_returns_empty_list_if_file_is_empty(monkeypatch, tmp_path):
     repo = UserRepository()
 
     assert repo.load_all() == []
+
+def test_find_by_id_success(monkeypatch):
+    """find_by_id should return the correct user dictionary when the ID exists."""
+    repo = UserRepository()
+
+    monkeypatch.setattr(repo, "load_all", lambda: [
+        {"id": "1", "username": "anjana"},
+        {"id": "2", "username": "brady"}
+    ])
+
+    result = repo.find_by_id("1")
+    
+    assert result == {"id": "1", "username": "anjana"}
+
+
+def test_find_by_id_not_found(monkeypatch):
+    """find_by_id should return None when the ID does not exist."""
+    repo = UserRepository()
+
+    monkeypatch.setattr(repo, "load_all", lambda: [
+        {"id": "1", "username": "anjana"}
+    ])
+
+    result = repo.find_by_id("99")
+    
+    assert result is None

@@ -1,6 +1,6 @@
 import pytest
 
-from backend.models.user.user_schema import User
+from backend.schemas.user_schema import User
 
 
 def test_user_valid_creation():
