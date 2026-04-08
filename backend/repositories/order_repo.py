@@ -19,4 +19,4 @@ class OrderRepository:
     def save_all(self, orders):
         """Takes a list of order dictionaries and writes them to the JSON file."""
         with open(self.file_path, 'w') as file:
-            json.dump(orders, file, indent=4)
+            json.dump(orders, file, indent=4, default=str)
