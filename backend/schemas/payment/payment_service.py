@@ -1,9 +1,5 @@
 from typing import Any
-<<<<<<<< HEAD:backend/schemas/payment/payment_service.py
-from backend.schemas.payment.payment_schema import CostBreakdown, PaymentSchema
-========
 from backend.schemas.payment_schema import CostBreakdown, PaymentSchema, PaymentStatus
->>>>>>>> e058d932c49e94b811b6eecee6781201cb952a01:backend/services/payment_service.py
 
 
 class PaymentService:
