@@ -6,7 +6,7 @@ from uuid import uuid4
 from backend.main import app
 from fastapi.testclient import TestClient
 from unittest.mock import MagicMock
-from backend.models.user.user_schema import User
+from backend.schemas.user.user_schema import User
 from backend.schemas.restaurant_schema import Restaurant
 from backend.schemas.items_schema import MenuItem as MenuItemSchema
 from backend.services.search_service import SearchService

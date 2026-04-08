@@ -10,7 +10,6 @@ from backend.schemas.payment_schema import (
 )
 from backend.services.payment_service import PaymentService
 
-
 @pytest.fixture
 def base_payment_data():
     return {
