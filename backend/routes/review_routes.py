@@ -9,7 +9,7 @@ from starlette import status
 from backend.schemas.review_schema import ReviewCreate, ReviewUpdate
 from backend.services.review_service import ReviewService
 from backend.repositories.review_repository import ReviewRepository
-from backend.repositories.order_repository import OrderRepository
+from backend.repositories.order_repo import OrderRepository
 from backend.repositories.restaurant_repository import RestaurantRepository
 
 router = APIRouter(prefix="/reviews", tags=["Reviews"])

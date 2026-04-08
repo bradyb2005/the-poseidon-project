@@ -17,7 +17,7 @@ class ItemRepository:
         if not self._file_path.parent.exists():
             self._file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def load_all(self) -> List[MenuItem]:
+    def load_all(self) -> List[MenuItem]:   
         """
         Reads the JSON file and returns a list of MenuItem objects
         Handles missing fields (price, id) by providing defaults
