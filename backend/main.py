@@ -7,6 +7,7 @@ from backend.routes.user_routes import router as user_router
 from backend.routes.admin_router import router as admin_router
 from backend.routes.payment_router import router as payment_router
 from backend.routes.delivery_router import router as delivery_router
+from backend.routes.review_routes import router as review_router
 from backend.routes.items_routes import router as items_routes
 
 app = FastAPI(title="The Poseidon Project")
@@ -19,6 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(user_router)
 app.include_router(restaurant_router)
 app.include_router(search_router)
 app.include_router(notification_router)
@@ -26,6 +28,7 @@ app.include_router(user_router)
 app.include_router(admin_router)
 app.include_router(payment_router)
 app.include_router(delivery_router)
+app.include_router(review_router)
 app.include_router(items_routes)
 
 @app.get("/")
