@@ -1,13 +1,13 @@
 import json
-import os
+from pathlib import Path
 
 class OrderRepository:
     def __init__(self, file_path='backend/data/orders.json'):
-        self.file_path = file_path
+        self.file_path = Path(file_path)
 
     def load_all(self):
         """Reads the JSON file and returns a list of dictionaries."""
-        if not os.path.exists(self.file_path):
+        if not self.file_path.exists():
             return []
         
         with open(self.file_path, 'r') as file:
