@@ -61,6 +61,7 @@
 .nav-auth-btn:hover {
   background: #3a7de0;
 }
+
 /* 1. LAYOUT FIX */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -68,6 +69,7 @@ body {
   color: #333;
   line-height: 1.6;
   /* Removed the flex-center from body so content can flow down */
+  margin: 0;
   min-height: 100vh;
 }
 
@@ -78,7 +80,73 @@ body {
   padding: 20px;
 }
 
-/* 2. HERO & SEARCH BOX */
+/* --- 3. MENU ITEM GRID (ADDED SECTION) --- */
+.menu-grid {
+  /* Creates a responsive grid of food items */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.menu-item {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+}
+
+.menu-item:hover {
+  /* Slight lift effect when hovering over a dish */
+  transform: scale(1.02);
+  border-color: #4f8ef7;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.item-header h3 { margin: 0; font-size: 1.1rem; }
+
+.description {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 15px;
+  flex-grow: 1;
+}
+
+.item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tag {
+  /* Styles for menu item tags like 'Vegan' or 'Spicy' */
+  background: #eef2ff;
+  color: #4f8ef7;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.add-to-cart-btn {
+  /* High contrast button for the main action */
+  background: #1a1a2e;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* 4. HERO & SEARCH BOX */
 .hero-banner {
   text-align: center;
   padding: 60px 20px;
@@ -101,7 +169,7 @@ body {
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* 3. HORIZONTAL SCROLLING (Trending) */
+/* 5. HORIZONTAL SCROLLING (Trending) */
 .featured-section {
   margin-bottom: 40px;
 }
@@ -135,7 +203,7 @@ body {
   margin-bottom: 5px;
 }
 
-/* 4. RESTAURANT GRID */
+/* 6. RESTAURANT GRID */
 .res-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -157,7 +225,7 @@ body {
   transform: translateY(-5px);
 }
 
-/* 5. STATUS BADGES */
+/* 7. STATUS BADGES */
 .res-badge {
   position: absolute;
   top: 15px;

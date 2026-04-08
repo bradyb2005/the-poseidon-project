@@ -56,14 +56,18 @@ async function renderHomepage() {
                             const statusText = isOpen ? 'Open Now' : 'Closed';
                             
                             return `
-                                <div class="res-card ${!isOpen ? 'res-closed-fade' : ''}" onclick="viewRestaurant(${res.id})">
+                                <div class="res-card ${!isOpen ? 'res-closed-fade' : ''}"
+                                    onclick="viewRestaurant(${res.id})"> <div class="res-badge ${statusClass}">${statusText}</div>
+                                    
                                     <div class="res-badge ${statusClass}">${statusText}</div>
                                     <div class="res-info">
                                         <h3>${res.name}</h3>
                                         <p class="address">📍 ${res._address || 'Local'}</p>
-                                        <span class="status-badge">Open until ${res._close_time}:00</span>
+                                        <span class="status-detail">Hours: ${res._open_time}:00 - ${res._close_time}:00</span>
                                     </div>
-                                    <button class="view-btn">View Menu</button>
+                                    <button class="view-btn">
+                                        ${isOpen ? 'View Menu' : 'See Menu'}
+                                    </button>
                                 </div>
                             `;
                         }).join('')}
