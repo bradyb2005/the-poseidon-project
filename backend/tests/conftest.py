@@ -6,11 +6,7 @@ from uuid import uuid4
 from backend.main import app
 from fastapi.testclient import TestClient
 from unittest.mock import MagicMock
-<<<<<<< HEAD
-from backend.schemas.user.user_schema import User
-=======
 from backend.schemas.user_schema import User
->>>>>>> order_servicev2
 from backend.schemas.restaurant_schema import Restaurant
 from backend.schemas.items_schema import MenuItem as MenuItemSchema
 from backend.services.search_service import SearchService
@@ -80,11 +76,8 @@ def valid_uuids():
         "item_4": "44444444-4444-4444-4444-444444444444",
         "user_uuid": "55555555-5555-5555-5555-555555555555"
     }
-<<<<<<< HEAD
-=======
 
 # Search fixtures
->>>>>>> order_servicev2
 
 @pytest.fixture
 def search_service(mock_restaurant_repo, mock_item_repo):

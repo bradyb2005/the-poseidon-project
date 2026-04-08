@@ -1,11 +1,7 @@
 import json
 import os
 from typing import Optional, List, Dict
-<<<<<<< HEAD
-from backend.schemas.user.user_schema import User
-=======
 from backend.schemas.user_schema import User
->>>>>>> order_servicev2
 
 
 DATA_FILE = os.path.join(
