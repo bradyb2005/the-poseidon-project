@@ -56,7 +56,7 @@ async function handleLogin() {
     if (response.ok) {
       localStorage.setItem("user", JSON.stringify(data.user));
       showMessage(msg, "Login successful! Redirecting...", "success");
-      setTimeout(() => renderNotifications(), 1000);
+      setTimeout(() => renderHomepage(), 1000);
     } else {
       showMessage(msg, data.detail || "Login failed.", "error");
     }

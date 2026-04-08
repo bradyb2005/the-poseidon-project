@@ -76,7 +76,7 @@ async function handleRegister() {
     if (response.ok) {
       localStorage.setItem("user", JSON.stringify(data.user));
       showMessage(msg, "Account created! Redirecting...", "success");
-      setTimeout(() => renderNotifications(), 1000);
+      setTimeout(() => renderHomepage(), 1000);
     } else {
       showMessage(msg, data.detail || "Registration failed.", "error");
     }
