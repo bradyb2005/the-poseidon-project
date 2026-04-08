@@ -11,6 +11,8 @@ from backend.repositories.order_repo import OrderRepository
 from backend.repositories.user_repository import UserRepository
 from backend.repositories.items_repository import ItemRepository
 from backend.repositories.restaurant_repository import RestaurantRepository
+from backend.services.payment_service import PaymentService
+from backend.schemas.payment_schema import CostBreakdown
 
 
 class OrderValidate:
@@ -36,7 +38,6 @@ class OrderValidate:
             raise ValueError("Longitude must be between -180 and 180")
         return value
 
-
 class OrderService:
     def __init__(self, order_repository: OrderRepository,
                  user_repository: UserRepository,
@@ -58,6 +59,7 @@ class OrderService:
         orders = self.repository.load_all()
         items = self.items_repository.load_all()
         restaurants = self.restaurant_repository.load_all()
+        payment_service = PaymentService()
         
         # Validate passed info
         try:
@@ -87,6 +89,20 @@ class OrderService:
         id = self.generate_order_id()
         if any(it.get("id") == id for it in orders):  # extremely unlikely, but consistent check
             raise HTTPException(status_code=409, detail="ID collision; retry.")
+        
+        subtotal = payment_service.calculate_subtotal(user_cart)
+        fees = payment_service.calculate_fees_and_taxes(subtotal)
+        total = payment_service.calculate_total(subtotal)
+
+        # Create cost breakdown object
+
+        cost_breakdown = CostBreakdown(
+            subtotal=subtotal,
+            delivery_fee=fees["delivery_fee"],
+            service_fee=fees["service_fee"],
+            tax=fees["tax"],
+            total=total.total
+        )
 
         new_order_data = {
             "id": id,
@@ -98,8 +114,7 @@ class OrderService:
             "delivery_latitude": lat,
             "delivery_longitude": lon,
             "delivery_postal_code": pc,
-            # TODO: Feat7 - Integrate fee calculators for these:
-            "cost_breakdown": 0
+            "cost_breakdown": cost_breakdown.model_dump(by_alias=True)
         }
         
         if payload.delivery_address:

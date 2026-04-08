@@ -72,7 +72,7 @@ def test_create_order_success(valid_uuids):
     result = service.create_order(payload)
 
     assert result.customer_id == valid_uuids["user_uuid"]
-    assert result.restaurant_id == 99 # <-- Changed to int
+    assert result.restaurant_id == 99
     assert result.delivery_postal_code == "V1V 1V1"
     
     mock_order_repo.save_all.assert_called_once()
@@ -100,20 +100,26 @@ def test_create_order_invalid_data_handling():
 
 # --- Update Order Tests ---
 
-def test_update_order_status_success():
+def test_update_order_status_success(valid_uuids):
     """Ensure order status can be updated"""
     mock_repo = MagicMock()
     
     existing_order = {
-        "id": "abc123A",
-        "customer_id": "brady_1",
-        "restaurant_id": 1, # <-- Changed to int                   
+        "id": valid_uuids["item_3"],
+        "customer_id": valid_uuids["user_uuid"],
+        "restaurant_id": 1,                 
         "status": OrderStatus.UNPAID,
         "delivery_latitude": 49.8,              
         "delivery_longitude": -119.4,          
         "delivery_postal_code": "V1V 1V1",      
         "order_date": "2026-03-25T12:00:00",    
-        "cost_breakdown": 0,                    
+        "cost_breakdown": {
+            "subtotal": 30.00,
+            "delivery_fee": 5.00,
+            "service_fee": 2.00,
+            "tax": 3.60,
+            "total": 40.60,
+        },                    
         "items": []
     }
     mock_repo.load_all.return_value = [existing_order]
@@ -122,7 +128,7 @@ def test_update_order_status_success():
     
     update_data = OrderUpdate(status=OrderStatus.PENDING)
 
-    result = service.update_order("abc123A", update_data)
+    result = service.update_order(valid_uuids["item_3"], update_data)
 
     assert result.status == OrderStatus.PENDING
     mock_repo.save_all.assert_called_once()
