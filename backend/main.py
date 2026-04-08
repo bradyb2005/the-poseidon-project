@@ -5,13 +5,9 @@ from backend.routes.search_routes import router as search_router
 from backend.routes.notifications_router import router as notification_router
 from backend.routes.user_routes import router as user_router
 from backend.routes.admin_router import router as admin_router
-
-
 from backend.routes.payment_router import router as payment_router
 from backend.routes.delivery_router import router as delivery_router
-from fastapi.middleware.cors import CORSMiddleware
 from backend.routes.items_routes import router as items_routes
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="The Poseidon Project")
 
