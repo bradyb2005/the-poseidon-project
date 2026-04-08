@@ -55,10 +55,6 @@ class OrderService:
         return f"{unique_hex}{random_letter}"
 
     def create_order(self, payload: OrderCreate) -> Order:
-        users = self.user_repository.load_all()
-        orders = self.repository.load_all()
-        items = self.items_repository.load_all()
-        restaurants = self.restaurant_repository.load_all()
         payment_service = PaymentService()
         
         # Validate passed info
@@ -70,15 +66,19 @@ class OrderService:
             raise HTTPException(status_code=400, detail=str(e))
             
         # Validate user's cart exists and has items
-        user_cart = next((u.get("cart") for u in users if u.get("id") == payload.customer_id), None)
+        user = self.user_repository.find_by_id(payload.customer_id)
+        user_cart = user.get("cart") if user else None
+
         if user_cart is None:
             raise HTTPException(status_code=404, detail="User or cart not found")
         if not user_cart.get("items"):
             raise HTTPException(status_code=400, detail="Cart is empty")
             
         first_menu_item_id = user_cart.get("items")[0].get("menu_item_id")
-        restaurant_id = next((i.get("restaurant_id") for i in items if i.get("item_id") == first_menu_item_id), None)
-        restaurant = next((r for r in restaurants if r.get("id") == restaurant_id), None)
+        item = self.items_repository.find_by_id(first_menu_item_id)
+        restaurant_id = item.restaurant_id if item else None
+
+        restaurant = self.restaurant_repository.find_by_id(str(restaurant_id)) if restaurant_id else None
         
         if restaurant is None:
             raise HTTPException(status_code=404, detail="Restaurant not found")
@@ -87,7 +87,7 @@ class OrderService:
 
         # Generate order ID
         id = self.generate_order_id()
-        if any(it.get("id") == id for it in orders):  # extremely unlikely, but consistent check
+        if self.repository.find_by_id(id) is not None:
             raise HTTPException(status_code=409, detail="ID collision; retry.")
         
         subtotal = payment_service.calculate_subtotal(user_cart)
@@ -128,6 +128,7 @@ class OrderService:
         self.repository.save_all(orders)
 
         # Clear user's cart
+        users = self.user_repository.load_all()
         for user in users:
             if user.get("id") == payload.customer_id:
                 user["cart"]["items"] = []
@@ -137,13 +138,10 @@ class OrderService:
         return Order(**new_order_data)
 
     def update_order(self, order_id: str, payload: OrderUpdate) -> Order:
-        orders = self.repository.load_all()
-        order_idx = next((i for i, o in enumerate(orders) if o.get("id") == order_id), None)
+        current_order = self.repository.find_by_id(order_id)
         
-        if order_idx is None:
+        if current_order is None:
             raise HTTPException(status_code=404, detail="Order not found")
-
-        current_order = orders[order_idx]
 
         try:
             if payload.status: current_order["status"] = payload.status
@@ -155,6 +153,12 @@ class OrderService:
                 current_order["delivery_postal_code"] = OrderValidate.validate_delivery_postal_code(payload.delivery_postal_code)
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
+
+        orders = self.repository.load_all()
+        for i, o in enumerate(orders):
+            if o.get("id") == order_id:
+                orders[i] = current_order
+                break
 
         self.repository.save_all(orders)
         return Order(**current_order)

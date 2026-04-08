@@ -29,27 +29,28 @@ def test_validate_postal_code_success(valid_pc):
 
 def test_create_order_success(valid_uuids):
     mock_order_repo = MagicMock()
+    mock_order_repo.find_by_id.return_value = None
     mock_order_repo.load_all.return_value = [] 
     
     mock_user_repo = MagicMock()
-    mock_user_repo.load_all.return_value = [
-        {
-            "id": valid_uuids["user_uuid"],
-            "cart": {
-                "items": [{"menu_item_id": valid_uuids["item_1"], "quantity": 1, "price_at_time": 9.99}]
-            }
+    user_dict = {
+        "id": valid_uuids["user_uuid"],
+        "cart": {
+            "items": [{"menu_item_id": valid_uuids["item_1"], "quantity": 1, "price_at_time": 9.99}]
         }
-    ]
+    }
+    mock_user_repo.find_by_id.return_value = user_dict
+    mock_user_repo.load_all.return_value = [user_dict]
     
+    mock_item = MagicMock()
+    mock_item.restaurant_id = 99
     mock_item_repo = MagicMock()
-    mock_item_repo.load_all.return_value = [
-        {"item_id": valid_uuids["item_1"], "restaurant_id": 99} # <-- Changed to int
-    ]
+    mock_item_repo.find_by_id.return_value = mock_item 
     
+    mock_rest = MagicMock()
+    mock_rest.is_published = True
     mock_rest_repo = MagicMock()
-    mock_rest_repo.load_all.return_value = [
-        {"id": 99, "is_published": True} # <-- Changed to int
-    ]
+    mock_rest_repo.find_by_id.return_value = mock_rest
 
     service = OrderService(
         order_repository=mock_order_repo,
@@ -60,7 +61,7 @@ def test_create_order_success(valid_uuids):
 
     payload = OrderCreate(
         customer_id=valid_uuids["user_uuid"],
-        restaurant_id=99, # <-- Changed to int
+        restaurant_id=99,
         items=[], 
         delivery_latitude=49.88,
         delivery_longitude=-119.49,
@@ -114,14 +115,15 @@ def test_update_order_status_success(valid_uuids):
         "delivery_postal_code": "V1V 1V1",      
         "order_date": "2026-03-25T12:00:00",    
         "cost_breakdown": {
-            "subtotal": 30.00,
-            "delivery_fee": 5.00,
-            "service_fee": 2.00,
-            "tax": 3.60,
-            "total": 40.60,
+            "_subtotal": 30.00,
+            "_delivery_fee": 5.00,
+            "_service_fee": 2.00,
+            "_tax": 3.60,
+            "_total": 40.60,
         },                    
         "items": []
     }
+    mock_repo.find_by_id.return_value = existing_order
     mock_repo.load_all.return_value = [existing_order]
     
     service = OrderService(mock_repo, MagicMock(), MagicMock(), MagicMock())
@@ -137,6 +139,7 @@ def test_update_order_status_success(valid_uuids):
 def test_update_order_not_found():
     """Test updating an order that doesn't exist"""
     mock_repo = MagicMock()
+    mock_repo.find_by_id.return_value = None
     mock_repo.load_all.return_value = []
     
     service = OrderService(mock_repo, MagicMock(), MagicMock(), MagicMock())
