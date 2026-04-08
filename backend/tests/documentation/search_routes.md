@@ -1,6 +1,6 @@
 Search routes test documentation
 
-<img width="600" height="123" alt="Screenshot 2026-04-02 at 3 12 42 PM" src="https://github.com/user-attachments/assets/c12654eb-7360-4e00-8d37-085ee48b1ad2" />
+<img width="771" height="129" alt="Screenshot 2026-04-07 at 3 28 30 PM" src="https://github.com/user-attachments/assets/8c3ef295-af89-40fe-a7cb-ebafa202116c" />
 
 For get serch tests, we have a successful test that uses equivalence partitioning and an empty query that uses BVA.
 
@@ -16,3 +16,5 @@ Another test ensures we get featured items
 For Detail view tests, we have 2.
 The first test uses equivalence partitionig to ensure we add all the details successfully.
 The next test uses exception handling and ensures the proper error is thrown when a restaurant doesnt exist
+
+A landing page was added as a functional test for data aggregation

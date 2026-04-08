@@ -94,3 +94,15 @@ class UserService:
                 return user
 
         raise ValueError("user not found")
+    
+    def authenticate_user(self, username: str, password: str) -> dict:
+        """Authenticate a user by username and password."""
+        users = self.user_repo.load_all()
+
+        for user in users:
+            if user["username"] == username:
+                if self.verify_password(password, user["password_hash"]):
+                    return user
+                raise ValueError("invalid credentials")
+
+        raise ValueError("invalid credentials")

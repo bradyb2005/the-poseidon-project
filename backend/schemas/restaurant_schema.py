@@ -27,6 +27,7 @@ class Restaurant(RestaurantBase):
     id: int 
     name: str 
     menu: List[str]
+    is_published: bool = True
 
     def get_id(self) -> int:
         return self.id
