@@ -9,6 +9,13 @@ class OrderItem(BaseModel):
     quantity: int
     price_at_time: Decimal
 
+class OrderItemCreate(BaseModel):
+    menu_item_id: UUID
+    quantity: int
+
+class OrderItemUpdate(BaseModel):
+    new_quantity: int
+
 class Cart(BaseModel):
     customer_id: str
     items: List[OrderItem] = []
