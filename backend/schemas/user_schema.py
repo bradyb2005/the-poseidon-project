@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import List, Optional
 
 from backend.schemas.cart_schema import Cart
+from backend.schemas.loyalty_schema import LoyaltyTier
 
 """Represents a user and validates required user data."""
 
@@ -24,6 +25,9 @@ class User:
     cart: Cart = field(init = False)
     orders: List[str] = field(default_factory=list)
     owned_restaurants_id: List[str] = field(default_factory=list)
+    # ADDED IN EXTRA FEATURE: Loyalty Program
+    loyalty_points: int = 0
+    loyalty_tier: str = LoyaltyTier.BRONZE.value
 
 
     def __post_init__(self) -> None:
