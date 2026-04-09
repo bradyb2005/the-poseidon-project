@@ -6,28 +6,30 @@ function renderForgotPassword() {
   root.innerHTML = `
     <div class="card">
       <h1>🔱 Reset Password</h1>
-      <p style="text-align:center; color:#666; margin-bottom:1.5rem; font-size:0.9rem;">
-        Enter the email address on your account and choose a new password.
-      </p>
+      <form>
+        <p style="text-align:center; color:#666; margin-bottom:1.5rem; font-size:0.9rem;">
+          Enter the email address on your account and choose a new password.
+        </p>
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="Enter your email">
-      </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email">
+        </div>
 
-      <div class="form-group">
-        <label for="new_password">New Password</label>
-        <input type="password" id="new_password" placeholder="Choose a new password">
-      </div>
+        <div class="form-group">
+          <label for="new_password">New Password</label>
+          <input type="password" id="new_password" placeholder="Choose a new password">
+        </div>
 
-      <div class="form-group">
-        <label for="confirm">Confirm New Password</label>
-        <input type="password" id="confirm" placeholder="Repeat new password">
-      </div>
+        <div class="form-group">
+          <label for="confirm">Confirm New Password</label>
+          <input type="password" id="confirm" placeholder="Repeat new password">
+        </div>
 
-      <button type="submit">Reset Password</button>
+        <button type="submit">Reset Password</button>
 
-      <div class="message" id="message"></div>
+        <div class="message" id="message"></div>
+      </form>
 
       <div class="link">
         Remembered it? <a href="#" onclick="renderLogin()">Back to login</a>
@@ -36,12 +38,12 @@ function renderForgotPassword() {
   `;
 
   const form = document.querySelector(".card form");
-    if (form) {
-        form.addEventListener("submit", function(e) {
-            e.preventDefault();
-            handleForgotPassword();
-        });
-    }
+  if (form) {
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      handleForgotPassword();
+    });
+  }
 }
 
 async function handleForgotPassword() {
@@ -58,12 +60,12 @@ async function handleForgotPassword() {
   if (new_password !== confirm) {
     showMessage(msg, "Passwords do not match.", "error");
     return;
-}
+  }
 
-if (!email.includes("@") || !email.includes(".")) {
+  if (!email.includes("@") || !email.includes(".")) {
     showMessage(msg, "Please enter a valid email address.", "error");
     return;
-}
+  }
 
   if (new_password.length < 6) {
     showMessage(msg, "Password must be at least 6 characters.", "error");
@@ -83,9 +85,9 @@ if (!email.includes("@") || !email.includes(".")) {
       showMessage(msg, "Password reset! Redirecting to login...", "success");
       setTimeout(() => renderLogin(), 1500);
     } else if (response.status === 404) {
-    showMessage(msg, "No account found with that email.", "error");
+      showMessage(msg, "No account found with that email.", "error");
     } else {
-    showMessage(msg, data.detail || "Reset failed.", "error");
+      showMessage(msg, data.detail || "Reset failed.", "error");
     }
 
   } catch (err) {

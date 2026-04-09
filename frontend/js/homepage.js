@@ -29,8 +29,21 @@ async function renderHomepage() {
         const currentHour = new Date().getHours();
 
         root.innerHTML = `
-            <div class="home-container">
-                <section class="hero-banner">
+        <div class="home-container">
+            <nav class="navbar">
+                <span class="nav-brand">🔱 Poseidon</span>
+                <div class="nav-links">
+                    ${JSON.parse(localStorage.getItem("user")) ? `
+                        <span>👤 ${JSON.parse(localStorage.getItem("user")).username}</span>
+                        <a href="#" onclick="renderNotifications()">Notifications</a>
+                        <a href="#" onclick="handleLogout()">Log out</a>
+                    ` : `
+                        <a href="#" onclick="renderLogin()">Log In</a>
+                        <a href="#" onclick="renderRegister()">Sign Up</a>
+                    `}
+            </div>
+        </nav>
+        <section class="hero-banner">
                     <h1>🔱 The Poseidon Project 🔱</h1>
                     <p>High-quality meals, delivered at sea-speed.</p>
                     <form class="search-box" onsubmit="handleSearch(event)">
@@ -132,3 +145,8 @@ window.addEventListener('scroll', () => {
         }
     }
 });
+
+function handleLogout() {
+    localStorage.removeItem("user");
+    renderHomepage();
+}
