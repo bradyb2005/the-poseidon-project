@@ -42,7 +42,7 @@ class CartService:
             existing_item["quantity"] += quantity
         else:
             new_item = OrderItem(
-                menu_item_id=menu_item_id,
+                menu_item_id=str(menu_item_id),
                 quantity=quantity,
                 price_at_time=menu_item.price 
             )
