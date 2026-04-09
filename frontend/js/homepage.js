@@ -23,7 +23,7 @@ async function renderHomepage() {
                 item_name: "Poseidon's Platter",
                 tags: ["Signature", "Fresh"],
                 rating: 4.8,
-                reviewCount: 124
+                reviewCount: 124,
                 topReview: "Best seafood I've ever had! The flavors were incredible and the freshness was unmatched."
             },
             {
@@ -31,7 +31,7 @@ async function renderHomepage() {
                 item_name: "Trident Tuna Steak",
                 tags: ["Premium"],
                 rating: null, // No reviews for this one
-                reviewCount: 0
+                reviewCount: 0,
                 topReview: null
             },
         ];
