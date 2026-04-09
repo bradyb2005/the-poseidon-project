@@ -6,8 +6,9 @@ async function viewRestaurant(restaurantId) {
     
     // --- DEMO INTERCEPTOR ---
     // Demo working menu
-    if (restaurantId === 999 || restaurantId === "999") {
-        renderMockMenu(root);
+    if (restaurantId === 999 || restaurantId === "999" || restaurantId === 888 || restaurantId === "888") {
+        const isUnowned = (restaurantId === 888 || restaurantId === "888");
+        renderMockMenu(root, isUnowned)
         return; 
     }
 
@@ -145,18 +146,33 @@ async function viewRestaurant(restaurantId) {
  * --- MOCK MENU RENDERER ---
  * Hardcoded restaurant page for the demo 'Golden Trident'.
  */
-function renderMockMenu(root) {
+function renderMockMenu(root, isUnowned = false) {
     window.scrollTo(0, 0);
+    const restaurantId = isUnowned ? 888 : 999;
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+   
     root.innerHTML = `
         <div class="restaurant-page">
             <header class="res-hero">
                 <button class="view-btn" onclick="renderHomepage()">← Back to Home</button>
+                <div class="owner-controls">
+                    ${isUnowned ? 
+                        `<button class="claim-btn" onclick="handleClaim(${restaurantId})">⚓ Claim Ownership</button>` : 
+                        `<button class="edit-btn" onclick="openOwnerDashboard(${restaurantId})">⚙️ Manage Restaurant</button>`}
+                </div>
                 <h1>The Golden Trident</h1>
                 <div class="res-meta">
                     <span>⭐ 4.9 (Demo)</span>
                     <span>📍 123 Kelowna Way</span>
                     <span>🕒 0:00 - 24:00</span>
                 </div>
+
+                <h1>${isUnowned ? 'The Abandoned Anchor' : 'The Golden Trident'}</h1>
+                <div class="res-meta">
+                    <span>⭐ ${isUnowned ? 'No ratings' : '4.9 (Demo)'}</span>
+                    <span>📍 ${isUnowned ? 'Ghost Ship Bay' : '123 Kelowna Way'}</span>
+                    <span>🕒 0:00 - 24:00</span>
+                </div
             </header>
 
             <div class="menu-container">
@@ -203,6 +219,13 @@ function renderMockMenu(root) {
                     </div>
                 </div>
             </div>
+
+            <section class="reviews-section">
+                <h2>Reviews</h2>
+                <div id="review-submission-area">
+                    ${renderReviewForm(restaurantId, 'DEMO-123')}
+                </div>
+            </section>
         </div>
     `;
 }
@@ -247,6 +270,13 @@ function renderReviewForm(restaurantId, orderId) {
  */
 async function submitReview(event, restaurantId, orderId) {
     event.preventDefault();
+
+    // --- 🔱 DEMO BYPASS START ---
+    if (orderId === 'DEMO-123') {
+        alert("🔱 [DEMO MODE] Review accepted! The crew is celebrating your feedback.");
+        viewRestaurant(restaurantId); // Refresh the mock page
+        return;
+    }
 
     const userJson = localStorage.getItem("user");
 
