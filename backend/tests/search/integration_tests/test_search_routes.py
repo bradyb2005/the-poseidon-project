@@ -56,13 +56,18 @@ def test_get_nearby_restaurants_success(client, mock_search_service):
         {"name": "Close Cafe", "distance_km": 1.2},
         {"name": "Far Bistro", "distance_km": 5.5}
     ]
+    mock_search_service.get_homepage_featured.return_value = []
     mock_search_service.get_nearby_restaurants.return_value = mock_nearby
 
     response = client.get("/search/nearby?lat=34.05&lon=-118.24")
 
     assert response.status_code == 200
-    assert len(response.json()) == 2
-    assert response.json()[0]["name"] == "Close Cafe"
+    data = response.json()
+    
+    assert "restaurants" in data
+    assert "items" in data["restaurants"]
+    assert len(data["restaurants"]["items"]) == 2
+    assert data["restaurants"]["items"][0]["name"] == "Close Cafe"
 
     mock_search_service.get_nearby_restaurants.assert_called_once_with(34.05, -118.24)
 

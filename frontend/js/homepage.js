@@ -22,7 +22,7 @@ async function renderHomepage() {
         if (pos) {
             const { latitude, longitude } = pos.coords;
             // If we have location, hit the nearby endpoint instead
-            nearbyUrl = `http://localhost:8000/search/nearby?lat=${latitude}&lng=${longitude}`;
+            nearbyUrl = `http://localhost:8000/search/nearby?lat=${latitude}&lon=${longitude}`;
         }
 
         const response = await fetch(nearbyUrl);
@@ -42,7 +42,7 @@ async function renderHomepage() {
                 price: "18.50",
                 item_name: "Trident Tuna Steak",
                 tags: ["Premium"],
-                rating: null, // No reviews for this one
+                rating: null,
                 reviewCount: 0,
                 topReview: null
             },
@@ -54,14 +54,26 @@ async function renderHomepage() {
         } else if (data.featured && typeof data.featured === 'object' && data.featured.item_name) {
             featuredItems = [data.featured];
         } else {
-            featuredItems = mockItems; // Fallback to mock so it's never undefined
+            featuredItems = mockItems;
         }
 
-        const restaurantItems = (data.restaurants && Array.isArray(data.restaurants.items)) 
-            ? data.restaurants.items 
-            : [];
+        let restaurantItems = [];
+        if (data.restaurants && Array.isArray(data.restaurants.items)) {
+            restaurantItems = data.restaurants.items;
+        } else if (Array.isArray(data.restaurants)) {
+            restaurantItems = data.restaurants;
+        } else {
+                restaurantItems = [
+                    {
+                        id: 999,
+                        name: "The Golden Trident",
+                        _address: "123 Kelowna Way",
+                        _open_time: 0,
+                        _close_time: 24
+                    }
+            ];
+        }
         
-        // Calculate current time to show Open/Closed status
         const currentHour = new Date().getHours();
 
         root.innerHTML = `
@@ -72,6 +84,7 @@ async function renderHomepage() {
                     ${JSON.parse(localStorage.getItem("user")) ? `
                         <span>👤 ${JSON.parse(localStorage.getItem("user")).username}</span>
                         <a href="#" onclick="renderNotifications()">Notifications</a>
+                        ${JSON.parse(localStorage.getItem("user")).is_admin ? `<a href="#" onclick="renderAdmin()">🔱 Admin</a>` : ''}
                         <a href="#" onclick="handleLogout()">Log out</a>
                     ` : `
                         <a href="#" onclick="renderLogin()">Log In</a>
@@ -130,7 +143,6 @@ async function renderHomepage() {
                     <h2>Popular Restaurants</h2>
                     <div class="res-grid">
                         ${restaurantItems.map(res => {
-                            // Determine if restaurant is currently open
                             const isOpen = currentHour >= res._open_time && currentHour < res._close_time;
                             const statusClass = isOpen ? 'status-open' : 'status-closed';
                             const statusText = isOpen ? 'Open Now' : 'Closed';
@@ -164,12 +176,9 @@ async function renderHomepage() {
                 <button onclick="renderHomepage()">Try Again</button>
             </div>
         `;
-
     }
 }
-/**
-Search and Navbar logic
- */
+
 async function handleSearch(event, tag = null) {
     if (event) event.preventDefault();
 
@@ -187,8 +196,6 @@ async function handleSearch(event, tag = null) {
     }
 }
 
-
-// Add a shadow to the navbar when scrolling
 window.addEventListener('scroll', () => {
     const nav = document.querySelector('.navbar');
     if (nav) {

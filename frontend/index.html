@@ -15,12 +15,12 @@
             
             <div class="nav-links">
                 <a href="#" onclick="renderHomepage()">Home</a>
+                <a href="#" onclick="renderCartPage()">Cart</a>
                 <a href="#" onclick="alert('Orders coming soon!')">Orders</a>
 
                 <!-- ✅ ADDED -->
                 <a href="#" onclick="renderDeliveryPage()">Delivery</a>
                 <a href="#" onclick="renderPaymentPage()">Payment</a>
-                <a href="#" onclick="renderLogin()">Login</a>
 
                 <button class="nav-auth-btn" id="auth-btn" onclick="handleAuthAction()">Login</button>
             </div>
@@ -41,6 +41,7 @@
     <script src="js/search.js"></script>
     <script src="js/delivery.js"></script>
     <script src="js/payment.js"></script>
+    <script src="js/cart.js"></script>
 
     <script>
         // Start the app on the homepage
@@ -62,11 +63,12 @@
         function handleAuthAction() {
             if (localStorage.getItem("user")) {
                 localStorage.removeItem("user");
-                window.location.href = "login.html";
+                updateNav();
+                renderHomepage();
             } else {
-                window.location.href = "login.html";
+                renderLogin();
             }
-        }
+}
     </script>
 </body>
 </html>

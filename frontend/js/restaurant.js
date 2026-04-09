@@ -4,6 +4,13 @@ async function viewRestaurant(restaurantId) {
     const root = document.getElementById('app-root');
     const user = JSON.parse(localStorage.getItem("user")) || {};
     
+    // --- DEMO INTERCEPTOR ---
+    // Demo working menu
+    if (restaurantId === 999 || restaurantId === "999") {
+        renderMockMenu(root);
+        return; 
+    }
+
     root.innerHTML = `
         <div class="loading-container">
             <div class="spinner"></div>
@@ -128,6 +135,72 @@ async function viewRestaurant(restaurantId) {
             </div>
         `;
     }
+}
+
+/**
+ * --- MOCK MENU RENDERER ---
+ * Hardcoded restaurant page for the demo 'Golden Trident'.
+ */
+function renderMockMenu(root) {
+    window.scrollTo(0, 0);
+    root.innerHTML = `
+        <div class="restaurant-page">
+            <header class="res-hero">
+                <button class="view-btn" onclick="renderHomepage()">← Back to Home</button>
+                <h1>The Golden Trident</h1>
+                <div class="res-meta">
+                    <span>⭐ 4.9 (Demo)</span>
+                    <span>📍 123 Kelowna Way</span>
+                    <span>🕒 0:00 - 24:00</span>
+                </div>
+            </header>
+
+            <div class="menu-container">
+                <h2>Menu (Demo Mode)</h2>
+                <div class="menu-grid">
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h3>Kraken Calamari</h3>
+                            <span class="price">$14.50</span>
+                        </div>
+                        <p class="description">Freshly caught and lightly breaded with Poseidon's secret spices.</p>
+                        <div class="item-footer">
+                            <div class="tags"><span class="tag">Signature</span><span class="tag">Fresh</span></div>
+                            <button class="add-to-cart-btn" onclick="addToCart('m1', 'Kraken Calamari', 14.50)">
+                                Add to Order
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="menu-item item-unavailable">
+                        <div class="item-header">
+                            <h3>Poseidon's Platter (Sold Out)</h3>
+                            <span class="price">$22.99</span>
+                        </div>
+                        <p class="description">A massive feast of the ocean's finest treasures.</p>
+                        <div class="item-footer">
+                            <div class="tags"><span class="tag">Premium</span></div>
+                            <button class="add-to-cart-btn" disabled>Sold Out</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h3>Seaweed Salad</h3>
+                            <span class="price">$8.00</span>
+                        </div>
+                        <p class="description">Crispy, chilled seaweed with sesame dressing.</p>
+                        <div class="item-footer">
+                            <div class="tags"><span class="tag">Vegan</span></div>
+                            <button class="add-to-cart-btn" onclick="addToCart('m3', 'Seaweed Salad', 8.00)">
+                                Add to Order
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 /**
@@ -354,9 +427,27 @@ async function updateItemPrice(restaurantId, itemId) {
 }
 
 
-/**
- * --- HELPER: CART PLACEHOLDER ---
- */
-function addToCart(itemId, name, price) {
+
+async function addToCart(itemId, name, price) {
+    try {
+        
+        const customerId = "test_user_1"; 
+
+        const response = await fetch(`http://localhost:8000/cart/${customerId}/items`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                menu_item_id: itemId,
+                quantity: 1
+            })
+        });
+
+        if (!response.ok) {
+            console.error("Backend failed to add item");
+        }
+    } catch (error) {
+        console.error("Network error trying to add to cart:", error);
+    }
+
     alert(`Added ${name} ($${parseFloat(price).toFixed(2)}) to your order!`);
 }
