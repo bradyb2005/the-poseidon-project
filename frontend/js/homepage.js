@@ -57,40 +57,34 @@ async function renderHomepage() {
             featuredItems = mockItems; // Fallback to mock so it's never undefined
         }
 
+        const demoMocks = [
+            {
+                id: 999,
+                name: "The Golden Trident",
+                _address: "123 Kelowna Way",
+                _open_time: 0,
+                _close_time: 24,
+                owner_id: 1 // Already owned for review demo
+            },
+            {
+                id: 888,
+                name: "The Abandoned Anchor",
+                _address: "Ghost Ship Bay",
+                _open_time: 10,
+                _close_time: 22,
+                owner_id: null, // Trigger claim button demo
+                is_published: false
+            }
+        ];
+
         let restaurantItems = [];
-        if (data.restaurants && Array.isArray(data.restaurants.items)) {
-            restaurantItems = data.restaurants.items;
-        } else if (Array.isArray(data.restaurants)) {
-            restaurantItems = data.restaurants;
-        } else {
-                restaurantItems = [
-                    {
-                        id: 999,
-                        name: "The Golden Trident",
-                        _address: "123 Kelowna Way",
-                        _open_time: 0,
-                        _close_time: 24,
-                        owner_id: 1
-                    },
-                    {
-                        id: 888,
-                        name: "The Abandoned Anchor",
-                        _address: "Ghost Ship Bay",
-                        _open_time: 10,
-                        _close_time: 22,
-                        owner_id: null,
-                        is_published: false
-        }
-            ];
-        }
 
         if (data.restaurants && Array.isArray(data.restaurants.items)) {
-            
             restaurantItems = [...demoMocks, ...data.restaurants.items];
         } else if (Array.isArray(data.restaurants)) {
             restaurantItems = [...demoMocks, ...data.restaurants];
         } else {
-            restaurantItems = demoMocks;
+            restaurantItems = demoMocks; // Fallback if backend is totally empty
         }
         
         // Calculate current time to show Open/Closed status
