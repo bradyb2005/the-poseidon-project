@@ -105,14 +105,15 @@ class SearchService:
 
         return self._paginate(featured_items, page, self.DEFAULT_FEATURE_LIMIT)
 
-    def browse_homepage(self, page: int = 1, limit: int = 20) -> Dict:
+    def browse_homepage(self, page: int = 1, limit: int = 20, include_unpublished: bool = False) -> Dict:
         """
+        MODIFIED: Added a flag to show ALL restaurants for demo purposes.
         Feat3-FR3: Returns all published restaurants for the homepage list.
         """
         all_res = [
             res.model_dump(by_alias=True) 
             for res in self.restaurant_repo.load_all() 
-            if res.is_published
+            if res.is_published or include_unpublished
         ]
 
         return self._paginate(all_res, page, limit)

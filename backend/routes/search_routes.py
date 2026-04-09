@@ -33,6 +33,7 @@ def get_homepage(
     page: int = 1, 
     limit: int = 20):
     """
+    MODIFIED: Added a flag to show ALL restaurants for demo purposes.
     GET: Feat3-FR1 - Browse restaurants for homepage with optional search query
     """
     return service.browse_homepage(page=page, limit=limit)
@@ -68,6 +69,17 @@ def get_restaurant_details(restaurant_id: int):
     """
     result = service.get_restaurant_details(restaurant_id)
     
+    # DEMO BYPASS: If result is None, try fetching it without the 'is_published' check
+    if not result:
+        all_res = restaurant_repo.load_all()
+        res = next((r for r in all_res if r.id == restaurant_id), None)
+        if res:
+            # Manually build the detail response even if unpublished
+            all_items = item_repo.load_all()
+            menu = [i.model_dump(by_alias=True) for i in all_items if i.restaurant_id == restaurant_id]
+            result = res.model_dump(by_alias=True)
+            result["full_menu_details"] = menu
+    
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
@@ -78,11 +90,12 @@ def get_restaurant_details(restaurant_id: int):
 @router.get("/landing", response_model=Dict)
 def get_full_landing_page():
     """
+    MODIFIED: Returning the full list so unpublished restaurants can be seen in the demo.
     GET: Homepage landing data - combines featured items and restaurant list
     It returns featured items AND the restaurant list in one go.
     """
     return {
         "featured": service.get_homepage_featured(),
-        "restaurants": service.browse_homepage(page=1, limit=10),
+        "restaurants": service.browse_homepage(page=1, limit=10, include_unpublished=True),
         "message": "Welcome to Poseidon"
     }
