@@ -63,6 +63,8 @@ def login_user(request: LoginRequest):
                 "id": user["id"],
                 "username": user["username"],
                 "email": user["email"],
+                "is_admin": user.get("is_admin", False),
+                "role": user.get("role", "customer"),
             },
         }
     except ValueError as e:
@@ -79,4 +81,5 @@ def forgot_password(request: ForgotPasswordRequest):
         return {"message": "password reset successfully"}
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    
     
