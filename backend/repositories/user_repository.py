@@ -32,3 +32,8 @@ class UserRepository:
 
         with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(users, f, indent=2)
+
+    def find_by_id(self, target_id: str) -> Optional[Dict]:
+        """Fetches all records, but only returns the single matched item."""
+        all_records = self.load_all()
+        return next((item for item in all_records if item.get("id") == target_id), None)

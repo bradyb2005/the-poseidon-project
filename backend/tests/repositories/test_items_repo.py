@@ -2,7 +2,7 @@
 import json
 from decimal import Decimal
 from uuid import uuid4
-from unittest.mock import mock_open, patch
+from unittest.mock import MagicMock, mock_open, patch
 from backend.repositories.items_repository import ItemRepository
 from backend.schemas.items_schema import MenuItem
 
@@ -92,3 +92,41 @@ def test_save_all_serialization(mock_file):
     assert '"item_name": "Briyani rice"' in written_content
     assert f'"id": "{str(item_uuid)}"' in written_content
     assert '"price": "15.50"' in written_content
+
+@patch.object(ItemRepository, 'load_all')
+def test_find_by_id_success(mock_load_all):
+    """
+    Positive Functional Test
+    Verifies that find_by_id correctly returns the matching item.
+    """
+    repo = ItemRepository()
+    
+    mock_item_1 = MagicMock()
+    mock_item_1.item_id = "target-item"
+    
+    mock_item_2 = MagicMock()
+    mock_item_2.item_id = "other-item"
+
+    mock_load_all.return_value = [mock_item_1, mock_item_2]
+
+    result = repo.find_by_id("target-item")
+
+    assert result == mock_item_1
+
+
+@patch.object(ItemRepository, 'load_all')
+def test_find_by_id_not_found(mock_load_all):
+    """
+    Negative Functional Test
+    Verifies that find_by_id returns None when the target ID does not exist.
+    """
+    repo = ItemRepository()
+    
+    mock_item = MagicMock()
+    mock_item.item_id = "target-item"
+
+    mock_load_all.return_value = [mock_item]
+
+    result = repo.find_by_id("non-existent-item")
+
+    assert result is None

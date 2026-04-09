@@ -20,3 +20,8 @@ class OrderRepository:
         """Takes a list of order dictionaries and writes them to the JSON file."""
         with open(self.file_path, 'w') as file:
             json.dump(orders, file, indent=4, default=str)
+
+    def find_by_id(self, target_id: str):
+        """Fetches all records, but only returns the single matched item."""
+        all_records = self.load_all()
+        return next((item for item in all_records if item.get("id") == target_id), None)

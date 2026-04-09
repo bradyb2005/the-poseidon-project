@@ -1,4 +1,5 @@
 # backend/tests/reviews/unit_tests/test_review_service.py
+from backend.schemas.payment_schema import CostBreakdown
 import pytest
 from unittest.mock import MagicMock
 from datetime import datetime, timedelta
@@ -15,12 +16,14 @@ def test_submit_review_success(review_service, mock_review_repo, mock_order_repo
     """
     mock_order_repo.load_all.return_value = [
         Order(id=valid_uuids["item_1"], status=OrderStatus.COMPLETED, restaurant_id=1, customer_id="cust-10",
-                items=[], 
-                delivery_latitude=49.88, 
-                delivery_longitude=-119.49, 
-                delivery_postal_code="V1V 1V1", 
-                cost_breakdown=0,
-                order_date="2026-04-08T12:00:00")
+              items=[], 
+            delivery_latitude=49.88, 
+            delivery_longitude=-119.49, 
+            delivery_postal_code="V1V 1V1", 
+            cost_breakdown=CostBreakdown(
+                subtotal=10.0, delivery_fee=5.0, service_fee=1.0, tax=0.80, total=16.80
+            ),
+            order_date="2026-04-08T12:00:00")
     ]
     mock_review_repo.load_all.return_value = []
     
@@ -39,7 +42,7 @@ def test_submit_review_order_not_found(review_service, mock_order_repo, valid_uu
     Ensures submitting a review for a non-existent order returns 404.
     """
     mock_order_repo.load_all.return_value = []
-    review_in = ReviewCreate(order_id=valid_uuids["item_3"], restaurant_id=1, customer_id="c1", rating=5)
+    review_in = ReviewCreate(order_id=valid_uuids["item_1"], restaurant_id=1, customer_id="c1", rating=5)
 
     result, status = review_service.submit_review(review_in) 
     
@@ -51,15 +54,16 @@ def test_submit_review_order_not_completed(review_service, mock_order_repo, vali
     Ensures reviews are blocked if the order status is not 'completed'.
     """
     mock_order_repo.load_all.return_value = [
-        Order(id=valid_uuids["item_2"], status=OrderStatus.PENDING, restaurant_id=1, customer_id="c1",
-              items=[], 
-                delivery_latitude=49.88, 
-                delivery_longitude=-119.49, 
-                delivery_postal_code="V1V 1V1", 
-                cost_breakdown=0,
-                order_date="2026-04-08T12:00:00")
+        Order(id=valid_uuids["item_1"], status=OrderStatus.PENDING, restaurant_id=1, customer_id="c1",items=[], 
+            delivery_latitude=49.88, 
+            delivery_longitude=-119.49, 
+            delivery_postal_code="V1V 1V1", 
+            cost_breakdown=CostBreakdown(
+                subtotal=10.0, delivery_fee=5.0, service_fee=1.0, tax=0.80, total=16.80
+            ),
+            order_date="2026-04-08T12:00:00")
     ]
-    review_in = ReviewCreate(order_id=valid_uuids["item_2"], restaurant_id=1, customer_id="c1", rating=5)
+    review_in = ReviewCreate(order_id=valid_uuids["item_1"], restaurant_id=1, customer_id="c1", rating=5)
 
     result, status = review_service.submit_review(review_in)
 
@@ -71,17 +75,19 @@ def test_submit_review_duplicate_check(review_service, mock_review_repo, mock_or
     Equivalence Partitioning
     Ensures only one review per order id is permitted.
     """
-    target_order_id = valid_uuids["item_3"]
+    target_order_id = valid_uuids["item_1"]
     sample_review.order_id = target_order_id 
 
     mock_order_repo.load_all.return_value = [
         Order(id=target_order_id, status=OrderStatus.COMPLETED, restaurant_id=1, customer_id="cust-10",
-                items=[], 
-                delivery_latitude=49.88, 
-                delivery_longitude=-119.49, 
-                delivery_postal_code="V1V 1V1", 
-                cost_breakdown=0,
-                order_date="2026-04-08T12:00:00")
+              items=[], 
+            delivery_latitude=49.88, 
+            delivery_longitude=-119.49, 
+            delivery_postal_code="V1V 1V1", 
+            cost_breakdown=CostBreakdown(
+                subtotal=10.0, delivery_fee=5.0, service_fee=1.0, tax=0.80, total=16.80
+            ),
+            order_date="2026-04-08T12:00:00")
     ]
     
     mock_review_repo.load_all.return_value = [sample_review]

@@ -1,20 +1,14 @@
 from decimal import Decimal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
-from uuid import UUID
+from uuid import UUID, uuid4
 
 class OrderItem(BaseModel):
-    menu_item_id: UUID
+    menu_item_id: UUID = Field(default_factory=uuid4)
     quantity: int
     price_at_time: Decimal
-
-class OrderItemCreate(BaseModel):
-    menu_item_id: UUID
-    quantity: int
-
-class OrderItemUpdate(BaseModel):
-    new_quantity: int
+>>>>>>>>> Temporary merge branch 2
 
 class Cart(BaseModel):
     customer_id: str

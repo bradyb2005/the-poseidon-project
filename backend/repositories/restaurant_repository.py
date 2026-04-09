@@ -3,7 +3,7 @@ import json
 import os
 from pathlib import Path
 from dataclasses import asdict
-from typing import List
+from typing import List, Optional
 from backend.schemas.restaurant_schema import Restaurant
 
 
@@ -47,3 +47,8 @@ class RestaurantRepository:
             return True
         except (IOError, TypeError):
             return False
+        
+    def find_by_id(self, target_id: str) -> Optional[Restaurant]:
+        """Fetches all records, but only returns the single matched item."""
+        all_records = self.load_all()
+        return next((item for item in all_records if str(item.id) == str(target_id)), None)

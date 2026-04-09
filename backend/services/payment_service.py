@@ -14,16 +14,16 @@ class PaymentService:
         Assumes order has:
         - order.items → list of items
         Each item has:
-        - price
+        - price_at_time
         - quantity
         """
         self._validate_order(order)
 
         subtotal = 0.0
 
-        for item in order.items:
+        for item in order.get("items", []):
             self._validate_item(item)
-            subtotal += item.price * item.quantity
+            subtotal += item.get("price_at_time") * item.get("quantity")
 
         return round(subtotal, 2)
 
@@ -115,19 +115,19 @@ class PaymentService:
             raise ValueError("order must have items")
 
     def _validate_item(self, item: Any) -> None:
-        if not hasattr(item, "price") or not hasattr(item, "quantity"):
-            raise ValueError("item must have price and quantity")
+        if "price_at_time" not in item or "quantity" not in item:
+            raise ValueError("item must have price_at_time and quantity")
 
-        if not isinstance(item.price, (int, float)):
+        if not isinstance(item["price_at_time"], (int, float)):
             raise ValueError("item price must be a number")
 
-        if not isinstance(item.quantity, int):
+        if not isinstance(item["quantity"], int):
             raise ValueError("item quantity must be an integer")
 
-        if item.price < 0:
+        if item["price_at_time"] < 0:
             raise ValueError("item price cannot be negative")
 
-        if item.quantity <= 0:
+        if item["quantity"] <= 0:
             raise ValueError("item quantity must be positive")
 
     def _validate_subtotal(self, subtotal: float) -> None:
