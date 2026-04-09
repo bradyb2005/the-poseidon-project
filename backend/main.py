@@ -7,6 +7,8 @@ from backend.routes.admin_router import router as admin_router   # ADD THIS
 from backend.routes.payment_router import router as payment_router
 from backend.routes.delivery_router import router as delivery_router
 from backend.routes.review_routes import router as review_router
+from backend.routes.cart_router import router as cart_router
+from backend.routes.order_router import router as order_router
 from fastapi.middleware.cors import CORSMiddleware
 from backend.routes.items_routes import router as items_routes
 from backend.routes.user_routes import router as user_router
@@ -30,6 +32,8 @@ app.include_router(payment_router)
 app.include_router(delivery_router)
 app.include_router(review_router)
 app.include_router(items_routes)
+app.include_router(cart_router)
+app.include_router(order_router)
 
 @app.get("/")
 def root():

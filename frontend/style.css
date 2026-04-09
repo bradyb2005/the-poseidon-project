@@ -352,3 +352,79 @@ body {
   text-align: center;
   border: 1px solid #ffeeba;
 }
+
+.page-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.section {
+  margin-bottom: 25px;
+}
+
+.section h3 {
+  margin-bottom: 10px;
+}
+
+.section input,
+.section select {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.section button {
+  background: #4f8ef7;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.section button:hover {
+  background: #3a7de0;
+}
+
+.delivery-card {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px 0;
+  background: white;
+}
+
+.delivery-card p {
+  margin: 4px 0;
+}
+
+.result-box {
+  margin-top: 10px;
+  padding: 10px;
+  background: #eef2ff;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.message-box {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.message-box.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.message-box.error {
+  background: #f8d7da;
+  color: #721c24;
+}

@@ -10,14 +10,12 @@ def test_order_create_success():
     payload = {
         "customer_id": "user_55",
         "restaurant_id": 10,
-        "items": [{"menu_item_id": "11111111-1111-1111-1111-111111111111", "quantity": 1, "price_at_time": 9.99}],
         "delivery_latitude": 49.88,
         "delivery_longitude": -119.49,
         "delivery_postal_code": "V1V 1V1"
     }
     order = OrderCreate(**payload)
     assert order.customer_id == "user_55"
-    assert len(order.items) == 1
 
 def test_order_create_missing_coordinates():
     """Tests that missing attributes raise a ValidationError."""
@@ -25,7 +23,6 @@ def test_order_create_missing_coordinates():
         OrderCreate(
             customer_id="test_customer",
             restaurant_id=10,
-            items=[{"menu_item_id": 1, "quantity": 1}],
             delivery_postal_code="V1V 1V1"
             # Missing lat/long
         )

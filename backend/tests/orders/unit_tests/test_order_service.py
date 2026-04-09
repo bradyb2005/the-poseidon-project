@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 from fastapi import HTTPException
 from backend.services.order_service import OrderService, OrderValidate
-from backend.schemas.order_schema import OrderCreate, OrderStatus, OrderItem, OrderUpdate
+from backend.schemas.order_schema import OrderCreate, OrderStatus, OrderUpdate
 
 # --- Validator Tests ---
 

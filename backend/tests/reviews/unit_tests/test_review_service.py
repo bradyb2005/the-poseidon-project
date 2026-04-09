@@ -20,9 +20,9 @@ def test_submit_review_success(review_service, mock_review_repo, mock_order_repo
             delivery_latitude=49.88, 
             delivery_longitude=-119.49, 
             delivery_postal_code="V1V 1V1", 
-            cost_breakdown=CostBreakdown(
-                subtotal=10.0, delivery_fee=5.0, service_fee=1.0, tax=0.80, total=16.80
-            ),
+            cost_breakdown= {
+                 "_subtotal": 10.0, "_delivery_fee": 5.0, "_service_fee": 1.0, "_tax": 0.80, "_total": 16.80
+            },
             order_date="2026-04-08T12:00:00")
     ]
     mock_review_repo.load_all.return_value = []
@@ -58,9 +58,9 @@ def test_submit_review_order_not_completed(review_service, mock_order_repo, vali
             delivery_latitude=49.88, 
             delivery_longitude=-119.49, 
             delivery_postal_code="V1V 1V1", 
-            cost_breakdown=CostBreakdown(
-                subtotal=10.0, delivery_fee=5.0, service_fee=1.0, tax=0.80, total=16.80
-            ),
+            cost_breakdown= {
+                "_subtotal": 10.0, "_delivery_fee": 5.0, "_service_fee": 1.0, "_tax": 0.80, "_total": 16.80
+            },
             order_date="2026-04-08T12:00:00")
     ]
     review_in = ReviewCreate(order_id=valid_uuids["item_1"], restaurant_id=1, customer_id="c1", rating=5)
@@ -84,9 +84,9 @@ def test_submit_review_duplicate_check(review_service, mock_review_repo, mock_or
             delivery_latitude=49.88, 
             delivery_longitude=-119.49, 
             delivery_postal_code="V1V 1V1", 
-            cost_breakdown=CostBreakdown(
-                subtotal=10.0, delivery_fee=5.0, service_fee=1.0, tax=0.80, total=16.80
-            ),
+            cost_breakdown= {
+                "_subtotal": 10.0, "_delivery_fee": 5.0, "_service_fee": 1.0, "_tax": 0.80, "_total": 16.80
+            },
             order_date="2026-04-08T12:00:00")
     ]
     
