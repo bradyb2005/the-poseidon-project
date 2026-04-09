@@ -13,6 +13,8 @@ from backend.repositories.items_repository import ItemRepository
 from backend.repositories.restaurant_repository import RestaurantRepository
 from backend.services.payment_service import PaymentService
 from backend.schemas.payment_schema import CostBreakdown
+from backend.services.loyalty_service import LoyaltyService
+from backend.schemas.loyalty_schema import LoyaltyTier, LoyaltyConfig
 
 
 class OrderValidate:
@@ -47,6 +49,8 @@ class OrderService:
         self.user_repository = user_repository
         self.items_repository = items_repository
         self.restaurant_repository = restaurant_repository
+        self.loyalty_service = LoyaltyService()
+
 
     def generate_order_id(self) -> str:
         """Generates 6 random hex chars + 1 random uppercase letter. (to follow ID structure in example data)"""
@@ -103,6 +107,10 @@ class OrderService:
             tax=fees["tax"],
             total=total.total
         )
+        # Apply the tier benefits (Discounts/Fee Waivers)
+        user_tier = user.get("loyalty_tier", "Bronze")
+        cost_breakdown_dict = cost_breakdown.model_dump(by_alias=True)
+        points_earned = self.loyalty_service.calculate_earned_points(cost_breakdown_dict["_subtotal"])
 
         new_order_data = {
             "id": id,
@@ -114,7 +122,8 @@ class OrderService:
             "delivery_latitude": lat,
             "delivery_longitude": lon,
             "delivery_postal_code": pc,
-            "cost_breakdown": cost_breakdown.model_dump(by_alias=True)
+            "cost_breakdown": cost_breakdown.model_dump(by_alias=True),
+            "loyalty_points_earned": points_earned
         }
         
         if payload.delivery_address:
@@ -157,6 +166,23 @@ class OrderService:
                 current_order["delivery_postal_code"] = OrderValidate.validate_delivery_postal_code(payload.delivery_postal_code)
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
+
+        if payload.status == OrderStatus.COMPLETED:
+            customer_id = current_order.get("customer_id")
+            users = self.user_repository.load_all()
+            
+            for u in users:
+                if u.get("id") == customer_id:
+                    order_subtotal = current_order.get("cost_breakdown", {}).get("_subtotal", 0.0)
+                    earned_points = self.loyalty_service.calculate_earned_points(order_subtotal)
+                    
+                    new_total_points = u.get("loyalty_points", 0) + earned_points
+                    u["loyalty_points"] = new_total_points
+                    
+                    u["loyalty_tier"] = self.loyalty_service.evaluate_tier(new_total_points)
+                    break
+            
+            self.user_repository.save_all(users)
 
         orders = self.repository.load_all()
         for i, o in enumerate(orders):
