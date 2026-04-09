@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": "1",
+    "username": "anjanaubc",
+    "email": "anjanaubc@gmail.com",
+    "password_hash": "$2b$12$MMUvnp146pWzyi.ntE6V5e08pa/m5nACOzxBj8i37LINKSkptQFw2"
+  },
+  {
+    "id": "2",
+    "username": "anjana8",
+    "email": "anj@gmail",
+    "password_hash": "$2b$12$Mc2eH9iBDXz9ETzTxiIWTuKrFEctFvtiMfiNt9ubLHogniyt8Ftti"
+  },
+  {
+    "id": "3",
+    "username": "anjana9",
+    "email": "anjana@gmail.com",
+    "password_hash": "$2b$12$o6Y2YrpOb5f5MnnPCH7Tteg6Dqsp0rttBK21OgvbU67mnq.5RcWn6"
+  }
+]

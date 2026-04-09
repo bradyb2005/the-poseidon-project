@@ -20,7 +20,6 @@
                 <!-- ✅ ADDED -->
                 <a href="#" onclick="renderDeliveryPage()">Delivery</a>
                 <a href="#" onclick="renderPaymentPage()">Payment</a>
-                <a href="#" onclick="renderLogin()">Login</a>
 
                 <button class="nav-auth-btn" id="auth-btn" onclick="handleAuthAction()">Login</button>
             </div>
@@ -62,11 +61,12 @@
         function handleAuthAction() {
             if (localStorage.getItem("user")) {
                 localStorage.removeItem("user");
-                window.location.href = "login.html";
+                updateNav();
+                renderHomepage();
             } else {
-                window.location.href = "login.html";
+                renderLogin();
             }
-        }
+}
     </script>
 </body>
 </html>
