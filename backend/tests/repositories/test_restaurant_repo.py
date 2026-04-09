@@ -1,6 +1,6 @@
-# backend/tests/restaurant/unit_tests/test_restaurant_repo.py
+# backend/tests/repositories/test_restaurant_repo.py
 import json
-from unittest.mock import mock_open, patch
+from unittest.mock import MagicMock, mock_open, patch
 from backend.repositories.restaurant_repository import RestaurantRepository
 from backend.schemas.restaurant_schema import Restaurant
 
@@ -86,3 +86,40 @@ def test_save_all_serialization(mock_file):
     written_content = "".join(call.args[0] for call in handle.write.call_args_list)
     assert '"id": 10' in written_content
     assert "Grayson's Grill" in written_content
+
+@patch.object(RestaurantRepository, 'load_all')
+def test_find_by_id_success(mock_load_all):
+    """
+    Positive Functional Test
+    Verifies that find_by_id correctly returns the matching restaurant.
+    """
+    repo = RestaurantRepository()
+    
+    mock_rest_1 = MagicMock()
+    mock_rest_1.id = 1 
+    mock_rest_2 = MagicMock()
+    mock_rest_2.id = 2
+
+    mock_load_all.return_value = [mock_rest_1, mock_rest_2]
+
+    result = repo.find_by_id("1")
+
+    assert result == mock_rest_1
+
+
+@patch.object(RestaurantRepository, 'load_all')
+def test_find_by_id_not_found(mock_load_all):
+    """
+    Negative Functional Test
+    Verifies that find_by_id returns None when the target ID does not exist.
+    """
+    repo = RestaurantRepository()
+    
+    mock_rest = MagicMock()
+    mock_rest.id = 1
+
+    mock_load_all.return_value = [mock_rest]
+
+    result = repo.find_by_id("99")
+
+    assert result is None

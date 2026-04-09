@@ -54,7 +54,12 @@ async function handleForgotPassword() {
   if (new_password !== confirm) {
     showMessage(msg, "Passwords do not match.", "error");
     return;
-  }
+}
+
+if (!email.includes("@") || !email.includes(".")) {
+    showMessage(msg, "Please enter a valid email address.", "error");
+    return;
+}
 
   if (new_password.length < 6) {
     showMessage(msg, "Password must be at least 6 characters.", "error");
@@ -73,8 +78,10 @@ async function handleForgotPassword() {
     if (response.ok) {
       showMessage(msg, "Password reset! Redirecting to login...", "success");
       setTimeout(() => renderLogin(), 1500);
+    } else if (response.status === 404) {
+    showMessage(msg, "No account found with that email.", "error");
     } else {
-      showMessage(msg, data.detail || "Reset failed.", "error");
+    showMessage(msg, data.detail || "Reset failed.", "error");
     }
 
   } catch (err) {
