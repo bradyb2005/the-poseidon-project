@@ -16,17 +16,27 @@
             <div class="nav-links">
                 <a href="#" onclick="renderHomepage()">Home</a>
                 <a href="#" onclick="alert('Orders coming soon!')">Orders</a>
+
+                <!-- ✅ ADDED -->
+                <a href="#" onclick="renderDeliveryPage()">Delivery</a>
+                <a href="#" onclick="renderPaymentPage()">Payment</a>
+
                 <button class="nav-auth-btn" id="auth-btn" onclick="handleAuthAction()">Login</button>
             </div>
         </div>
     </nav>
 
     <main id="app-root"></main>
-    <!-- Add your JavaScript files here -->
+
+    <!-- Existing JS -->
     <script src="js/api.js"></script>
     <script src="js/homepage.js"></script>
     <script src="js/restaurant.js"></script>
     <script src="js/search.js"></script>
+
+    <!-- ✅ ADDED -->
+    <script src="js/delivery.js"></script>
+    <script src="js/payment.js"></script>
 
     <script>
         // Start the app on the homepage
