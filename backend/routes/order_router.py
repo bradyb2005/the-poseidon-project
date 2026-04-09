@@ -30,3 +30,19 @@ def update_order(
     service: OrderService = Depends(get_order_service)
 ):
     return service.update_order(order_id, payload)
+
+@router.get("/{order_id}", response_model=Order, status_code=status.HTTP_200_OK)
+def get_order(
+    order_id: str,
+    service: OrderService = Depends(get_order_service)
+):
+    """Retrieve a specific order by its ID."""
+    return service.get_order_by_id(order_id)
+
+@router.get("/user/{customer_id}", response_model=list[Order], status_code=status.HTTP_200_OK)
+def get_user_orders(
+    customer_id: str,
+    service: OrderService = Depends(get_order_service)
+):
+    """Retrieve all orders for a specific customer."""
+    return service.get_orders_by_customer(customer_id)
