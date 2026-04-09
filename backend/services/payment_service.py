@@ -1,4 +1,5 @@
 from typing import Any
+
 from backend.schemas.payment_schema import CostBreakdown, PaymentSchema, PaymentStatus
 
 
@@ -10,12 +11,6 @@ class PaymentService:
     def calculate_subtotal(self, order: Any) -> float:
         """
         Calculates subtotal from order items
-
-        Assumes order has:
-        - order.items → list of items
-        Each item has:
-        - price_at_time
-        - quantity
         """
         self._validate_order(order)
 
@@ -23,7 +18,8 @@ class PaymentService:
 
         for item in order.get("items", []):
             self._validate_item(item)
-            subtotal += item.get("price_at_time") * item.get("quantity")
+            price = item.get("price") if "price" in item else item.get("price_at_time")
+            subtotal += price * item.get("quantity")
 
         return round(subtotal, 2)
 
@@ -104,27 +100,28 @@ class PaymentService:
             "message": "Fulfillment request created successfully",
         }
 
-    # -------------------------
-    # Private helpers
-    # -------------------------
-
     def _validate_order(self, order: Any) -> None:
         if order is None:
             raise ValueError("order cannot be None")
-        if not hasattr(order, "items"):
+        if not isinstance(order, dict) or "items" not in order:
             raise ValueError("order must have items")
 
     def _validate_item(self, item: Any) -> None:
-        if "price_at_time" not in item or "quantity" not in item:
-            raise ValueError("item must have price_at_time and quantity")
+        if "quantity" not in item:
+            raise ValueError("item must have quantity")
 
-        if not isinstance(item["price_at_time"], (int, float)):
+        if "price" not in item and "price_at_time" not in item:
+            raise ValueError("item must have price or price_at_time")
+
+        price = item.get("price") if "price" in item else item.get("price_at_time")
+
+        if not isinstance(price, (int, float)):
             raise ValueError("item price must be a number")
 
         if not isinstance(item["quantity"], int):
             raise ValueError("item quantity must be an integer")
 
-        if item["price_at_time"] < 0:
+        if price < 0:
             raise ValueError("item price cannot be negative")
 
         if item["quantity"] <= 0:

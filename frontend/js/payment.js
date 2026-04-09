@@ -31,13 +31,13 @@ async function calculate() {
   const quantity = parseInt(document.getElementById("quantity").value);
   const calcBox = document.getElementById("calc");
 
-  if (!price || !quantity) {
+  if (isNaN(price) || isNaN(quantity) || price <= 0 || quantity <= 0) {
     calcBox.innerText = "Enter valid price and quantity";
     return;
   }
 
   currentOrder = {
-    items: [{ price_at_time: price, quantity }]
+    items: [{ price, quantity }]
   };
 
   try {
@@ -97,13 +97,38 @@ async function pay() {
     return;
   }
 
+  const cardName = document.getElementById("card_name").value.trim();
+  const cardNumberRaw = document.getElementById("card_number").value.trim();
+  const cvvRaw = document.getElementById("cvv").value.trim();
+  const expiry = document.getElementById("expiry").value.trim();
+
+  if (!cardName || !cardNumberRaw || !cvvRaw || !expiry) {
+    msg.innerText = "Fill in all card fields";
+    return;
+  }
+
+  if (!/^\d{16}$/.test(cardNumberRaw)) {
+    msg.innerText = "Card number must be 16 digits";
+    return;
+  }
+
+  if (!/^\d{3,4}$/.test(cvvRaw)) {
+    msg.innerText = "CVV must be 3 or 4 digits";
+    return;
+  }
+
+  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+    msg.innerText = "Expiry must be in MM/YY format";
+    return;
+  }
+
   const payload = {
     id: Date.now(),
     order: currentOrder,
-    card_name: document.getElementById("card_name").value,
-    card_number: parseInt(document.getElementById("card_number").value),
-    security_number: parseInt(document.getElementById("cvv").value),
-    expiration: document.getElementById("expiry").value,
+    card_name: cardName,
+    card_number: parseInt(cardNumberRaw, 10),
+    security_number: parseInt(cvvRaw, 10),
+    expiration: expiry,
     status: "denied",
     amount: currentTotal
   };
@@ -123,11 +148,18 @@ async function pay() {
     }
 
     if ((data.status ?? data._status) === "accepted") {
-      await fetch(`${API_BASE}/payments/fulfillment`, {
+      const fulfillmentRes = await fetch(`${API_BASE}/payments/fulfillment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
+
+      const fulfillmentData = await fulfillmentRes.json();
+
+      if (!fulfillmentRes.ok) {
+        msg.innerText = JSON.stringify(fulfillmentData);
+        return;
+      }
 
       msg.innerText = "Success 🎉";
     } else {

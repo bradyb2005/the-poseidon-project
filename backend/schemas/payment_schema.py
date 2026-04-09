@@ -68,16 +68,13 @@ class PaymentBase(BaseModel):
     def validate_card_number(cls, value: Optional[int]) -> Optional[int]:
         if value is None:
             return value
-
+        
         value_str = str(value)
-
         if not value_str.isdigit():
             raise ValueError("card_number must be numeric")
-        if len(value_str) != 12:
-            raise ValueError("card_number must be exactly 12 digits")
         if value <= 0:
             raise ValueError("card_number must be positive")
-
+        
         return value
 
     @field_validator("security_number")
