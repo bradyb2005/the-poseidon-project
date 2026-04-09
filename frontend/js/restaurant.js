@@ -354,9 +354,27 @@ async function updateItemPrice(restaurantId, itemId) {
 }
 
 
-/**
- * --- HELPER: CART PLACEHOLDER ---
- */
-function addToCart(itemId, name, price) {
+
+async function addToCart(itemId, name, price) {
+    try {
+        
+        const customerId = "test_user_1"; 
+
+        const response = await fetch(`http://localhost:8000/cart/${customerId}/items`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                menu_item_id: itemId,
+                quantity: 1
+            })
+        });
+
+        if (!response.ok) {
+            console.error("Backend failed to add item");
+        }
+    } catch (error) {
+        console.error("Network error trying to add to cart:", error);
+    }
+
     alert(`Added ${name} ($${parseFloat(price).toFixed(2)}) to your order!`);
 }
