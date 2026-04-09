@@ -42,11 +42,11 @@ class CartService:
             existing_item["quantity"] += quantity
         else:
             new_item = OrderItem(
-                menu_item_id=menu_item_id,
+                menu_item_id=str(menu_item_id),
                 quantity=quantity,
                 price_at_time=menu_item.price 
             )
-            cart_items.append(new_item.model_dump())
+            cart_items.append(new_item.model_dump(mode='json'))
 
         if "cart" not in user:
             user["cart"] = {"customer_id": customer_id, "items": cart_items}
