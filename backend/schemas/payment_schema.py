@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+from datetime import datetime
 from enum import Enum
 from typing import Any, Optional
 
@@ -64,23 +66,61 @@ class PaymentBase(BaseModel):
     @field_validator("card_number")
     @classmethod
     def validate_card_number(cls, value: Optional[int]) -> Optional[int]:
-        if value is not None and value <= 0:
+        if value is None:
+            return value
+
+        value_str = str(value)
+
+        if not value_str.isdigit():
+            raise ValueError("card_number must be numeric")
+        if len(value_str) != 12:
+            raise ValueError("card_number must be exactly 12 digits")
+        if value <= 0:
             raise ValueError("card_number must be positive")
+
         return value
 
     @field_validator("security_number")
     @classmethod
     def validate_security_number(cls, value: Optional[int]) -> Optional[int]:
-        if value is not None and value <= 0:
+        if value is None:
+            return value
+
+        value_str = str(value)
+
+        if not value_str.isdigit():
+            raise ValueError("CVV must be numeric")
+        if len(value_str) not in (3, 4):
+            raise ValueError("CVV must be 3 or 4 digits")
+        if value <= 0:
             raise ValueError("security_number must be positive")
+
         return value
 
     @field_validator("expiration")
     @classmethod
     def validate_expiration(cls, value: Optional[str]) -> Optional[str]:
-        if value is not None and not value.strip():
+        if value is None:
+            return value
+
+        value = value.strip()
+
+        if not value:
             raise ValueError("expiration cannot be blank")
-        return value.strip() if isinstance(value, str) else value
+
+        if not re.match(r"^(0[1-9]|1[0-2])/\d{2}$", value):
+            raise ValueError("expiration must be in MM/YY format")
+
+        month_str, year_str = value.split("/")
+        month = int(month_str)
+        year = int("20" + year_str)
+
+        now = datetime.now()
+
+        if year < now.year or (year == now.year and month < now.month):
+            raise ValueError("card is expired")
+
+        return value
 
     @field_validator("amount")
     @classmethod

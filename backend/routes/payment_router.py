@@ -1,7 +1,7 @@
 # backend/routes/payment_router.py
 from typing import Any, Dict
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Body
 
 from backend.schemas.payment_schema import (
     CostBreakdown,
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 # --- Feature 6: Cost Calculation Methods ---
 
 @router.post("/subtotal", response_model=Dict[str, float], status_code=status.HTTP_200_OK)
-def post_calculate_subtotal(order: Any):
+def post_calculate_subtotal(order: Any = Body(...)):
     """
     POST: Calculate subtotal from an order
     """
@@ -32,7 +32,7 @@ def post_calculate_subtotal(order: Any):
 
 
 @router.post("/fees-taxes", response_model=Dict[str, float], status_code=status.HTTP_200_OK)
-def post_calculate_fees_and_taxes(subtotal: float):
+def post_calculate_fees_and_taxes(subtotal: float = Body(...)):
     """
     POST: Calculate delivery fee, service fee, and tax from subtotal
     """
@@ -46,7 +46,7 @@ def post_calculate_fees_and_taxes(subtotal: float):
 
 
 @router.post("/total", response_model=CostBreakdown, status_code=status.HTTP_200_OK)
-def post_calculate_total(subtotal: float):
+def post_calculate_total(subtotal: float = Body(...)):
     """
     POST: Calculate full cost breakdown from subtotal
     """
@@ -101,5 +101,3 @@ def post_create_fulfillment_request(payload: PaymentSchema):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-
-#router code
