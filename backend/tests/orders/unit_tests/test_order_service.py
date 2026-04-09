@@ -35,6 +35,7 @@ def test_create_order_success(valid_uuids):
     mock_user_repo = MagicMock()
     user_dict = {
         "id": valid_uuids["user_uuid"],
+        "orders": [],
         "cart": {
             "items": [{"menu_item_id": valid_uuids["item_1"], "quantity": 1, "price_at_time": 9.99}]
         }
@@ -75,6 +76,9 @@ def test_create_order_success(valid_uuids):
     assert result.customer_id == valid_uuids["user_uuid"]
     assert result.restaurant_id == 99
     assert result.delivery_postal_code == "V1V 1V1"
+
+    assert result.id in user_dict["orders"] 
+    assert user_dict["cart"]["items"] == []
     
     mock_order_repo.save_all.assert_called_once()
     mock_user_repo.save_all.assert_called_once()

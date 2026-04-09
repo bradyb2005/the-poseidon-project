@@ -54,6 +54,8 @@ class OrderService:
         random_letter = random.choice(string.ascii_uppercase)
         return f"{unique_hex}{random_letter}"
 
+    
+
     def create_order(self, payload: OrderCreate) -> Order:
         payment_service = PaymentService()
         
@@ -127,11 +129,12 @@ class OrderService:
         orders.append(new_order_data)
         self.repository.save_all(orders)
 
-        # Clear user's cart
+        # Clear user's cart and save order to user's order history
         users = self.user_repository.load_all()
         for user in users:
             if user.get("id") == payload.customer_id:
                 user["cart"]["items"] = []
+                user["orders"].append(id)
                 break
         self.user_repository.save_all(users)
         
