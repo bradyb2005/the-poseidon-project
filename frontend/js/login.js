@@ -6,20 +6,21 @@ function renderLogin() {
   root.innerHTML = `
     <div class="card">
       <h1>🔱 Poseidon</h1>
+      <form>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Enter your username">
+        </div>
 
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" placeholder="Enter your username">
-      </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password">
+        </div>
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Enter your password">
-      </div>
+        <button type="submit">Log In</button>
 
-      <button type="submit">Log In</button>
-
-      <div class="message" id="message"></div>
+        <div class="message" id="message"></div>
+      </form>
 
       <div class="link">
         <a href="#" onclick="renderForgotPassword()">Forgot password?</a>
@@ -31,10 +32,10 @@ function renderLogin() {
 
   const form = document.querySelector(".card form");
   if (form) {
-      form.addEventListener("submit", function(e) {
-          e.preventDefault();
-          handleLogin();
-      });
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      handleLogin();
+    });
   }
 }
 
@@ -58,10 +59,13 @@ async function handleLogin() {
     const data = await response.json();
 
     if (response.ok) {
-      localStorage.setItem("user", JSON.stringify(data.user));
-      showMessage(msg, "Login successful! Redirecting...", "success");
-      setTimeout(() => renderHomepage(), 1000);
-    } else {
+    localStorage.setItem("user", JSON.stringify(data.user));
+    showMessage(msg, "Login successful! Redirecting...", "success");
+    setTimeout(() => {
+        updateNav();
+        renderHomepage();
+    }, 1000);
+    }else {
       showMessage(msg, data.detail || "Login failed.", "error");
     }
 
@@ -71,8 +75,8 @@ async function handleLogin() {
 }
 
 function showMessage(el, text, type) {
-    el.textContent = text;
-    el.className = `message ${type}`;
-    el.style.display = "block";
-    el.onclick = () => { el.style.display = "none"; };
+  el.textContent = text;
+  el.className = `message ${type}`;
+  el.style.display = "block";
+  el.onclick = () => { el.style.display = "none"; };
 }
