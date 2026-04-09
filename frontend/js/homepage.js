@@ -83,6 +83,15 @@ async function renderHomepage() {
         }
             ];
         }
+
+        if (data.restaurants && Array.isArray(data.restaurants.items)) {
+            
+            restaurantItems = [...demoMocks, ...data.restaurants.items];
+        } else if (Array.isArray(data.restaurants)) {
+            restaurantItems = [...demoMocks, ...data.restaurants];
+        } else {
+            restaurantItems = demoMocks;
+        }
         
         // Calculate current time to show Open/Closed status
         const currentHour = new Date().getHours();
