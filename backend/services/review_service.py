@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from backend.schemas.review_schema import ReviewCreate, ReviewUpdate, ReviewDisplay
 from backend.repositories.review_repository import ReviewRepository
 from backend.repositories.restaurant_repository import RestaurantRepository
-from backend.repositories.order_repository import OrderRepository
+from backend.repositories.order_repo import OrderRepository
 
 class ReviewService:
     def __init__(

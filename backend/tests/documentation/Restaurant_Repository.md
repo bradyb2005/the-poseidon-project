@@ -11,3 +11,8 @@ We have an invalid equivalence test with an missing input classs that tries to l
 We have a fault injection test that also handles exceptions by using a corrupted JSON file and ensures that it throws the proper error
 
 We have a functionality test that ensures we can correctly write data into the file.
+
+--Added later:--
+Find by ID tests have been added, one positive and negative functional test.
+
+![1775681307407](image/Restaurant_Repository/1775681307407.png)

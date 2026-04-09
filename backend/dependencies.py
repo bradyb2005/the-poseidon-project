@@ -5,7 +5,6 @@ from backend.services.restaurant_service import RestaurantService
 from backend.services.item_service import MenuService
 
 # Initialize Repositories
-# These point to your actual JSON data files
 restaurant_repo = RestaurantRepository("backend/data/restaurants.json")
 item_repo = ItemRepository("backend/data/items.json") 
 
