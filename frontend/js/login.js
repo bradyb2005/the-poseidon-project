@@ -17,7 +17,7 @@ function renderLogin() {
         <input type="password" id="password" placeholder="Enter your password">
       </div>
 
-      <button onclick="handleLogin()">Log In</button>
+      <button type="submit">Log In</button>
 
       <div class="message" id="message"></div>
 
@@ -29,9 +29,13 @@ function renderLogin() {
     </div>
   `;
 
-  document.addEventListener("keydown", function onEnter(e) {
-    if (e.key === "Enter") handleLogin();
-  });
+  const form = document.querySelector(".card form");
+  if (form) {
+      form.addEventListener("submit", function(e) {
+          e.preventDefault();
+          handleLogin();
+      });
+  }
 }
 
 async function handleLogin() {
@@ -56,7 +60,7 @@ async function handleLogin() {
     if (response.ok) {
       localStorage.setItem("user", JSON.stringify(data.user));
       showMessage(msg, "Login successful! Redirecting...", "success");
-      setTimeout(() => renderNotifications(), 1000);
+      setTimeout(() => renderHomepage(), 1000);
     } else {
       showMessage(msg, data.detail || "Login failed.", "error");
     }
@@ -67,7 +71,8 @@ async function handleLogin() {
 }
 
 function showMessage(el, text, type) {
-  el.textContent = text;
-  el.className = `message ${type}`;
-  el.style.display = "block";
+    el.textContent = text;
+    el.className = `message ${type}`;
+    el.style.display = "block";
+    el.onclick = () => { el.style.display = "none"; };
 }
