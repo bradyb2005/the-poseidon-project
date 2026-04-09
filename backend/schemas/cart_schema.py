@@ -8,7 +8,6 @@ class OrderItem(BaseModel):
     menu_item_id: UUID = Field(default_factory=uuid4)
     quantity: int
     price_at_time: Decimal
->>>>>>>>> Temporary merge branch 2
 
 class Cart(BaseModel):
     customer_id: str

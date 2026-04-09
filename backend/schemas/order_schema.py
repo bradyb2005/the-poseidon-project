@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
 from enum import Enum
+from backend.schemas.cart_schema import OrderItem
 
 class OrderStatus(str, Enum):
     UNPAID = "unpaid"
@@ -43,23 +44,3 @@ class OrderUpdate(BaseModel):
     delivery_longitude: Optional[float] = None
     delivery_postal_code: Optional[str] = None
     delivery_instructions: Optional[str] = None
-=========
-# backend/schemas/order_schema.py
-from pydantic import BaseModel, ConfigDict
-from enum import Enum
-
-# This is a dummy file to allow for review service to be tested
-
-class OrderStatus(str, Enum):
-    PENDING = "pending"
-    COMPLETED = "completed"
-    CANCELLED = "cancelled"
-
-class Order(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: str
-    status: OrderStatus
-    restaurant_id: int
-    customer_id: str
->>>>>>>>> Temporary merge branch 2
