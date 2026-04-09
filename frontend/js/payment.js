@@ -29,29 +29,64 @@ function renderPaymentPage() {
 async function calculate() {
   const price = parseFloat(document.getElementById("price").value);
   const quantity = parseInt(document.getElementById("quantity").value);
+  const calcBox = document.getElementById("calc");
 
-  if (!price || !quantity) return;
+  if (!price || !quantity) {
+    calcBox.innerText = "Enter valid price and quantity";
+    return;
+  }
 
-  currentOrder = { items: [{ price, quantity }] };
+  currentOrder = {
+    items: [{ price_at_time: price, quantity }]
+  };
 
-  const sub = await fetch(`${API_BASE}/payments/subtotal`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(currentOrder)
-  });
+  try {
+    const sub = await fetch(`${API_BASE}/payments/subtotal`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentOrder)
+    });
 
-  const subData = await sub.json();
+    const subData = await sub.json();
 
-  const total = await fetch(`${API_BASE}/payments/total?subtotal=${subData.subtotal}`, {
-    method: "POST"
-  });
+    if (!sub.ok) {
+      calcBox.innerText = JSON.stringify(subData);
+      return;
+    }
 
-  const totalData = await total.json();
+    const subtotal = subData.subtotal ?? subData._subtotal;
 
-  currentTotal = totalData.total;
+    const total = await fetch(`${API_BASE}/payments/total`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(subtotal)
+    });
 
-  document.getElementById("calc").innerText =
-    `Total: $${currentTotal}`;
+    const totalData = await total.json();
+
+    if (!total.ok) {
+      calcBox.innerText = JSON.stringify(totalData);
+      return;
+    }
+
+    const breakdownSubtotal = totalData.subtotal ?? totalData._subtotal;
+    const deliveryFee = totalData.delivery_fee ?? totalData._delivery_fee;
+    const serviceFee = totalData.service_fee ?? totalData._service_fee;
+    const tax = totalData.tax ?? totalData._tax;
+    const grandTotal = totalData.total ?? totalData._total;
+
+    currentTotal = grandTotal;
+
+    calcBox.innerText =
+      `Subtotal: $${breakdownSubtotal}
+Delivery Fee: $${deliveryFee}
+Service Fee: $${serviceFee}
+Tax: $${tax}
+Total: $${grandTotal}`;
+  } catch (err) {
+    console.error(err);
+    calcBox.innerText = "Error connecting to backend";
+  }
 }
 
 async function pay() {
@@ -66,30 +101,40 @@ async function pay() {
     id: Date.now(),
     order: currentOrder,
     card_name: document.getElementById("card_name").value,
-    card_number: document.getElementById("card_number").value, // STRING ✅
-    security_number: document.getElementById("cvv").value,
+    card_number: parseInt(document.getElementById("card_number").value),
+    security_number: parseInt(document.getElementById("cvv").value),
     expiration: document.getElementById("expiry").value,
-    status: "pending", // ✅
+    status: "denied",
     amount: currentTotal
   };
 
-  const res = await fetch(`${API_BASE}/payments/process`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(payload)
-  });
-
-  const data = await res.json();
-
-  if (data.status === "accepted") {
-    await fetch(`${API_BASE}/payments/fulfillment`, {
+  try {
+    const res = await fetch(`${API_BASE}/payments/process`, {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(data)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
 
-    msg.innerText = "Success 🎉";
-  } else {
-    msg.innerText = "Denied";
+    const data = await res.json();
+
+    if (!res.ok) {
+      msg.innerText = JSON.stringify(data);
+      return;
+    }
+
+    if ((data.status ?? data._status) === "accepted") {
+      await fetch(`${API_BASE}/payments/fulfillment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      msg.innerText = "Success 🎉";
+    } else {
+      msg.innerText = "Denied";
+    }
+  } catch (err) {
+    console.error(err);
+    msg.innerText = "Error processing payment";
   }
 }
