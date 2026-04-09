@@ -17,9 +17,9 @@ async function handleSearch(event) {
  * @param {string} query - The search term or tag name
  * @param {boolean} isTag - Whether the query is a specific tag filter
  */
-async function renderSearchResults(query, isTag = false, page = 1) {
+async function renderSearchResults(query, isTag = false) {
     const root = document.getElementById('app-root');
-    
+    const page = 1; // For pagination, if needed
 
     root.innerHTML = `
         <div class="loading-container">
@@ -48,7 +48,7 @@ async function renderSearchResults(query, isTag = false, page = 1) {
                     <button class="back-link" onclick="renderHomepage()">← Back to Home</button>
                 </div>
 
-                <div class="results-grid">
+                <div class="res-grid">
                     ${data.items && data.items.length > 0 ? data.items.map(item => `
                         <div class="item-card-mini" onclick="viewRestaurant(${item.restaurant_id})">
                             <span class="price">$${parseFloat(item.price).toFixed(2)}</span>
@@ -70,6 +70,11 @@ async function renderSearchResults(query, isTag = false, page = 1) {
             </div>
         `;
     } catch (err) {
-        root.innerHTML = `<p class="error">The sea is too rough: ${err.message}</p>`;
+        root.innerHTML = `
+            <div class="error-box">
+                <p>The sea is too rough: ${err.message}</p>
+                <button class="view-btn" onclick="renderHomepage()">Return to Port</button>
+            </div>
+        `;
     }
 }
