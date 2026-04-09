@@ -64,6 +64,11 @@ async function handleRegister() {
     return;
   }
 
+  if (!email.includes("@") || !email.includes(".")) {
+    showMessage(msg, "Please enter a valid email address.", "error");
+    return;
+  }
+
   if (password.length < 6) {
     showMessage(msg, "Password must be at least 6 characters.", "error");
     return;
